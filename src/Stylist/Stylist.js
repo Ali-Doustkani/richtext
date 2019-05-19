@@ -56,9 +56,9 @@ function affectTheMiddle({ points, text, context, effects, type }) {
   const effect = merge(effects, type)
   const [first, middle, last] = threePieces(text, points, context)
   context
-    .addResult(first)
+    .addResult(first, effects)
     .addResult(middle, effect)
-    .addResult(last)
+    .addResult(last, effects)
 }
 
 function undoMiddle({ points, text, context, effects, type }) {

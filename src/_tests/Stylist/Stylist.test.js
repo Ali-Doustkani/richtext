@@ -213,7 +213,7 @@ it('unbold an italic and bold text', () => {
   ])
 })
 
-it('apply style to an existing one', () => {
+it('apply style to another part of text', () => {
   expect(
     style({
       type: style.italic,
@@ -225,5 +225,19 @@ it('apply style to an existing one', () => {
     { text: 'hello', effects: [style.bold] },
     { text: ' ' },
     { text: 'world', effects: [style.italic] }
+  ])
+})
+
+it('apply style to a part that already contains style', () => {
+  expect(
+    style({
+      type: style.bold,
+      input: [{ text: 'hello world', effects: [style.italic] }],
+      from: 6,
+      to: 11
+    })
+  ).toEqual([
+    { text: 'hello ', effects: [style.italic] },
+    { text: 'world', effects: [style.italic, style.bold] }
   ])
 })
