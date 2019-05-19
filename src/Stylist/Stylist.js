@@ -71,9 +71,9 @@ function undoMiddle({ points, text, context, effects, type }) {
     .addResult(last, effects)
 }
 
-function takeTheFirstPart({ points, text, context }) {
+function takeTheFirstPart({ points, text, effects, context }) {
   const [first, second] = twoPieces(text, points.from, context)
-  context.addResult(first).buffer(second)
+  context.addResult(first, effects).buffer(second)
 }
 
 function waitForNextPart({ text, context }) {

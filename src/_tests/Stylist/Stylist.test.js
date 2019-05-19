@@ -228,6 +228,25 @@ it('apply style to another part of text', () => {
   ])
 })
 
+it('apply style to a part before existing style', () => {
+  expect(
+    style({
+      type: style.italic,
+      input: [
+        { text: 'first ' },
+        { text: 'second ', effects: [style.bold] },
+        { text: 'third' }
+      ],
+      from: 0,
+      to: 6
+    })
+  ).toEqual([
+    { text: 'first ', effects: [style.italic] },
+    { text: 'second ', effects: [style.bold] },
+    { text: 'third' }
+  ])
+})
+
 it('apply style to a part that already contains style', () => {
   expect(
     style({
@@ -239,5 +258,24 @@ it('apply style to a part that already contains style', () => {
   ).toEqual([
     { text: 'hello ', effects: [style.italic] },
     { text: 'world', effects: [style.italic, style.bold] }
+  ])
+})
+
+it('apply style to a part after existing style', () => {
+  expect(
+    style({
+      type: style.italic,
+      input: [
+        { text: 'first ' },
+        { text: 'second ', effects: [style.bold] },
+        { text: 'third' }
+      ],
+      from: 13,
+      to: 18
+    })
+  ).toEqual([
+    { text: 'first ' },
+    { text: 'second ', effects: [style.bold] },
+    { text: 'third', effects: [style.italic] }
   ])
 })
