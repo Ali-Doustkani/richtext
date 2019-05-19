@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Richtext</title>
+    <style>
+      #editor {
+        background-color: rgba(255, 255, 255, 0.89);
+        border: 1px solid black;
+        margin: 0 10px;
+        padding: 5px;
+      }
+      .text-highlight {
+        background-color: crimson;
+        padding: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>Type Here:</h3>
+    <button id="bold">Bold</button>
+    <button id="italic">Italic</button>
+    <button id="highlight">Highlight</button>
+    <div id="editor" contenteditable="true"></div>
+    <script src="index.js"></script>
+  </body>
+</html>

@@ -1,0 +1,23 @@
+{
+  "name": "richtext",
+  "private": true,
+  "version": "1.0.0",
+  "main": "Richtext.js",
+  "scripts": {
+    "test-selection": "parcel ./src/_tests/UITests/Selection/index.html",
+    "test-richtext": "parcel ./src/_tests/UITests/Richtext/index.html",
+    "test": "jest --watchAll",
+    "start": "parcel ./src/_view/index.html",
+    "build": "parcel build ./src/richtext.js"
+  },
+  "author": "Ali Doustkani",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.4.4",
+    "@babel/preset-env": "^7.4.4",
+    "jest": "^24.8.0"
+  },
+  "dependencies": {
+    "parcel-bundler": "^1.12.3"
+  }
+}
