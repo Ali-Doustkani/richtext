@@ -1,6 +1,6 @@
 import style from './Stylist/Stylist'
 
-richedit.init = function(options) {
+richtext.init = function(options) {
   const initObj = {}
   for (let prop in options) {
     if (typeof options[prop] === 'string') {
@@ -8,19 +8,54 @@ richedit.init = function(options) {
     } else {
       initObj[prop] = options[prop]
     }
-    richedit[prop] = prop
+    richtext[prop] = prop
   }
   style.init(initObj)
 }
 
-function richedit(editor) {
+function richtext(editor) {
+  // check editor contentEditable
+  if (!editor.children.length) {
+    const p = document.createElement('p')
+    p.contentEditable = true
+    editor.appendChild(p)
+  }
+  if (editor.firstChild.nodeName !== 'P') {
+    throw new Error('only <p> element is valid inside editor')
+  }
+  editor.addEventListener(
+    'keydown',
+    e => {
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        console.log('keydown enter')
+      }
+    },
+    true
+  )
+  editor.addEventListener(
+    'keyup',
+    e => {
+      console.log('keyup enter')
+      e.stopPropagation()
+      if (e.key === 'Enter') {
+        const newP = document.createElement('p')
+        newP.contentEditable = true
+        editor.appendChild(newP)
+        newP.focus()
+      }
+    },
+    true
+  )
+
   return {
     apply: function(start, end, styleName) {
+      const currentParagraph = document.activeElement
       render(
-        editor,
+        currentParagraph,
         style({
           type: style[styleName],
-          input: restore(editor),
+          input: restore(currentParagraph),
           from: start,
           to: end
         })
@@ -29,9 +64,9 @@ function richedit(editor) {
   }
 }
 
-function restore(div) {
+function restore(paragraph) {
   const ret = []
-  let node = div.firstChild
+  let node = paragraph.firstChild
   while (node !== null) {
     ret.push(drillDown(node, []))
     node = node.nextSibling
@@ -57,20 +92,20 @@ function getType(nodeName) {
       return style[prop]
     }
   }
-  throw new Error('Unsupported nodeName')
+  throw new Error('Unsupported nodeName: ' + nodeName)
 }
 
-function render(editor, model) {
-  editor.innerHTML = ''
+function render(paragraph, model) {
+  paragraph.innerHTML = ''
   model.forEach(item => {
     if (!item.effects) {
-      editor.appendChild(el(item.text))
+      paragraph.appendChild(el(item.text))
     } else {
       let element = item.text
       item.effects.forEach(effect => {
         element = el(effect).value(element)
       })
-      editor.appendChild(element)
+      paragraph.appendChild(element)
     }
   })
 }
@@ -95,4 +130,4 @@ function el(option) {
   }
 }
 
-export { restore, richedit }
+export { restore, richtext }
