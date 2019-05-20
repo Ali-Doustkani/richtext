@@ -36,7 +36,7 @@ function style(options) {
     }
   })
 
-  return context.flush().result()
+  return context.result()
 }
 
 function dontTouch({ text, effects, context }) {
@@ -50,7 +50,7 @@ function takeAll({ text, effects, type, context, undo }) {
   } else {
     effective = merge(effects, type)
   }
-  context.flush(effective).addResult(text, effective)
+  context.addResult(text, effective)
 }
 
 function takeMiddlePart({ points, text, context, effects, type, undo }) {
@@ -62,9 +62,10 @@ function takeMiddlePart({ points, text, context, effects, type, undo }) {
     .addResult(last, effects)
 }
 
-function takeFirstPart({ points, text, effects, context }) {
+function takeFirstPart({ points, text, effects, type, context }) {
   const [first, second] = twoPieces(text, points.from, context)
-  context.addResult(first, effects).buffer(second)
+  const effective = merge(effects, type)
+  context.addResult(first, effects).addResult(second, effective)
 }
 
 function takeSecondPart({
@@ -83,8 +84,7 @@ function takeSecondPart({
   }
   const [first, second] = twoPieces(text, points.to, context)
   context
-    .buffer(first)
-    .flush(effective)
+    .addResult(first, effective)
     .addResult(second, effects)
 }
 
