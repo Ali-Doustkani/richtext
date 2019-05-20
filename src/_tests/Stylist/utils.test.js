@@ -42,10 +42,14 @@ test('remove item from array', () => {
 })
 
 test('merge an element to an array, with no duplicate', () => {
-  const array = [1, 2, 3]
-  const result = merge(array, 3)
+  // const array = [1, 2, 3]
+  const bold = { tag: 'strong' }
+  const italic = { tag: 'i' }
+  const highlight = { tag: 'div' }
+  const array = [bold, italic]
+  const result = merge(array, highlight)
   expect(result).not.toBe(array)
-  expect(result).toEqual([1, 2, 3])
+  expect(result).toEqual([bold, italic, highlight])
 })
 
 test('merge element with no array', () => {

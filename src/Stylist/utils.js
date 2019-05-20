@@ -45,6 +45,16 @@ function merge(array, element) {
   return [...array.filter(item => item !== element), element]
 }
 
+function merge2(array, element) {
+  if (!array) {
+    return [element]
+  }
+  if (array.includes(element)) {
+    return [...array.filter(item => item !== element)]
+  }
+  return [...array.filter(item => item !== element), element]
+}
+
 function areEqual(first, second) {
   // if they are empty array set them to undefined
   first = first && first.length ? first : undefined
@@ -60,4 +70,4 @@ function areEqual(first, second) {
   return first.every(item => second.includes(item))
 }
 
-export { remove, merge, areEqual, decide }
+export { remove, merge,merge2,  areEqual, decide }

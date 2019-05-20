@@ -71,17 +71,42 @@ function createContext(from, to) {
       func(text, effects, readLength)
     }
   }
-  ret.regionIsUntouched = function() {
-    return readLength < from || state.head >= to
+  ret.regionUntouched = () => {
+    return readLength <= from || state.head >= to
   }
+  ret.region0Part = () => {
+    return readLength <= to && state.head >= from
+  }
+  ret.undoable = (effects, type) => {
+    return (
+      state.head === from &&
+      readLength === to &&
+      effects &&
+      effects.includes(type)
+    )
+  }
+  ret.region3Parts = () => {
+    const [head, len] = [state.head, readLength]
+    const leftHandedTrio = head < from && from < len && to <= len
+    const rightHandedTrio = head <= from && from < len && to < len
+    return leftHandedTrio || rightHandedTrio
+  }
+  ret.regionFirstEffectiveOf2Parts = () => {
+    const first = state.head <= from && readLength < to
+    const second = state.head < from && readLength <= to
+    return first || second
+  }
+  ret.regionSecondEffectiveOf2Parts = () => {
+    const first = from <= state.head && readLength > to
+    const second = from < state.head && readLength >= to
+    return first || second
+  }
+
   ret.regionBeginAndEnds = function() {
     return state.head <= from && state.head >= to - currentTextLength
   }
   ret.regionIsBeginning = function() {
     return readLength <= to && state.head < from
-  }
-  ret.regionInTheMiddle = function() {
-    return readLength <= to && state.head >= from
   }
   ret.regionIsEnding = function() {
     return readLength > to

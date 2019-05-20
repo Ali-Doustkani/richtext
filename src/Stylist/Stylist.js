@@ -1,5 +1,5 @@
 import createContext from './context'
-import { remove, merge, decide } from './utils'
+import { merge, merge2, remove } from './utils'
 
 function check(options) {
   if (options) {
@@ -15,78 +15,77 @@ function style(options) {
   const { input, from, to, type } = check(options)
   const context = createContext(from, to)
   context.iterateOver(input, (text, effects) => {
-    decide(() => effects === undefined || !effects.includes(type))
-      .withArgument({
-        points: { from: options.from, to: options.to },
-        context,
-        text,
-        effects,
-        type
-      })
-      .when(context.regionIsUntouched)
-      .doWith(passIt)
-      .orUndoWith(undo)
-      .when(context.regionBeginAndEnds)
-      .doWith(affectTheMiddle)
-      .orUndoWith(undoMiddle)
-      .when(context.regionIsBeginning)
-      .doWith(takeTheFirstPart)
-      .orUndoWith(undo)
-      .when(context.regionInTheMiddle)
-      .doWith(waitForNextPart)
-      .orUndoWith(undo)
-      .when(context.regionIsEnding)
-      .doWith(finalizeWithTheSecondPart)
-      .orUndoWith(undo)
+    const arg = {
+      points: { from: options.from, to: options.to },
+      context,
+      text,
+      effects,
+      type,
+      undo: context.undoable(effects, type)
+    }
+    if (context.regionUntouched()) {
+      dontTouch(arg)
+    } else if (context.region0Part()) {
+      takeAll(arg)
+    } else if (context.region3Parts()) {
+      takeMiddlePart(arg)
+    } else if (context.regionFirstEffectiveOf2Parts()) {
+      takeFirstPart(arg)
+    } else if (context.regionSecondEffectiveOf2Parts()) {
+      takeSecondPart(arg)
+    }
   })
 
   return context.flush().result()
 }
 
-function undo({ text, effects, type, context }) {
-  const effective = merge(effects, type)
-  context.flush(effective).addResult(text, effective)
-}
-
-function passIt({ text, effects, context }) {
+function dontTouch({ text, effects, context }) {
   context.addResult(text, effects)
 }
 
-function affectTheMiddle({ points, text, context, effects, type }) {
-  const effect = merge(effects, type)
-  const [first, middle, last] = threePieces(text, points, context)
-  context
-    .addResult(first, effects)
-    .addResult(middle, effect)
-    .addResult(last, effects)
+function takeAll({ text, effects, type, context, undo }) {
+  let effective
+  if (undo) {
+    effective = remove(effects, type)
+  } else {
+    effective = merge(effects, type)
+  }
+  context.flush(effective).addResult(text, effective)
 }
 
-function undoMiddle({ points, text, context, effects, type }) {
-  const effective = remove(effects, type)
+function takeMiddlePart({ points, text, context, effects, type, undo }) {
+  const effective = merge2(effects, type)
   const [first, middle, last] = threePieces(text, points, context)
-  context.flush(effects)
   context
     .addResult(first, effects)
     .addResult(middle, effective)
     .addResult(last, effects)
 }
 
-function takeTheFirstPart({ points, text, effects, context }) {
+function takeFirstPart({ points, text, effects, context }) {
   const [first, second] = twoPieces(text, points.from, context)
   context.addResult(first, effects).buffer(second)
 }
 
-function waitForNextPart({ text, context }) {
-  context.buffer(text)
-}
-
-function finalizeWithTheSecondPart({ points, text, context, effects, type }) {
-  const effective = merge(effects, type)
+function takeSecondPart({
+  points,
+  text,
+  context,
+  effects,
+  type,
+  undo
+}) {
+  let effective
+  if (undo) {
+    effective = remove(effects, type)
+  } else {
+    effective = merge(effects, type)
+  }
   const [first, second] = twoPieces(text, points.to, context)
   context
     .buffer(first)
     .flush(effective)
-    .addResult(second)
+    .addResult(second, effects)
 }
 
 function twoPieces(item, point, context) {
