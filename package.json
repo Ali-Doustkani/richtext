@@ -16,9 +16,8 @@
     "@babel/core": "^7.4.4",
     "@babel/preset-env": "^7.4.4",
     "dom-testing-library": "^4.1.0",
-    "jest": "^24.8.0"
-  },
-  "dependencies": {
+    "jest": "^24.8.0",
     "parcel-bundler": "^1.12.3"
-  }
+  },
+  "dependencies": {}
 }
