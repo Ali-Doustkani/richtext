@@ -30,6 +30,16 @@ function type(value) {
     sandbox.firstChild.focus()
   }
   document.activeElement.innerHTML += value
+  setCaret(document.activeElement.textContent.length)
+}
+
+function setCaret(pos) {
+  const current = document.activeElement.firstChild
+  const selection = window.getSelection()
+  const range = document.createRange()
+  range.setStart(current, pos)
+  selection.removeAllRanges()
+  selection.addRange(range)
 }
 
 function enter() {
@@ -37,4 +47,4 @@ function enter() {
   fireEvent.keyUp(sandbox.firstChild, { key: 'Enter', code: 13 })
 }
 
-export { initDOM, render, html, getEditor, type, enter }
+export { initDOM, render, html, getEditor, type, enter, setCaret }

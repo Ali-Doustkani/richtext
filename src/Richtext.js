@@ -13,34 +13,37 @@ richtext.init = function(options) {
   style.init(initObj)
 }
 
-function richtext(editor) {
-  // check editor contentEditable
+function checkEditor(editor) {
+  if (editor.contentEditable === true) {
+    throw new Error('the contentEditable of <div> editor must be false')
+  }
   if (!editor.children.length) {
-    const p = document.createElement('p')
-    p.contentEditable = true
-    editor.appendChild(p)
+    editor.appendChild(p())
   }
   if (editor.firstChild.nodeName !== 'P') {
     throw new Error('only <p> element is valid inside editor')
   }
+}
+
+function richtext(editor) {
+  checkEditor(editor)
+
   editor.addEventListener(
     'keydown',
     e => {
       if (e.key === 'Enter') {
         e.preventDefault()
-        console.log('keydown enter')
       }
     },
     true
   )
+
   editor.addEventListener(
     'keyup',
     e => {
-      console.log('keyup enter')
-      e.stopPropagation()
       if (e.key === 'Enter') {
-        const newP = document.createElement('p')
-        newP.contentEditable = true
+        e.stopPropagation()
+        const newP = p()
         editor.appendChild(newP)
         newP.focus()
       }
@@ -49,8 +52,11 @@ function richtext(editor) {
   )
 
   return {
-    apply: function(start, end, styleName) {
+    apply: (start, end, styleName) => {
       const currentParagraph = document.activeElement
+      if (currentParagraph.parentElement !== editor) {
+        return
+      }
       render(
         currentParagraph,
         style({
@@ -128,6 +134,12 @@ function el(option) {
       return element
     }
   }
+}
+
+function p() {
+  const paragraph = document.createElement('p')
+  paragraph.contentEditable = true
+  return paragraph
 }
 
 export { restore, richtext }

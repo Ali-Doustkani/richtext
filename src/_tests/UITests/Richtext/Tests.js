@@ -1,6 +1,6 @@
 import { restore, richtext } from '../../../Richtext'
 import style from './../../../Stylist/Stylist'
-import { initDOM, render, html, getEditor, type, enter } from './utils'
+import { initDOM, render, html, getEditor, type, enter, setCaret } from './utils'
 
 QUnit.moduleStart(() => {
   richtext.init({
@@ -61,10 +61,20 @@ QUnit.test('enter multiple paragraphs', assert => {
 })
 
 QUnit.test('style something from second paragraph', assert => {
-  const editor = richtext(getEditor())
+  const a = getEditor()
+  const editor = richtext(a)
   type('1st')
   enter()
   type('second')
   editor.apply(0, 6, richtext.bold)
   assert.equal(html(), '<p>1st</p><p><b>second</b></p>')
+})
+
+QUnit.test('if editor has not focus then do nothing', assert => {
+  const editor = richtext(render('hello world'))
+  const input = document.createElement('input')
+  document.body.appendChild(input)
+  input.focus()
+  editor.apply(0, 5, richtext.bold)
+  assert.equal(html(), '<p>hello world</p>')
 })
