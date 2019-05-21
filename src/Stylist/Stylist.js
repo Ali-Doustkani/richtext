@@ -1,5 +1,5 @@
 import createContext from './context'
-import { merge, merge2, remove } from './utils'
+import { merge, merge2, remove, when } from './utils'
 
 function check(options) {
   if (options) {
@@ -15,97 +15,57 @@ function style(options) {
   const { input, from, to, type } = check(options)
   const context = createContext(from, to)
   context.iterateOver(input, (text, effects) => {
-    const arg = {
-      points: { from: options.from, to: options.to },
-      context,
-      text,
-      effects,
-      type,
-      undo: context.undoable(effects, type)
-    }
-    if (context.regionUntouched()) {
-      dontTouch(arg)
-    } else if (context.region0Part()) {
-      takeAll(arg)
-    } else if (context.region3Parts()) {
-      takeMiddlePart(arg)
-    } else if (context.regionFirstEffectiveOf2Parts()) {
-      takeFirstPart(arg)
-    } else if (context.regionSecondEffectiveOf2Parts()) {
-      takeSecondPart(arg)
-    }
+    when(context.regionUntouched)
+      .then(dontTouch)
+      .otherwise(context.region0Part)
+      .then(takeAll)
+      .otherwise(context.region3Parts)
+      .then(takeMiddlePart)
+      .otherwise(context.regionFirstEffectiveOf2Parts)
+      .then(takeFirstPart)
+      .otherwise(context.regionSecondEffectiveOf2Parts)
+      .then(takeSecondPart)
+      .run({ context, text, effects, type })
   })
 
   return context.result()
 }
 
-function dontTouch({ text, effects, context }) {
+function dontTouch({ context, text, effects }) {
   context.addResult(text, effects)
 }
 
-function takeAll({ text, effects, type, context, undo }) {
-  let effective
-  if (undo) {
-    effective = remove(effects, type)
-  } else {
-    effective = merge(effects, type)
-  }
+function takeAll({ context, text, effects, type }) {
+  const effective = context.mustUndo(effects, type)
+    ? remove(effects, type)
+    : merge(effects, type)
   context.addResult(text, effective)
 }
 
-function takeMiddlePart({ points, text, context, effects, type, undo }) {
+function takeMiddlePart({ context, text, effects, type }) {
   const effective = merge2(effects, type)
-  const [first, middle, last] = threePieces(text, points, context)
+  const [first, middle, last] = context.threePieces(text)
   context
     .addResult(first, effects)
     .addResult(middle, effective)
     .addResult(last, effects)
 }
 
-function takeFirstPart({ points, text, effects, type, context }) {
-  const [first, second] = twoPieces(text, points.from, context)
+function takeFirstPart({ context, text, effects, type }) {
+  const [first, second] = context.twoPieces(text)
   const effective = merge(effects, type)
   context.addResult(first, effects).addResult(second, effective)
 }
 
-function takeSecondPart({
-  points,
-  text,
-  context,
-  effects,
-  type,
-  undo
-}) {
-  let effective
-  if (undo) {
-    effective = remove(effects, type)
-  } else {
-    effective = merge(effects, type)
-  }
-  const [first, second] = twoPieces(text, points.to, context)
-  context
-    .addResult(first, effective)
-    .addResult(second, effects)
+function takeSecondPart({ context, text, effects, type }) {
+  const effective = context.mustUndo(effects, type)
+    ? remove(effects, type)
+    : merge(effects, type)
+  const [first, second] = context.twoPieces(text)
+  context.addResult(first, effective).addResult(second, effects)
 }
 
-function twoPieces(item, point, context) {
-  return [
-    item.slice(0, point - context.head()),
-    item.slice(point - context.head())
-  ]
-}
-
-function threePieces(value, point, context) {
-  const from = point.from - context.head()
-  const to = point.to - context.head()
-  return [
-    value.slice(0, from),
-    value.slice(from, to),
-    value.slice(to, value.length)
-  ]
-}
-
-style.init = function(options) {
+style.init = options => {
   for (let styleName in options) {
     Object.defineProperty(style, styleName, {
       enumerable: true,

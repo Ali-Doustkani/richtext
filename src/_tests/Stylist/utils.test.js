@@ -1,37 +1,20 @@
-import { decide, remove, merge } from '../../Stylist/utils'
+import { remove, merge, when } from '../../Stylist/utils'
 
-test.each`
-  decideVal | whenVal  | doCalledVal | undoCalledVal
-  ${true}   | ${false} | ${false}    | ${false}
-  ${false}  | ${false} | ${false}    | ${false}
-  ${true}   | ${true}  | ${true}     | ${false}
-  ${false}  | ${true}  | ${false}    | ${true}
-`(
-  '$takeVal, $whenVal',
-  ({ decideVal, whenVal, doCalledVal, undoCalledVal }) => {
-    let doCalled = false
-    let undoCalled = false
-    decide(() => decideVal)
-      .withArgument()
-      .when(() => whenVal)
-      .doWith(() => (doCalled = true))
-      .orUndoWith(() => (undoCalled = true))
-    expect(doCalled).toBe(doCalledVal)
-    expect(undoCalled).toBe(undoCalledVal)
-  }
-)
+test('when', () => {
+  const cond1 = () => true
+  const cond2 = () => true
+  const cond3 = () => false
+  let output
 
-test("when act is done don't run anymore", () => {
-  let count = 0
-  decide(() => true)
-    .withArgument()
-    .when(() => true)
-    .doWith(() => count++)
-    .orUndoWith(() => count++)
-    .when(() => false)
-    .doWith(() => count++)
-    .orUndoWith(() => count++)
-  expect(count).toBe(1)
+  when(cond1)
+    .then(() => (output = 1))
+    .otherwise(cond2)
+    .then(() => (output = 2))
+    .otherwise(cond3)
+    .then(() => (output = 3))
+    .run()
+
+  expect(output).toBe(1)
 })
 
 test('remove item from array', () => {

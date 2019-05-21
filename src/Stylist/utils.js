@@ -1,35 +1,32 @@
-// if 'when' expression is true then run the 'doWith' or 'undoWith' based 'decide' expression result
-function decide(test) {
-  let ran = false
-  let theArg = undefined
-  const takeValue = test()
-  const ifObj = {}
-  ifObj.when = func => {
-    const ifResult = func()
-    return {
-      doWith: doFunc => {
-        if (!ran && takeValue && ifResult) {
-          ran = true
-          doFunc(theArg)
-        }
-        return {
-          orUndoWith: undoFunc => {
-            if (!ran && !takeValue && ifResult) {
-              ran = true
-              undoFunc(theArg)
-            }
-            return ifObj
-          }
+function when(condition) {
+  const conditions = [condition]
+  const results = []
+  const otherwiseObj = {
+    otherwise: condition => {
+      conditions.push(condition)
+      return thenObj
+    },
+    run: arg => {
+      if (conditions.length !== results.length) {
+        throw new Error(
+          'there must be equal number of "when expressions" and "then expressions"'
+        )
+      }
+      for (let i = 0; i < conditions.length; i++) {
+        if (conditions[i]()) {
+          results[i](arg)
+          break
         }
       }
     }
   }
-  return {
-    withArgument: arg => {
-      theArg = arg
-      return ifObj
+  const thenObj = {
+    then: result => {
+      results.push(result)
+      return otherwiseObj
     }
   }
+  return thenObj
 }
 
 // remove the element from array
@@ -70,4 +67,4 @@ function areEqual(first, second) {
   return first.every(item => second.includes(item))
 }
 
-export { remove, merge,merge2,  areEqual, decide }
+export { remove, merge, merge2, areEqual, when }
