@@ -1,5 +1,5 @@
 import createContext from './context'
-import { merge, merge2, remove, when } from './utils'
+import { merge, remove, when } from './utils'
 
 function check(options) {
   if (options) {
@@ -48,7 +48,9 @@ function takeAll({ context, text, effects, type }) {
 }
 
 function takeMiddlePart({ context, text, effects, type }) {
-  const effective = merge2(effects, type)
+  const effective = context.mustUndo(effects, type)
+    ? remove(effects, type)
+    : merge(effects, type)
   const [first, middle, last] = context.threePieces(text)
   context
     .addResult(first, effects)

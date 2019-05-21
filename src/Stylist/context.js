@@ -53,12 +53,19 @@ function createContext(from, to) {
   }
 
   ret.mustUndo = (effects, type) => {
-    return (
+    const a =
       state.head === from &&
       readLength === to &&
       effects &&
       effects.includes(type)
-    )
+    const b =
+      from >= state.head &&
+      to > state.head &&
+      from < readLength &&
+      to <= readLength &&
+      effects &&
+      effects.includes(type)
+    return a || b
   }
 
   ret.region3Parts = () => {
