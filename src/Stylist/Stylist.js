@@ -5,6 +5,11 @@ function check(options) {
   if (options) {
     if (typeof options.input === 'string') {
       options.input = [{ text: options.input }]
+    } else if (
+      typeof options.input === 'object' &&
+      !Array.isArray(options.input)
+    ) {
+      options.input = [options.input]
     }
     return options
   }

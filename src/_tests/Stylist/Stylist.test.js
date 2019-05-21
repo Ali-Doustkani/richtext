@@ -151,7 +151,7 @@ it('unbold an ending section', () => {
   expect(
     style({
       type: style.bold,
-      input: [{ text: 'first second', effects: [style.bold] }],
+      input: { text: 'first second', effects: [style.bold] },
       from: 6,
       to: 12
     })
@@ -202,7 +202,7 @@ it('unbold an italic and bold text', () => {
   expect(
     style({
       type: style.bold,
-      input: [{ text: 'hello world', effects: [style.bold, style.italic] }],
+      input: { text: 'hello world', effects: [style.bold, style.italic] },
       from: 2,
       to: 5
     })
@@ -251,7 +251,7 @@ it('apply style to a part that already contains style', () => {
   expect(
     style({
       type: style.bold,
-      input: [{ text: 'hello world', effects: [style.italic] }],
+      input: { text: 'hello world', effects: [style.italic] },
       from: 6,
       to: 11
     })
@@ -278,4 +278,15 @@ it('apply style to a part after existing style', () => {
     { text: 'second ', effects: [style.bold] },
     { text: 'third', effects: [style.italic] }
   ])
+})
+
+it('return undefined when there is no effect', () => {
+  expect(
+    style({
+      type: style.bold,
+      input: { text: 'hello', effects: [style.bold] },
+      from: 0,
+      to: 5
+    })
+  ).toEqual([{ text: 'hello' }])
 })
