@@ -1,5 +1,5 @@
 import createContext from './context'
-import { merge, remove, when } from './utils'
+import { when } from './utils'
 
 function check(options) {
   if (options) {
@@ -19,7 +19,7 @@ function check(options) {
 function style(options) {
   const { input, from, to, type } = check(options)
   const context = createContext(from, to)
-  context.iterateOver(input, (text, effects) => {
+  context.iterateOver(input, type, (text, originalEffects, newEffects) => {
     when(context.regionUntouched)
       .then(dontTouch)
       .otherwise(context.region0Part)
@@ -30,46 +30,36 @@ function style(options) {
       .then(takeFirstPart)
       .otherwise(context.regionSecondEffectiveOf2Parts)
       .then(takeSecondPart)
-      .run({ context, text, effects, type })
+      .run({ context, text, originalEffects, newEffects })
   })
 
   return context.result()
 }
 
-function dontTouch({ context, text, effects }) {
-  context.addResult(text, effects)
+function dontTouch({ context, text, originalEffects }) {
+  context.addResult(text, originalEffects)
 }
 
-function takeAll({ context, text, effects, type }) {
-  const effective = context.mustUndo(effects, type)
-    ? remove(effects, type)
-    : merge(effects, type)
-  context.addResult(text, effective)
+function takeAll({ context, text, newEffects }) {
+  context.addResult(text, newEffects)
 }
 
-function takeMiddlePart({ context, text, effects, type }) {
-  const effective = context.mustUndo(effects, type)
-    ? remove(effects, type)
-    : merge(effects, type)
+function takeMiddlePart({ context, text, originalEffects, newEffects }) {
   const [first, middle, last] = context.threePieces(text)
   context
-    .addResult(first, effects)
-    .addResult(middle, effective)
-    .addResult(last, effects)
+    .addResult(first, originalEffects)
+    .addResult(middle, newEffects)
+    .addResult(last, originalEffects)
 }
 
-function takeFirstPart({ context, text, effects, type }) {
+function takeFirstPart({ context, text, originalEffects, newEffects }) {
   const [first, second] = context.twoPieces(text)
-  const effective = merge(effects, type)
-  context.addResult(first, effects).addResult(second, effective)
+  context.addResult(first, originalEffects).addResult(second, newEffects)
 }
 
-function takeSecondPart({ context, text, effects, type }) {
-  const effective = context.mustUndo(effects, type)
-    ? remove(effects, type)
-    : merge(effects, type)
+function takeSecondPart({ context, text, originalEffects, newEffects }) {
   const [first, second] = context.twoPieces(text)
-  context.addResult(first, effective).addResult(second, effects)
+  context.addResult(first, newEffects).addResult(second, originalEffects)
 }
 
 style.init = options => {

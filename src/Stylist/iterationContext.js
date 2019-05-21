@@ -1,4 +1,4 @@
-import { areEqual } from './utils'
+import { areEqual, remove, merge } from './utils'
 
 function create(result, head) {
   return Object.freeze({
@@ -24,10 +24,19 @@ function addToResult(state, text, effects) {
 
 function createContext(from, to) {
   let state = create()
-  let readLength = 0
+  let regionHead = 0
   const ret = {}
 
-  ret.head = () => state.head
+  const mustUndo = (effects, type) => {
+    const hasTheEffect = effects && effects.includes(type)
+    const regionFitToPoints = state.head === from && regionHead === to
+    const pointsAreInRegion =
+      from >= state.head &&
+      to > state.head &&
+      from < regionHead &&
+      to <= regionHead
+    return hasTheEffect && (regionFitToPoints || pointsAreInRegion)
+  }
 
   ret.result = () => state.result
 
@@ -36,54 +45,41 @@ function createContext(from, to) {
     return ret
   }
 
-  ret.iterateOver = (array, func) => {
-    for (let i = 0; i < array.length; i++) {
-      const { text, effects } = array[i]
-      readLength += text.length
-      func(text, effects, readLength)
+  ret.iterateOver = (input, type, func) => {
+    for (let i = 0; i < input.length; i++) {
+      const { text, effects } = input[i]
+      regionHead += text.length
+      const newEffects = mustUndo(effects, type)
+        ? remove(effects, type)
+        : merge(effects, type)
+      func(text, effects, newEffects)
     }
   }
 
   ret.regionUntouched = () => {
-    return readLength <= from || state.head >= to
+    return regionHead <= from || state.head >= to
   }
 
   ret.region0Part = () => {
-    return readLength <= to && state.head >= from
-  }
-
-  ret.mustUndo = (effects, type) => {
-    const a =
-      state.head === from &&
-      readLength === to &&
-      effects &&
-      effects.includes(type)
-    const b =
-      from >= state.head &&
-      to > state.head &&
-      from < readLength &&
-      to <= readLength &&
-      effects &&
-      effects.includes(type)
-    return a || b
+    return regionHead <= to && state.head >= from
   }
 
   ret.region3Parts = () => {
-    const [head, len] = [state.head, readLength]
+    const [head, len] = [state.head, regionHead]
     const leftHandedTrio = head < from && from < len && to <= len
     const rightHandedTrio = head <= from && from < len && to < len
     return leftHandedTrio || rightHandedTrio
   }
 
   ret.regionFirstEffectiveOf2Parts = () => {
-    const first = state.head <= from && readLength < to
-    const second = state.head < from && readLength <= to
+    const first = state.head <= from && regionHead < to
+    const second = state.head < from && regionHead <= to
     return first || second
   }
 
   ret.regionSecondEffectiveOf2Parts = () => {
-    const first = from <= state.head && readLength > to
-    const second = from < state.head && readLength >= to
+    const first = from <= state.head && regionHead > to
+    const second = from < state.head && regionHead >= to
     return first || second
   }
 
@@ -94,7 +90,7 @@ function createContext(from, to) {
   }
 
   ret.twoPieces = text => {
-    const p = state.head <= from && from < readLength ? from : to
+    const p = state.head <= from && from < regionHead ? from : to
     return [text.slice(0, p - state.head), text.slice(p - state.head)]
   }
 
