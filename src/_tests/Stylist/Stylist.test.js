@@ -290,3 +290,25 @@ it('return undefined when there is no effect', () => {
     })
   ).toEqual([{ text: 'hello' }])
 })
+
+it('bold a long text with different styles inside', () => {
+  expect(
+    style({
+      type: style.bold,
+      input: [
+        { text: 'one' },
+        { text: 'two', effects: [style.italic] },
+        { text: 'three', effects: [style.bold] },
+        { text: 'four' }
+      ],
+      from: 1,
+      to: 14
+    })
+  ).toEqual([
+    { text: 'o' },
+    { text: 'ne', effects: [style.bold] },
+    { text: 'two', effects: [style.italic, style.bold] },
+    { text: 'threefou', effects: [style.bold] },
+    { text: 'r' }
+  ])
+})
