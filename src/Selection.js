@@ -16,11 +16,9 @@ function firstText(node) {
   return firstText(node.firstChild)
 }
 
-function selectionPoints(rootNode) {
-  const sel = window.getSelection().getRangeAt(0)
-
-  if (rootNode === undefined) {
-    rootNode = sel.commonAncestorContainer
+function selectionPoints(rootNode, range) {
+  if (!rootNode) {
+    rootNode = range.commonAncestorContainer
   }
 
   let node = firstText(rootNode),
@@ -30,7 +28,7 @@ function selectionPoints(rootNode) {
 
   const incrementEndOffset = node => (endOffset += node.textContent.length)
   const incrementStartOffset = node => {
-    if (node === sel.startContainer) {
+    if (node === range.startContainer) {
       enoughReadingForStart = true
     }
     if (!enoughReadingForStart) {
@@ -38,15 +36,15 @@ function selectionPoints(rootNode) {
     }
   }
 
-  while (node !== sel.endContainer) {
+  while (node !== range.endContainer) {
     incrementEndOffset(node)
     incrementStartOffset(node)
     node = nextText(node)
   }
 
   return {
-    start: startOffset + sel.startOffset,
-    end: endOffset + sel.endOffset
+    start: startOffset + range.startOffset,
+    end: endOffset + range.endOffset
   }
 }
 

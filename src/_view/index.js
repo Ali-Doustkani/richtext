@@ -19,18 +19,27 @@ function mouseDown(e) {
 
 document.getElementById('bold').onmousedown = mouseDown
 document.getElementById('bold').onclick = () => {
-  const sel = selectionPoints(document.activeElement)
+  const sel = selectionPoints(
+    document.activeElement,
+    window.getSelection().getRangeAt(0)
+  )
   editor.apply(sel.start, sel.end, richtext.bold)
 }
 
 document.getElementById('italic').onmousedown = mouseDown
 document.getElementById('italic').onclick = () => {
-  const sel = selectionPoints(document.activeElement)
+  const sel = selectionPoints(
+    document.activeElement,
+    window.getSelection().getRangeAt(0)
+  )
   editor.apply(sel.start, sel.end, richtext.italic)
 }
 
 document.getElementById('highlight').onmousedown = mouseDown
 document.getElementById('highlight').onclick = () => {
-  const sel = selectionPoints(document.activeElement)
+  const sel = selectionPoints(
+    document.activeElement,
+    window.getSelection().getRangeAt(0)
+  )
   editor.apply(sel.start, sel.end, richtext.highlight)
 }
