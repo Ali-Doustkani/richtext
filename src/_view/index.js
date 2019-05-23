@@ -1,16 +1,15 @@
-import { richtext } from './../Richtext'
+import createRichtext from './../Richtext'
 import { selectionPoints } from './../Selection'
 
-richtext.init({
+const div = document.getElementById('editor')
+const editor = createRichtext({
   bold: 'b',
   italic: 'i',
   highlight: {
     tag: 'span',
     className: 'text-highlight'
   }
-})
-const div = document.getElementById('editor')
-const editor = richtext(div)
+})(div)
 div.firstChild.focus()
 
 function mouseDown(e) {
@@ -23,7 +22,7 @@ document.getElementById('bold').onclick = () => {
     document.activeElement,
     window.getSelection().getRangeAt(0)
   )
-  editor.apply(sel.start, sel.end, richtext.bold)
+  editor.apply(sel.start, sel.end, 'bold')
 }
 
 document.getElementById('italic').onmousedown = mouseDown
@@ -32,7 +31,7 @@ document.getElementById('italic').onclick = () => {
     document.activeElement,
     window.getSelection().getRangeAt(0)
   )
-  editor.apply(sel.start, sel.end, richtext.italic)
+  editor.apply(sel.start, sel.end, 'italic')
 }
 
 document.getElementById('highlight').onmousedown = mouseDown
@@ -41,5 +40,5 @@ document.getElementById('highlight').onclick = () => {
     document.activeElement,
     window.getSelection().getRangeAt(0)
   )
-  editor.apply(sel.start, sel.end, richtext.highlight)
+  editor.apply(sel.start, sel.end, 'highlight')
 }

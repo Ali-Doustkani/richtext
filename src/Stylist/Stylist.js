@@ -62,13 +62,4 @@ function takeSecondPart({ context, text, originalEffects, newEffects }) {
   context.addResult(first, newEffects).addResult(second, originalEffects)
 }
 
-style.init = options => {
-  for (let styleName in options) {
-    Object.defineProperty(style, styleName, {
-      enumerable: true,
-      value: options[styleName]
-    })
-  }
-}
-
 export default style
