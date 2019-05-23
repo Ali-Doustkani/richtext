@@ -24,15 +24,14 @@ test('remove item from array', () => {
   expect(result).toEqual([1, 3])
 })
 
-test('merge an element to an array, with no duplicate', () => {
-  // const array = [1, 2, 3]
-  const bold = { tag: 'strong' }
-  const italic = { tag: 'i' }
-  const highlight = { tag: 'div' }
-  const array = [bold, italic]
-  const result = merge(array, highlight)
+test('merge an element to an array', () => {
+  const array = [1, 2]
+  let result = merge(array, 3)
   expect(result).not.toBe(array)
-  expect(result).toEqual([bold, italic, highlight])
+  expect(result).toEqual([1, 2, 3])
+
+  result = merge(result, 3)
+  expect(result).toEqual([1, 2, 3])
 })
 
 test('merge element with no array', () => {
