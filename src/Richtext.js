@@ -3,10 +3,11 @@ import createDomReader from './DOM/DomReader'
 import { standardizeRules } from './DOM/utils'
 import { selectionPoints } from './Selection'
 import breakAt from './Stylist/Break'
+import { renderTo, createParagraph } from './DOM/DomWriter'
 
 function create(rules) {
   rules = standardizeRules(rules)
-  const readDom = createDomReader(rules)
+  const readParagraph = createDomReader(rules)
 
   return function(editor) {
     checkEditor(editor)
@@ -27,12 +28,12 @@ function create(rules) {
         if (e.key === 'Enter') {
           e.stopPropagation()
           const [m1, m2] = breakAt(
-            readDom(active()),
+            readParagraph(active()),
             selectionPoints(active(), window.getSelection().getRangeAt(0))
           )
-          render(active(), m1)
-          const newParagraph = p()
-          render(newParagraph, m2)
+          renderTo(active(), m1)
+          const newParagraph = createParagraph()
+          renderTo(newParagraph, m2)
           document.activeElement.insertAdjacentElement('afterend', newParagraph)
           newParagraph.focus()
         }
@@ -45,11 +46,11 @@ function create(rules) {
         if (active().parentElement !== editor) {
           return
         }
-        render(
+        renderTo(
           active(),
           style({
             type: rules[styleName],
-            input: readDom(active()),
+            input: readParagraph(active()),
             from: start,
             to: end
           })
@@ -68,52 +69,11 @@ function checkEditor(editor) {
     throw new Error('the contentEditable of <div> editor must be false')
   }
   if (!editor.children.length) {
-    editor.appendChild(p())
+    editor.appendChild(createParagraph())
   }
   if (editor.firstChild.nodeName !== 'P') {
     throw new Error('only <p> element is valid inside editor')
   }
-}
-
-function render(paragraph, model) {
-  paragraph.innerHTML = ''
-  model.forEach(item => {
-    if (!item.effects) {
-      paragraph.appendChild(el(item.text))
-    } else {
-      let element = item.text
-      item.effects.forEach(effect => {
-        element = el(effect).value(element)
-      })
-      paragraph.appendChild(element)
-    }
-  })
-}
-
-function el(option) {
-  if (typeof option === 'string') {
-    return document.createTextNode(option)
-  }
-  const element = document.createElement(option.tag)
-  if (option.className) {
-    element.setAttribute('class', option.className)
-  }
-  return {
-    value: value => {
-      if (typeof value === 'string') {
-        element.innerText = value
-      } else {
-        element.appendChild(value)
-      }
-      return element
-    }
-  }
-}
-
-function p() {
-  const paragraph = document.createElement('p')
-  paragraph.contentEditable = true
-  return paragraph
 }
 
 export default create
