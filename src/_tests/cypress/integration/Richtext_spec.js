@@ -56,6 +56,22 @@ describe('styling text', () => {
     )
   })
 
+  it('enter after selecting a text', () => {
+    cy.visit('/')
+    cy.get('#editor>p')
+      .type('hello world')
+      .highlight(4, 6)
+    cy.get('#editor>p').type('{enter}')
+    cy.get('#editor>p')
+      .eq(1)
+      .type('of ')
+
+    cy.get('#editor').should(
+      'have.html',
+      '<p contenteditable="true">hell</p><p contenteditable="true">of world</p>'
+    )
+  })
+
   it('enter multiple paragraphs', () => {
     cy.visit('/')
     cy.get('#editor>p').type('hello{enter}world')
@@ -64,13 +80,20 @@ describe('styling text', () => {
       '<p contenteditable="true">hello</p><p contenteditable="true">world</p>'
     )
 
-    cy.get('#editor>p:nth-child(2)')
+    cy.get('#editor>p')
       .highlight(0, 5)
       .contains('Bold')
       .click()
+
+    cy.get('#editor>p>b').highlight(4, 4)
+
+    cy.get('#editor>p')
+      .eq(0)
+      .type('{enter}')
+
     cy.get('#editor').should(
       'have.html',
-      '<p contenteditable="true">hello</p><p contenteditable="true"><b>world</b></p>'
+      '<p contenteditable="true"><b>hell</b></p><p contenteditable="true"><b>o</b></p><p contenteditable="true">world</p>'
     )
   })
 })

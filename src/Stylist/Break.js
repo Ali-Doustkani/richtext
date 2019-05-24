@@ -74,4 +74,4 @@ function copy(text, effects) {
   return { text, effects: [...effects] }
 }
 
-export { breakAt }
+export default breakAt 

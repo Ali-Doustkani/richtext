@@ -1,9 +1,13 @@
 import style from './Stylist/Stylist'
 import createDomReader from './DOM/DomReader'
 import { standardizeRules } from './DOM/utils'
+import { selectionPoints } from './Selection'
+import breakAt from './Stylist/Break'
 
 function create(rules) {
   rules = standardizeRules(rules)
+  const readDom = createDomReader(rules)
+
   return function(editor) {
     checkEditor(editor)
 
@@ -22,9 +26,15 @@ function create(rules) {
       e => {
         if (e.key === 'Enter') {
           e.stopPropagation()
-          const newP = p()
-          editor.appendChild(newP)
-          newP.focus()
+          const [m1, m2] = breakAt(
+            readDom(active()),
+            selectionPoints(active(), window.getSelection().getRangeAt(0))
+          )
+          render(active(), m1)
+          const newParagraph = p()
+          render(newParagraph, m2)
+          document.activeElement.insertAdjacentElement('afterend', newParagraph)
+          newParagraph.focus()
         }
       },
       true
@@ -32,15 +42,14 @@ function create(rules) {
 
     return {
       apply: (start, end, styleName) => {
-        const currentParagraph = document.activeElement
-        if (currentParagraph.parentElement !== editor) {
+        if (active().parentElement !== editor) {
           return
         }
         render(
-          currentParagraph,
+          active(),
           style({
             type: rules[styleName],
-            input: createDomReader(rules)(currentParagraph),
+            input: readDom(active()),
             from: start,
             to: end
           })
@@ -48,6 +57,10 @@ function create(rules) {
       }
     }
   }
+}
+
+function active() {
+  return document.activeElement
 }
 
 function checkEditor(editor) {

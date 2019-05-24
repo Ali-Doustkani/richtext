@@ -1,4 +1,4 @@
-import { breakAt } from './../../Stylist/Break'
+import breakAt from './../../Stylist/Break'
 
 it('creates a new array for result', () => {
   const model = [{ text: '123456' }]
