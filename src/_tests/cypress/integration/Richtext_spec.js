@@ -2,88 +2,86 @@ describe('styling text', () => {
   it('simple styling', () => {
     cy.visit('/')
 
-    cy.get('#editor>p').type('hello world')
+    cy.get('#editor>p').type('HelloWorld')
     cy.contains('Bold').click()
 
-    cy.get('#editor').should(
-      'have.html',
-      '<p contenteditable="true">hello world</p>'
-    )
+    cy.get('#editor').haveHtml(`
+    <p contenteditable="true">
+      HelloWorld
+    </p>
+    `)
 
-    cy.get('#editor>p')
-      .highlight(0, 5)
-      .contains('Italic')
-      .click()
+    cy.get('#editor>p').highlight(0, 5)
+    cy.contains('Italic').click()
 
-    cy.get('#editor').should(
-      'have.html',
-      '<p contenteditable="true"><i>hello</i> world</p>'
-    )
+    cy.get('#editor').haveHtml(`
+    <p contenteditable="true">
+      <i>Hello</i>
+      World
+    </p>`)
 
-    cy.get('#editor>p')
-      .highlightAll()
-      .contains('Bold')
-      .click()
+    cy.get('#editor>p').highlightAll()
+    cy.contains('Bold').click()
 
-    cy.get('#editor').should(
-      'have.html',
-      '<p contenteditable="true"><b><i>hello</i></b><b> world</b></p>'
-    )
+    cy.get('#editor').haveHtml(`
+    <p contenteditable="true">
+      <b><i>Hello</i></b>
+      <b>World</b>
+    </p>`)
   })
 
   it('three different styles', () => {
     cy.visit('/')
 
     cy.get('#editor>p')
-      .type('hello world')
+      .type('HelloWorld')
       .highlight(0, 5)
-      .contains('Italic')
-      .click()
+    cy.contains('Italic').click()
 
-    cy.get('#editor>p>i')
-      .highlight(0, 5)
-      .contains('Bold')
-      .click()
+    cy.get('#editor>p>i').highlight(0, 5)
+    cy.contains('Bold').click()
 
-    cy.get('#editor>p>b>i')
-      .highlight(0, 5)
-      .contains('Custom Style')
-      .click()
+    cy.get('#editor>p>b>i').highlight(0, 5)
+    cy.contains('Custom Style').click()
 
-    cy.get('#editor').should(
-      'have.html',
-      '<p contenteditable="true"><span class="text-highlight"><b><i>hello</i></b></span> world</p>'
-    )
+    cy.get('#editor').haveHtml(`
+    <p contenteditable="true">
+      <span class="text-highlight">
+        <b><i>Hello</i></b>
+      </span>
+      World
+    </p>`)
   })
 
   it('enter after selecting a text', () => {
     cy.visit('/')
     cy.get('#editor>p')
-      .type('hello world')
-      .highlight(4, 6)
-    cy.get('#editor>p').type('{enter}')
-    cy.get('#editor>p')
-      .eq(1)
-      .type('of ')
+      .type('HelloWorld')
+      .highlight(4, 5)
+      .type('{enter}Of')
 
-    cy.get('#editor').should(
-      'have.html',
-      '<p contenteditable="true">hell</p><p contenteditable="true">of world</p>'
-    )
+    cy.get('#editor').haveHtml(`
+    <p contenteditable="true">
+      Hell
+    </p>
+    <p contenteditable="true">
+      OfWorld
+    </p>`)
   })
 
   it('enter multiple paragraphs', () => {
     cy.visit('/')
-    cy.get('#editor>p').type('hello{enter}world')
-    cy.get('#editor').should(
-      'have.html',
-      '<p contenteditable="true">hello</p><p contenteditable="true">world</p>'
-    )
+    cy.get('#editor>p').type('Hello{enter}World')
+    cy.get('#editor').haveHtml(`
+    <p contenteditable="true">
+      Hello
+    </p>
+    <p contenteditable="true">
+      World
+    </p>`)
 
-    cy.get('#editor>p')
-      .highlight(0, 5)
-      .contains('Bold')
-      .click()
+    cy.get('#editor>p').highlight(0, 5)
+    cy.contains('Bold').click()
 
     cy.get('#editor>p>b').highlight(4, 4)
 
@@ -91,9 +89,15 @@ describe('styling text', () => {
       .eq(0)
       .type('{enter}')
 
-    cy.get('#editor').should(
-      'have.html',
-      '<p contenteditable="true"><b>hell</b></p><p contenteditable="true"><b>o</b></p><p contenteditable="true">world</p>'
-    )
+    cy.get('#editor').haveHtml(`
+    <p contenteditable="true">
+      <b>Hell</b>
+    </p>
+    <p contenteditable="true">
+      <b>o</b>
+    </p>
+    <p contenteditable="true">
+      World
+    </p>`)
   })
 })
