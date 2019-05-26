@@ -1,8 +1,8 @@
 import style from './Stylist/Stylist'
-import createDomReader from './DOM/DomReader'
-import { standardizeRules } from './DOM/utils'
-import { selectionPoints } from './Selection'
 import breakAt from './Stylist/Break'
+import createDomReader from './DOM/DomReader'
+import getRange from './Range'
+import { standardizeRules } from './DOM/utils'
 import { renderTo, createParagraph } from './DOM/DomWriter'
 
 function create(rules) {
@@ -29,7 +29,7 @@ function create(rules) {
           e.stopPropagation()
           const [m1, m2] = breakAt(
             readParagraph(active()),
-            selectionPoints(active(), window.getSelection().getRangeAt(0))
+            getRange(active(), window.getSelection().getRangeAt(0))
           )
           renderTo(active(), m1)
           const newParagraph = createParagraph()

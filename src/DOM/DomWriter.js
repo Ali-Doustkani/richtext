@@ -1,4 +1,4 @@
-function renderTo(paragraph, model, doc) {
+function renderTo(paragraph, model) {
   paragraph.innerHTML = ''
   model.forEach(item => {
     let element

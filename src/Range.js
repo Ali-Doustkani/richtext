@@ -16,7 +16,7 @@ function firstText(node) {
   return firstText(node.firstChild)
 }
 
-function selectionPoints(rootNode, range) {
+function getRange(rootNode, range) {
   if (!rootNode) {
     rootNode = range.commonAncestorContainer
   }
@@ -48,4 +48,4 @@ function selectionPoints(rootNode, range) {
   }
 }
 
-export { selectionPoints }
+export default getRange

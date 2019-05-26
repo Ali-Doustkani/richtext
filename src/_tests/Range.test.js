@@ -1,4 +1,4 @@
-import { selectionPoints } from './../Selection'
+import getRange from './../Range'
 
 function render(html) {
   document.body.innerHTML = html.replace(/\s{2,}/g, '')
@@ -8,7 +8,7 @@ it('simple selection', () => {
   render('<p id="root">simple text</p>')
   const p_root = document.getElementById('root').firstChild
   expect(
-    selectionPoints(p_root, {
+    getRange(p_root, {
       commonAncestorContainer: p_root,
       startContainer: p_root,
       startOffset: 1,
@@ -26,7 +26,7 @@ it('two elements in a paragraph', () => {
   const p_start = document.getElementById('start')
   const b_end = document.getElementById('end')
   expect(
-    selectionPoints(p_start, {
+    getRange(p_start, {
       commonAncestorContainer: p_start,
       startContainer: p_start.firstChild,
       startOffset: 2,
@@ -48,7 +48,7 @@ it('find common ancestor', () => {
   const p_first = document.getElementById('first')
   const p_second = document.getElementById('second')
   expect(
-    selectionPoints(null, {
+    getRange(null, {
       commonAncestorContainer: div,
       startContainer: p_first.firstChild,
       startOffset: 1,
@@ -63,7 +63,7 @@ it('one root with different children', () => {
   const p_root = document.getElementById('root')
   const strong_start = document.getElementById('start')
   expect(
-    selectionPoints(p_root, {
+    getRange(p_root, {
       commonAncestorContainer: strong_start.firstChild,
       startContainer: strong_start.firstChild,
       startOffset: 0,

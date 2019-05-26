@@ -1,5 +1,5 @@
 import createRichtext from './../Richtext'
-import { selectionPoints } from './../Selection'
+import getRange from './../Range'
 
 const div = document.getElementById('editor')
 const editor = createRichtext({
@@ -18,7 +18,7 @@ function mouseDown(e) {
 
 document.getElementById('bold').onmousedown = mouseDown
 document.getElementById('bold').onclick = () => {
-  const sel = selectionPoints(
+  const sel = getRange(
     document.activeElement,
     window.getSelection().getRangeAt(0)
   )
@@ -27,7 +27,7 @@ document.getElementById('bold').onclick = () => {
 
 document.getElementById('italic').onmousedown = mouseDown
 document.getElementById('italic').onclick = () => {
-  const sel = selectionPoints(
+  const sel = getRange(
     document.activeElement,
     window.getSelection().getRangeAt(0)
   )
@@ -36,7 +36,7 @@ document.getElementById('italic').onclick = () => {
 
 document.getElementById('highlight').onmousedown = mouseDown
 document.getElementById('highlight').onclick = () => {
-  const sel = selectionPoints(
+  const sel = getRange(
     document.activeElement,
     window.getSelection().getRangeAt(0)
   )
