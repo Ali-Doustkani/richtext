@@ -1,4 +1,3 @@
-import { JSDOM } from 'jsdom'
 import createDomReader from './../../DOM/DomReader'
 
 const rules = {
@@ -10,11 +9,9 @@ const rules = {
   }
 }
 
-it('restore', () => {
-  const paragraph = new JSDOM(
-    '<p id="p"><b><i>hello</i></b> <i>world</i></p>'
-  ).window.document.getElementById('p')
-
+it('read', () => {
+  document.body.innerHTML = '<p id="p"><b><i>hello</i></b> <i>world</i></p>'
+  const paragraph = document.getElementById('p')
   const model = createDomReader(rules)(paragraph, rules)
 
   expect(model).toEqual([

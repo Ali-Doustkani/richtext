@@ -1,20 +1,12 @@
-import { JSDOM } from 'jsdom'
 import { selectionPoints } from './../Selection'
 
 function render(html) {
-  html = html.replace(/\s{2,}/g, '')
-  return new JSDOM(html)
+  document.body.innerHTML = html.replace(/\s{2,}/g, '')
 }
 
-beforeAll(() => {
-  JSDOM.prototype.$ = function(id) {
-    return this.window.document.getElementById(id)
-  }
-})
-
 it('simple selection', () => {
-  const dom = render('<p id="root">simple text</p>')
-  const p_root = dom.$('root').firstChild
+  render('<p id="root">simple text</p>')
+  const p_root = document.getElementById('root').firstChild
   expect(
     selectionPoints(p_root, {
       commonAncestorContainer: p_root,
@@ -27,12 +19,12 @@ it('simple selection', () => {
 })
 
 it('two elements in a paragraph', () => {
-  const dom = render(`
+  render(`
   <p id="start">
     abc<b>defg</b>hi<b id="end">jklmn</b>
   </p>`)
-  const p_start = dom.$('start')
-  const b_end = dom.$('end')
+  const p_start = document.getElementById('start')
+  const b_end = document.getElementById('end')
   expect(
     selectionPoints(p_start, {
       commonAncestorContainer: p_start,
@@ -45,16 +37,16 @@ it('two elements in a paragraph', () => {
 })
 
 it('find common ancestor', () => {
-  const dom = render(`
+  render(`
   <div id="ancestor">
     <p id="first">ab<b><i>c</i></b>d</p>
     <div>
       <p id="second">e<strong>f</strong>ghij</p>
     </div>
   </div>`)
-  const div = dom.$('ancestor')
-  const p_first = dom.$('first')
-  const p_second = dom.$('second')
+  const div = document.getElementById('ancestor')
+  const p_first = document.getElementById('first')
+  const p_second = document.getElementById('second')
   expect(
     selectionPoints(null, {
       commonAncestorContainer: div,
@@ -67,11 +59,9 @@ it('find common ancestor', () => {
 })
 
 it('one root with different children', () => {
-  const dom = new JSDOM(
-    `<p id="root">hello <strong id="start">world</strong></p>`
-  )
-  const p_root = dom.$('root')
-  const strong_start = dom.$('start')
+  render(`<p id="root">hello <strong id="start">world</strong></p>`)
+  const p_root = document.getElementById('root')
+  const strong_start = document.getElementById('start')
   expect(
     selectionPoints(p_root, {
       commonAncestorContainer: strong_start.firstChild,
