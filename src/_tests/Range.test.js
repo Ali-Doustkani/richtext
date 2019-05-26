@@ -1,12 +1,12 @@
-import relativeRange from './../Range'
+import { relativeRange, absoluteRange } from './../Range'
 
 function render(html) {
   document.body.innerHTML = html.replace(/\s{2,}/g, '')
 }
 
-it('simple text selection', () => {
-  render('<p id="root">simple text</p>')
-  const p_root = document.getElementById('root').firstChild
+it('calculate reletive range of a simple text selection', () => {
+  render('<p>simple text</p>')
+  const p_root = document.getElementsByTagName('p')[0].firstChild
   expect(
     relativeRange(p_root, {
       commonAncestorContainer: p_root,
@@ -18,7 +18,7 @@ it('simple text selection', () => {
   ).toEqual({ start: 1, end: 3 })
 })
 
-it('two elements in a paragraph', () => {
+it('calculate reletive range of two elements in a paragraph', () => {
   render(`
   <p id="start">
     abc<b>defg</b>hi<b id="end">jklmn</b>
@@ -36,7 +36,7 @@ it('two elements in a paragraph', () => {
   ).toEqual({ start: 2, end: 14 })
 })
 
-it('find common ancestor', () => {
+it('find common ancestor of relative range', () => {
   render(`
   <div id="ancestor">
     <p id="first">ab<b><i>c</i></b>d</p>
@@ -58,10 +58,10 @@ it('find common ancestor', () => {
   ).toEqual({ start: 1, end: 7 })
 })
 
-it('one root with different children', () => {
-  render(`<p id="root">hello <strong id="start">world</strong></p>`)
-  const p_root = document.getElementById('root')
-  const strong_start = document.getElementById('start')
+it('calculate reletive range of one root with different children', () => {
+  render(`<p>hello <strong>world</strong></p>`)
+  const p_root = document.getElementsByTagName('p')[0]
+  const strong_start = document.getElementsByTagName('strong')[0]
   expect(
     relativeRange(p_root, {
       commonAncestorContainer: strong_start.firstChild,
@@ -73,9 +73,9 @@ it('one root with different children', () => {
   ).toEqual({ start: 6, end: 11 })
 })
 
-it('return 0 when container is empty', () => {
-  render('<p id="root"></p>')
-  const p_root = document.getElementById('root')
+it('calculate reletive range of when container is empty', () => {
+  render('<p></p>')
+  const p_root = document.getElementsByTagName('p')[0]
   expect(
     relativeRange(p_root, {
       commonAncestorContainer: p_root,
@@ -87,9 +87,9 @@ it('return 0 when container is empty', () => {
   ).toEqual({ start: 0, end: 0 })
 })
 
-it('return position when container contains text', () => {
-  render('<p id="root">Hello</p>')
-  const p_root = document.getElementById('root')
+it('calculate reletive range without selection', () => {
+  render('<p>Hello</p>')
+  const p_root = document.getElementsByTagName('p')[0]
   expect(
     relativeRange(p_root, {
       commonAncestorContainer: p_root,
@@ -100,3 +100,50 @@ it('return position when container contains text', () => {
     })
   ).toEqual({ start: 4, end: 4 })
 })
+
+it('calculate absolute range on a simple tree', () => {
+  render('<p>Hello World</p>')
+  const p = document.getElementsByTagName('p')[0]
+  expect(absoluteRange(p, { start: 6, end: 11 })).toEqual({
+    startContainer: p.firstChild,
+    startOffset: 6,
+    endContainer: p.firstChild,
+    endOffset: 11
+  })
+})
+
+it.each`
+  from | to   | target                                | startOffset | destination                             | endOffset
+  ${0} | ${9} | ${'firstChild.firstChild.firstChild'} | ${0}        | ${'childNodes.4.firstChild.firstChild'} | ${2}
+  ${1} | ${7} | ${'firstChild.firstChild.firstChild'} | ${1}        | ${'childNodes.3'}                       | ${2}
+  ${2} | ${8} | ${'childNodes.1'}                     | ${1}        | ${'childNodes.4.firstChild.firstChild'} | ${1}
+  ${7} | ${9} | ${'childNodes.3'}                     | ${2}        | ${'childNodes.4.firstChild.firstChild'} | ${2}
+  ${1} | ${1} | ${'firstChild.firstChild.firstChild'} | ${1}        | ${'firstChild.firstChild.firstChild'}   | ${1}
+`(
+  'calculate absolute range on a complex tree',
+  ({ from, to, target, startOffset, destination, endOffset }) => {
+    render(`
+  <p>
+    <b>
+      <i>1</i>
+    </b>
+    234
+    <b>5</b>
+    67
+    <b>
+      <i>89</i>
+    </b>
+  </p>`)
+    const p = document.getElementsByTagName('p')[0]
+    let startContainer = p,
+      endContainer = p
+    target.split('.').forEach(sec => (startContainer = startContainer[sec]))
+    destination.split('.').forEach(sec => (endContainer = endContainer[sec]))
+    expect(absoluteRange(p, { start: from, end: to })).toEqual({
+      startContainer,
+      startOffset,
+      endContainer,
+      endOffset
+    })
+  }
+)

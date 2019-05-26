@@ -31,7 +31,7 @@ function relativeRange(rootNode, range) {
   while (node !== range.endContainer) {
     incrementEndOffset(node)
     incrementStartOffset(node)
-    node = nextText(node)
+    node = nextText(node, rootNode)
   }
 
   return {
@@ -40,6 +40,47 @@ function relativeRange(rootNode, range) {
   }
 }
 
+/**
+ * Generates an absolute range object that is ready to use with Range API.
+ * @param {HTMLElement} rootNode The starting point will be calculated relative to this node.
+ * @param {object} selection Relative selection object with 'start' and 'end'.
+ */
+function absoluteRange(rootNode, selection) {
+  if (!rootNode) {
+    throw new Error("'rootNode' is required")
+  }
+  if (selection.start > selection.end) {
+    throw new Error('The start point must comes before the end point')
+  }
+
+  let node = firstText(rootNode),
+    read = 0,
+    startContainer,
+    endContainer,
+    startOffset,
+    endOffset
+  while (!startContainer || !endContainer) {
+    read += node.data.length
+    const r = read - node.data.length
+    if (!startContainer && read >= selection.start) {
+      startContainer = node
+      startOffset = selection.start - r
+    }
+    if (read >= selection.end) {
+      endContainer = node
+      endOffset = selection.end - r
+    }
+    node = nextText(node, rootNode)
+  }
+  return {
+    startContainer,
+    startOffset,
+    endContainer,
+    endOffset
+  }
+}
+
+// dig the tree until a text node is found
 function firstText(node) {
   if (node.nodeType === Node.TEXT_NODE) {
     return node
@@ -47,7 +88,8 @@ function firstText(node) {
   return firstText(node.firstChild)
 }
 
-function nextText(node) {
+// navigate the entire tree under 'rootNode' until a text node is found
+function nextText(node, rootNode) {
   if (node.nextSibling !== null) {
     if (node.nextSibling.nodeType === Node.TEXT_NODE) {
       return node.nextSibling
@@ -55,7 +97,10 @@ function nextText(node) {
       return firstText(node.nextSibling.firstChild)
     }
   }
-  return nextText(node.parentNode)
+  if (node.parentNode === rootNode) {
+    return null
+  }
+  return nextText(node.parentNode, rootNode)
 }
 
-export default relativeRange
+export { relativeRange, absoluteRange }

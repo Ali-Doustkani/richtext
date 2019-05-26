@@ -1,11 +1,11 @@
 describe('styling text', () => {
-  it('simple styling', () => {
+  it('type and style so simple', () => {
     cy.visit('/')
 
     cy.get('#editor>p').type('HelloWorld')
     cy.contains('Bold').click()
 
-    cy.get('#editor').haveHtml(`
+    cy.get('#editor').shouldHaveHtml(`
     <p contenteditable="true">
       HelloWorld
     </p>
@@ -14,7 +14,7 @@ describe('styling text', () => {
     cy.get('#editor>p').highlight(0, 5)
     cy.contains('Italic').click()
 
-    cy.get('#editor').haveHtml(`
+    cy.get('#editor').shouldHaveHtml(`
     <p contenteditable="true">
       <i>Hello</i>
       World
@@ -23,14 +23,40 @@ describe('styling text', () => {
     cy.get('#editor>p').highlightAll()
     cy.contains('Bold').click()
 
-    cy.get('#editor').haveHtml(`
+    cy.get('#editor').shouldHaveHtml(`
     <p contenteditable="true">
       <b><i>Hello</i></b>
       <b>World</b>
     </p>`)
   })
 
-  it('three different styles', () => {
+  it('check selection based on "Stay Selected" checkbox', () => {
+    cy.visit('/')
+    cy.get('[type="checkbox"]').uncheck()
+    cy.get('#editor>p').type('HelloWorld')
+    cy.get('#editor>p').highlight(0, 5)
+    cy.contains('Bold').click()
+
+    cy.get('#editor>p').shouldHaveRange({
+      startContainer: el => el.firstChild.firstChild,
+      startOffset: 5,
+      endContainer: el => el.firstChild.firstChild,
+      endOffset: 5
+    })
+
+    cy.get('[type="checkbox"]').check()
+    cy.get('#editor>p').highlightAll()
+    cy.contains('Bold').click()
+
+    cy.get('#editor>p').shouldHaveRange({
+      startContainer: el => el.firstChild.firstChild,
+      startOffset: 0,
+      endContainer: el => el.firstChild.firstChild,
+      endOffset: 10
+    })
+  })
+
+  it('apply different styles to the same text', () => {
     cy.visit('/')
 
     cy.get('#editor>p')
@@ -44,7 +70,7 @@ describe('styling text', () => {
     cy.get('#editor>p>b>i').highlight(0, 5)
     cy.contains('Custom Style').click()
 
-    cy.get('#editor').haveHtml(`
+    cy.get('#editor').shouldHaveHtml(`
     <p contenteditable="true">
       <span class="text-highlight">
         <b><i>Hello</i></b>
@@ -53,14 +79,14 @@ describe('styling text', () => {
     </p>`)
   })
 
-  it('enter after selecting a text', () => {
+  it('press {enter} after selecting some text', () => {
     cy.visit('/')
     cy.get('#editor>p')
       .type('HelloWorld')
       .highlight(4, 5)
       .type('{enter}Of')
 
-    cy.get('#editor').haveHtml(`
+    cy.get('#editor').shouldHaveHtml(`
     <p contenteditable="true">
       Hell
     </p>
@@ -69,10 +95,10 @@ describe('styling text', () => {
     </p>`)
   })
 
-  it('enter multiple paragraphs', () => {
+  it('press {enter} creates multiple paragraphs', () => {
     cy.visit('/')
     cy.get('#editor>p').type('Hello{enter}World')
-    cy.get('#editor').haveHtml(`
+    cy.get('#editor').shouldHaveHtml(`
     <p contenteditable="true">
       Hello
     </p>
@@ -89,7 +115,7 @@ describe('styling text', () => {
       .eq(0)
       .type('{enter}')
 
-    cy.get('#editor').haveHtml(`
+    cy.get('#editor').shouldHaveHtml(`
     <p contenteditable="true">
       <b>Hell</b>
     </p>
@@ -101,7 +127,7 @@ describe('styling text', () => {
     </p>`)
   })
 
-  it('backspace in the beginning of a paragraph', () => {
+  it('press {backspace} at the beginning of a paragraph', () => {
     cy.visit('/')
     cy.get('#editor>p').type('One{enter}TwoThree')
     cy.get('#editor>p')
@@ -112,7 +138,7 @@ describe('styling text', () => {
       .eq(1)
       .type('{home}1{backspace}{backspace}')
 
-    cy.get('#editor').haveHtml(`
+    cy.get('#editor').shouldHaveHtml(`
       <p contenteditable="true">
         OneTwo
         <b>Three</b>

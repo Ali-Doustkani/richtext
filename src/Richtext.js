@@ -1,6 +1,6 @@
 import style from './Stylist/Stylist'
 import createDomReader from './DOM/DomReader'
-import relativeRange from './Range'
+import { relativeRange, absoluteRange } from './Range'
 import { breakAt, glue } from './Stylist/Break'
 import { standardizeRules } from './DOM/utils'
 import { renderTo, createParagraph } from './DOM/DomWriter'
@@ -11,6 +11,7 @@ import { renderTo, createParagraph } from './DOM/DomWriter'
  * @returns {Function} The function that configures the given <div> or <article> element as the editor.
  */
 function create(rules) {
+  let staySelected = false
   rules = standardizeRules(rules)
   const readParagraph = createDomReader(rules)
 
@@ -41,6 +42,7 @@ function create(rules) {
     )
 
     return {
+      staySelected: value => (staySelected = value),
       apply: (start, end, styleName) => {
         if (active().parentElement !== editor) {
           return
@@ -54,6 +56,7 @@ function create(rules) {
             to: end
           })
         )
+        select(staySelected ? start : end, end)
       }
     }
   }
@@ -70,7 +73,7 @@ function checkEditor(editor) {
     throw new Error('only <p> element is valid inside editor')
   }
 }
- 
+
 function handleBackspaceKey(readParagraph) {
   const range = getRelativeRange()
   if (range.start !== 0 || range.start !== 0) {
@@ -99,6 +102,16 @@ function handleEnterKey(readParagraph) {
   renderTo(newParagraph, m2)
   document.activeElement.insertAdjacentElement('afterend', newParagraph)
   newParagraph.focus()
+}
+
+function select(start, end) {
+  const points = absoluteRange(active(), { start, end })
+  const range = document.createRange()
+  range.setStart(points.startContainer, points.startOffset)
+  range.setEnd(points.endContainer, points.endOffset)
+  const sel = window.getSelection()
+  sel.empty()
+  sel.addRange(range)
 }
 
 function active() {

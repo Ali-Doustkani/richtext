@@ -32,9 +32,27 @@ Cypress.Commands.add('highlightAll', { prevSubject: 'element' }, subject => {
 })
 
 Cypress.Commands.add(
-  'haveHtml',
+  'shouldHaveHtml',
   { prevSubject: 'element' },
   (subject, html) => {
     cy.wrap(subject).should('have.html', html.replace(/\s{2,}/g, ''))
+  }
+)
+
+Cypress.Commands.add(
+  'shouldHaveRange',
+  { prevSubject: 'element' },
+  (subject, expectedRange) => {
+    const realRange = subject[0].ownerDocument.defaultView
+      .getSelection()
+      .getRangeAt(0)
+    expect(realRange.startContainer).to.equal(
+      expectedRange.startContainer(subject[0])
+    )
+    expect(realRange.startOffset).to.equal(expectedRange.startOffset)
+    expect(realRange.endContainer).to.equal(
+      expectedRange.endContainer(subject[0])
+    )
+    expect(realRange.endOffset).to.equal(expectedRange.endOffset)
   }
 )

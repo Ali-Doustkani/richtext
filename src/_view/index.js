@@ -1,5 +1,5 @@
 import createRichtext from './../Richtext'
-import getRange from './../Range'
+import { relativeRange } from './../Range'
 
 const div = document.getElementById('editor')
 const editor = createRichtext({
@@ -16,9 +16,13 @@ function mouseDown(e) {
   e.preventDefault()
 }
 
+document.getElementById('staySelected').onchange = e => {
+  editor.staySelected(e.target.checked)
+}
+
 document.getElementById('bold').onmousedown = mouseDown
 document.getElementById('bold').onclick = () => {
-  const sel = getRange(
+  const sel = relativeRange(
     document.activeElement,
     window.getSelection().getRangeAt(0)
   )
@@ -27,7 +31,7 @@ document.getElementById('bold').onclick = () => {
 
 document.getElementById('italic').onmousedown = mouseDown
 document.getElementById('italic').onclick = () => {
-  const sel = getRange(
+  const sel = relativeRange(
     document.activeElement,
     window.getSelection().getRangeAt(0)
   )
@@ -36,7 +40,7 @@ document.getElementById('italic').onclick = () => {
 
 document.getElementById('highlight').onmousedown = mouseDown
 document.getElementById('highlight').onclick = () => {
-  const sel = getRange(
+  const sel = relativeRange(
     document.activeElement,
     window.getSelection().getRangeAt(0)
   )
