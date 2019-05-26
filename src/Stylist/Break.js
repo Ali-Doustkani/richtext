@@ -1,11 +1,19 @@
-function breakAt(model, selection) {
+import { areEqual } from './utils'
+
+/**
+ * Splits the model into two different models.
+ * @param {Array} model The model which will be broke into two different models.
+ * @param {object} range The relative range object that specifies the breaking point.
+ * @returns {Array} Returns an array containing two items, which are new models.
+ */
+function breakAt(model, range) {
   const originalModel = [],
     newModel = []
-  if (typeof selection === 'number') {
-    selection = { start: selection, end: selection }
+  if (typeof range === 'number') {
+    range = { start: range, end: range }
   }
 
-  iterateOver(model, selection, (item, ctx) => {
+  iterateOver(model, range, (item, ctx) => {
     if (ctx.notStartedYet()) {
       originalModel.push(ctx.whole(item))
     } else if (ctx.starting()) {
@@ -74,4 +82,27 @@ function copy(text, effects) {
   return { text, effects: [...effects] }
 }
 
-export default breakAt 
+/**
+ * Concats two models.
+ * @param {Array} model1
+ * @param {Array} model2
+ * @returns {Array}       a new model that contains both model1 and model2
+ */
+function glue(model1, model2) {
+  const result = []
+  const push = item => result.push(copy(item.text, item.effects))
+  model1.forEach(push)
+  if (result.length && model2.length) {
+    const lastEffect = result[result.length - 1].effects
+    const firstModel = model2.shift()
+    if (areEqual(lastEffect, firstModel.effects)) {
+      result[result.length - 1].text += firstModel.text
+    } else {
+      push(firstModel)
+    }
+  }
+  model2.forEach(push)
+  return result
+}
+
+export { breakAt, glue }

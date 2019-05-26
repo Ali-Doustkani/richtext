@@ -100,4 +100,23 @@ describe('styling text', () => {
       World
     </p>`)
   })
+
+  it('backspace in the beginning of a paragraph', () => {
+    cy.visit('/')
+    cy.get('#editor>p').type('One{enter}TwoThree')
+    cy.get('#editor>p')
+      .eq(1)
+      .highlight(3, 8)
+    cy.contains('Bold').click()
+    cy.get('#editor>p')
+      .eq(1)
+      .type('{home}1{backspace}{backspace}')
+
+    cy.get('#editor').haveHtml(`
+      <p contenteditable="true">
+        OneTwo
+        <b>Three</b>
+      </p>
+      `)
+  })
 })

@@ -42,6 +42,12 @@ function merge(array, element) {
   return [...array.filter(item => item !== element), element]
 }
 
+/**
+ * Checks the equality of two different effect arrays.
+ * @param {Array} first   First effects array.
+ * @param {Array} second  Second effects array.
+ * @returns {boolean}     If they are equal returns true, otherwise false.
+ */
 function areEqual(first, second) {
   // if they are empty array set them to undefined
   first = first && first.length ? first : undefined

@@ -1,14 +1,14 @@
-import getRange from './../Range'
+import relativeRange from './../Range'
 
 function render(html) {
   document.body.innerHTML = html.replace(/\s{2,}/g, '')
 }
 
-it('simple selection', () => {
+it('simple text selection', () => {
   render('<p id="root">simple text</p>')
   const p_root = document.getElementById('root').firstChild
   expect(
-    getRange(p_root, {
+    relativeRange(p_root, {
       commonAncestorContainer: p_root,
       startContainer: p_root,
       startOffset: 1,
@@ -26,7 +26,7 @@ it('two elements in a paragraph', () => {
   const p_start = document.getElementById('start')
   const b_end = document.getElementById('end')
   expect(
-    getRange(p_start, {
+    relativeRange(p_start, {
       commonAncestorContainer: p_start,
       startContainer: p_start.firstChild,
       startOffset: 2,
@@ -48,7 +48,7 @@ it('find common ancestor', () => {
   const p_first = document.getElementById('first')
   const p_second = document.getElementById('second')
   expect(
-    getRange(null, {
+    relativeRange(null, {
       commonAncestorContainer: div,
       startContainer: p_first.firstChild,
       startOffset: 1,
@@ -63,7 +63,7 @@ it('one root with different children', () => {
   const p_root = document.getElementById('root')
   const strong_start = document.getElementById('start')
   expect(
-    getRange(p_root, {
+    relativeRange(p_root, {
       commonAncestorContainer: strong_start.firstChild,
       startContainer: strong_start.firstChild,
       startOffset: 0,
@@ -71,4 +71,32 @@ it('one root with different children', () => {
       endOffset: 5
     })
   ).toEqual({ start: 6, end: 11 })
+})
+
+it('return 0 when container is empty', () => {
+  render('<p id="root"></p>')
+  const p_root = document.getElementById('root')
+  expect(
+    relativeRange(p_root, {
+      commonAncestorContainer: p_root,
+      startContainer: p_root,
+      startOffset: 0,
+      endContainer: p_root,
+      endOffset: 0
+    })
+  ).toEqual({ start: 0, end: 0 })
+})
+
+it('return position when container contains text', () => {
+  render('<p id="root">Hello</p>')
+  const p_root = document.getElementById('root')
+  expect(
+    relativeRange(p_root, {
+      commonAncestorContainer: p_root,
+      startContainer: p_root.firstChild,
+      startOffset: 4,
+      endContainer: p_root.firstChild,
+      endOffset: 4
+    })
+  ).toEqual({ start: 4, end: 4 })
 })

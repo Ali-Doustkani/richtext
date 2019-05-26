@@ -1,4 +1,4 @@
-import breakAt from './../../Stylist/Break'
+import { breakAt, glue } from './../../Stylist/Break'
 
 it('creates a new array for result', () => {
   const model = [{ text: '123456' }]
@@ -70,4 +70,34 @@ it('break beginning of line', () => {
   const [m1, m2] = breakAt([{ text: '123456' }], 0)
   expect(m1).toEqual([])
   expect(m2).toEqual([{ text: '123456' }])
+})
+
+it('glue same effects', () => {
+  const m1 = [{ text: '123', effects: [1] }, { text: 'abc', effects: ['e1'] }]
+  const m2 = [{ text: 'def', effects: ['e1'] }]
+  expect(glue(m1, m2)).toEqual([
+    { text: '123', effects: [1] },
+    { text: 'abcdef', effects: ['e1'] }
+  ])
+})
+
+it('glue different effects', () => {
+  const m1 = [{ text: 'Hello', effects: [1] }]
+  const m2 = [{ text: 'World', effects: [2] }]
+  expect(glue(m1, m2)).toEqual([
+    { text: 'Hello', effects: [1] },
+    { text: 'World', effects: [2] }
+  ])
+})
+
+it('glue when first model is empty', () => {
+  const m1 = []
+  const m2 = [{ text: 'Hello World' }]
+  expect(glue(m1, m2)).toEqual([{ text: 'Hello World' }])
+})
+
+it('glue when second model is empty', () => {
+  const m1 = [{ text: 'Hello World' }]
+  const m2 = []
+  expect(glue(m1, m2)).toEqual([{ text: 'Hello World' }])
 })
