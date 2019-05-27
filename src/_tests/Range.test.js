@@ -4,6 +4,20 @@ function render(html) {
   document.body.innerHTML = html.replace(/\s{2,}/g, '')
 }
 
+it('calculate relative range of an empty paragraph', () => {
+  render('<p></p>')
+  const p = document.getElementsByTagName('p')[0]
+  expect(
+    relativeRange(p, {
+      commonAncestorContainer: p,
+      startContainer: p,
+      startOffset: 0,
+      endContainer: p,
+      endOffset: 0
+    })
+  ).toEqual({ start: 0, end: 0 })
+})
+
 it('calculate reletive range of a simple text selection', () => {
   render('<p>simple text</p>')
   const p_root = document.getElementsByTagName('p')[0].firstChild
@@ -99,6 +113,17 @@ it('calculate reletive range without selection', () => {
       endOffset: 4
     })
   ).toEqual({ start: 4, end: 4 })
+})
+
+it('calculate absolute range of an empty paragraph', () => {
+  render('<p></p>')
+  const p = document.getElementsByTagName('p')[0]
+  expect(absoluteRange(p, { start: 10, end: 50 })).toEqual({
+    startContainer: p,
+    startOffset: 0,
+    endContainer: p,
+    endOffset: 0
+  })
 })
 
 it('calculate absolute range on a simple tree', () => {

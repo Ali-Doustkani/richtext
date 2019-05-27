@@ -53,6 +53,15 @@ function absoluteRange(rootNode, selection) {
     throw new Error('The start point must comes before the end point')
   }
 
+  if (!rootNode.firstChild) {
+    return {
+      startContainer: rootNode,
+      startOffset: 0,
+      endContainer: rootNode,
+      endOffset: 0
+    }
+  }
+
   let node = firstText(rootNode),
     read = 0,
     startContainer,
