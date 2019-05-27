@@ -129,20 +129,59 @@ describe('styling text', () => {
 
   it('press {backspace} at the beginning of a paragraph', () => {
     cy.visit('/')
-    cy.get('#editor>p').type('One{enter}TwoThree')
+    cy.get('#editor>p').type('123{enter}456{enter}789')
     cy.get('#editor>p')
       .eq(1)
-      .highlight(3, 8)
+      .highlight(0, 3)
     cy.contains('Bold').click()
     cy.get('#editor>p')
       .eq(1)
-      .type('{home}1{backspace}{backspace}')
+      .type('{home}{backspace}')
 
     cy.get('#editor').shouldHaveHtml(`
       <p contenteditable="true">
-        OneTwo
-        <b>Three</b>
+        123<b>456</b>
+      </p>
+      <p contenteditable="true">
+        789
       </p>
       `)
+    cy.get('#editor>p')
+      .eq(0)
+      .shouldHaveRange({
+        startContainer: el => el.firstChild,
+        startOffset: 3,
+        endContainer: el => el.firstChild,
+        endOffset: 3
+      })
+  })
+
+  it('press {delete} at the beginning of a paragraph', () => {
+    cy.visit('/')
+    cy.get('#editor>p').type('123{enter}456{enter}789')
+    cy.get('#editor>p')
+      .eq(1)
+      .highlight(0, 3)
+    cy.contains('Bold').click()
+    cy.get('#editor>p')
+      .eq(0)
+      .type('{end}{del}')
+
+    cy.get('#editor').shouldHaveHtml(`
+      <p contenteditable="true">
+        123<b>456</b>
+      </p>
+      <p contenteditable="true">
+        789
+      </p>`)
+
+    cy.get('#editor>p')
+      .eq(0)
+      .shouldHaveRange({
+        startContainer: el => el.firstChild,
+        startOffset: 3,
+        endContainer: el => el.firstChild,
+        endOffset: 3
+      })
   })
 })

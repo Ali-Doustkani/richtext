@@ -29,10 +29,28 @@ function el(option) {
   }
 }
 
-function createParagraph() {
+function createParagraph(model) {
   const paragraph = document.createElement('p')
   paragraph.contentEditable = true
-  return paragraph
+  if (model) {
+    renderTo(paragraph, model)
+  }
+  const editor = document.activeElement.parentNode
+  return {
+    replaceWith: (p1, p2) => {
+      editor.removeChild(p1)
+      editor.insertBefore(paragraph, p2)
+      editor.removeChild(p2)
+      paragraph.focus()
+    },
+    addAfter: p => {
+      p.insertAdjacentElement('afterend', paragraph)
+      paragraph.focus()
+    },
+    append: editor => {
+      editor.appendChild(paragraph)
+    }
+  }
 }
 
 export { renderTo, createParagraph }
