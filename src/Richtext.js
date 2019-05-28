@@ -46,8 +46,11 @@ function create(rules) {
 }
 
 function checkEditor(rules, editor) {
+  if (editor.tagName !== 'DIV' && editor.tagName !== 'ARTICLE') {
+    throw new Error('the editor can only be a <div> or <article> element')
+  }
   if (editor.contentEditable === true) {
-    throw new Error('the contentEditable of <div> editor must be false')
+    throw new Error(`the contentEditable of <${editor.tagName}> editor must be false`)
   }
   if (!editor.children.length) {
     createRichParagraph(rules, editor).attach()
