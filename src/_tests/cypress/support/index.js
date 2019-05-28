@@ -54,5 +54,21 @@ Cypress.Commands.add(
       expectedRange.endContainer(subject[0])
     )
     expect(realRange.endOffset).to.equal(expectedRange.endOffset)
+    return subject
+  }
+)
+
+Cypress.Commands.add(
+  'shouldHavePosition',
+  { prevSubject: 'element' },
+  (subject, container, offset) => {
+    const range = subject[0].ownerDocument.defaultView
+      .getSelection()
+      .getRangeAt(0)
+    expect(range.startContainer).to.equal(container(subject[0]))
+    expect(range.startOffset).to.equal(offset)
+    expect(range.endContainer).to.equal(container(subject[0]))
+    expect(range.endOffset).to.equal(offset)
+    return subject
   }
 )

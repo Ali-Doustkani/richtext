@@ -53,6 +53,22 @@ function toRichParagraph(rules, editor, paragraph) {
       return w
     },
 
+    focusPrev: () => {
+      if (!w.isFirst) {
+        const prev = w.prev
+        prev.paragraph().focus()
+        prev.setPosition(prev.length)
+      }
+    },
+
+    focusNext: () => {
+      if (!w.isLast) {
+        const next = w.next
+        next.paragraph().focus()
+        next.setPosition(0)
+      }
+    },
+
     attach: () => {
       editor.appendChild(paragraph)
       return w
@@ -116,7 +132,7 @@ function toRichParagraph(rules, editor, paragraph) {
     get isFirst() {
       return paragraph.previousSibling === null
     },
-    
+
     get isLast() {
       return paragraph.nextSibling === null
     }

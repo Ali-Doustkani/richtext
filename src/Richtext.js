@@ -1,6 +1,7 @@
 import { glue } from './Stylist/Break'
 import { standardizeRules } from './DOM/utils'
 import { toRichParagraph, createRichParagraph } from './RichParagraph'
+import { relativeRange } from './Range'
 
 /**
  * It creates a configurator function based on the rules.
@@ -13,8 +14,9 @@ function create(rules) {
 
   return function(editor) {
     checkEditor(rules, editor)
-    const paragraph = () => toRichParagraph(rules, editor, document.activeElement)
-   
+    const paragraph = () =>
+      toRichParagraph(rules, editor, document.activeElement)
+
     editor.addEventListener(
       'keydown',
       e => {
@@ -24,16 +26,10 @@ function create(rules) {
           handleBackspaceKey(e, paragraph())
         } else if (e.key === 'Delete') {
           handleDeleteKey(e, paragraph())
-        }
-      },
-      true
-    )
-
-    editor.addEventListener(
-      'keyup',
-      e => {
-        if (e.key === 'Enter') {
-          e.stopPropagation()
+        } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+          handleArrowUp(e, paragraph())
+        } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+          handleArrowDown(e, paragraph())
         }
       },
       true
@@ -89,6 +85,23 @@ function handleDeleteKey(event, p) {
   p.create(glue(p.model, p.next.model))
     .replaceWith(p, p.next)
     .setPosition(len)
+}
+
+function handleArrowUp(event, p) {
+  const range = window.getSelection().getRangeAt(0)
+  if (range.startOffset === 0 && range.endOffset === 0) {
+    event.preventDefault()
+    p.focusPrev()
+  }
+}
+
+function handleArrowDown(event, p) {
+  const range = window.getSelection().getRangeAt(0)
+  const relRange = relativeRange(p.paragraph(), range)
+  if (relRange.start === p.length && relRange.end === p.length) {
+    event.preventDefault()
+    p.focusNext()
+  }
 }
 
 export default create

@@ -37,12 +37,7 @@ describe('styling text', () => {
     cy.get('#editor>p').highlight(0, 5)
     cy.contains('Bold').click()
 
-    cy.get('#editor>p').shouldHaveRange({
-      startContainer: el => el.firstChild.firstChild,
-      startOffset: 5,
-      endContainer: el => el.firstChild.firstChild,
-      endOffset: 5
-    })
+    cy.get('#editor>p').shouldHavePosition(el => el.firstChild.firstChild, 5)
 
     cy.get('[type="checkbox"]').check()
     cy.get('#editor>p').highlightAll()
@@ -79,7 +74,7 @@ describe('styling text', () => {
     </p>`)
   })
 
-  it('press {enter} after selecting some text', () => {
+  it('handle enter key after selecting some text', () => {
     cy.visit('/')
     cy.get('#editor>p')
       .type('HelloWorld')
@@ -95,7 +90,7 @@ describe('styling text', () => {
     </p>`)
   })
 
-  it('press {enter} creates multiple paragraphs', () => {
+  it('handle enter key for creating new paragraphs', () => {
     cy.visit('/')
     cy.get('#editor>p').type('Hello{enter}World')
     cy.get('#editor').shouldHaveHtml(`
@@ -127,7 +122,7 @@ describe('styling text', () => {
     </p>`)
   })
 
-  it('press {backspace} at the beginning of a paragraph', () => {
+  it('handle backspace key at the beginning of a paragraph', () => {
     cy.visit('/')
     cy.get('#editor>p').type('123{enter}456{enter}789')
     cy.get('#editor>p')
@@ -148,15 +143,10 @@ describe('styling text', () => {
       `)
     cy.get('#editor>p')
       .eq(0)
-      .shouldHaveRange({
-        startContainer: el => el.firstChild,
-        startOffset: 3,
-        endContainer: el => el.firstChild,
-        endOffset: 3
-      })
+      .shouldHavePosition(el => el.firstChild, 3)
   })
 
-  it('press {delete} at the beginning of a paragraph', () => {
+  it('handle del key at the beginning of a paragraph', () => {
     cy.visit('/')
     cy.get('#editor>p').type('123{enter}456{enter}789')
     cy.get('#editor>p')
@@ -177,11 +167,53 @@ describe('styling text', () => {
 
     cy.get('#editor>p')
       .eq(0)
-      .shouldHaveRange({
-        startContainer: el => el.firstChild,
-        startOffset: 3,
-        endContainer: el => el.firstChild,
-        endOffset: 3
-      })
+      .shouldHavePosition(el => el.firstChild, 3)
+  })
+
+  it('handle uparrow key between paragraphs', () => {
+    cy.visit('/')
+    cy.get('#editor>p')
+      .type('X'.repeat(90))
+      .type('{enter}')
+    cy.get('#editor>p')
+      .eq(1)
+      .type('Y'.repeat(90))
+      .type('{uparrow}')
+      .should('have.focus')
+      .type('{uparrow}{uparrow}')
+      .should('not.have.focus')
+    cy.get('#editor>p')
+      .eq(0)
+      .should('have.focus')
+      .shouldHavePosition(el => el.firstChild, 90)
+      .type('{uparrow}')
+      .type('{uparrow}')
+      .should('have.focus')
+      //  Arrow Down
+      .type('{downarrow}')
+      .should('have.focus')
+      .type('{downarrow}')
+      .should('not.have.focus')
+    cy.get('#editor>p')
+      .eq(1)
+      .should('have.focus')
+      .type('{downarrow}{downarrow}')
+      .should('have.focus')
+      // Arrow Left
+      .type('{uparrow}{home}')
+      .should('have.focus')
+      .type('{leftarrow}')
+      .should('not.have.focus')
+    cy.get('#editor>p')
+      .eq(0)
+      .should('have.focus')
+      .shouldHavePosition(el => el.firstChild, 90)
+      // Arrow Right
+      .type('{rightarrow}')
+      .should('not.have.focus')
+    cy.get('#editor>p')
+      .eq(1)
+      .should('have.focus')
+      .shouldHavePosition(el => el.firstChild, 0)
   })
 })
