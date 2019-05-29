@@ -1,4 +1,4 @@
-function rulesAreOk(rules) {
+function effectsAreOk(rules) {
   if (!rules) {
     throw new Error("'rules' cannot be empty")
   }
@@ -33,4 +33,4 @@ function standardizeRules(rules) {
     return initObj
   }
 
-export { rulesAreOk, standardizeRules }
+export { effectsAreOk , standardizeRules }

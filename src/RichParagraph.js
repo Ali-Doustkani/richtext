@@ -14,13 +14,16 @@ function createRichParagraph(rules, editor, model) {
 }
 
 function toRichParagraph(rules, editor, paragraph) {
+  let changedStart
   const read = createDomReader(rules)
   const w = {
     create: model => createRichParagraph(rules, editor, model),
 
     paragraph: () => paragraph,
 
-    style: (styleName, start, end) =>
+    style: (styleName, start, end) => {
+      const lastParagraph = paragraph
+      const sdfsdf=read(paragraph)
       w.render(
         style({
           type: rules[styleName],
@@ -28,8 +31,12 @@ function toRichParagraph(rules, editor, paragraph) {
           from: start,
           to: end
         })
-      ),
-
+      )
+      if (paragraph !== lastParagraph) {
+        changedStart = start
+      }
+      return w
+    },
     break: () =>
       breakAt(
         w.model,
@@ -37,11 +44,15 @@ function toRichParagraph(rules, editor, paragraph) {
       ),
 
     render: model => {
-      render(paragraph, model)
+      paragraph = render(paragraph, model)
       return w
     },
 
     setPosition: (start, end) => {
+      if (changedStart) {
+        start -= changedStart
+        end -= changedStart
+      }
       end = end || start
       const points = absoluteRange(paragraph, { start, end })
       const range = document.createRange()

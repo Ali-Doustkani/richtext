@@ -170,7 +170,7 @@ describe('styling text', () => {
       .shouldHavePosition(el => el.firstChild, 3)
   })
 
-  it('handle uparrow key between paragraphs', () => {
+  it('handle arrow keys between paragraphs', () => {
     cy.visit('/')
     cy.get('#editor>p')
       .type('X'.repeat(90))
@@ -215,5 +215,54 @@ describe('styling text', () => {
       .eq(1)
       .should('have.focus')
       .shouldHavePosition(el => el.firstChild, 0)
+  })
+
+  it('apply header editor', () => {
+    cy.visit('/')
+    cy.get('#editor>p')
+      .type('ContentTitleContent')
+      .highlight(7, 12)
+    cy.contains('Header').click()
+
+    cy.get('#editor>h1')
+      .eq(0)
+      .should('have.focus')
+      .should('have.class', 'header-style')
+      .type('{uparrow}{uparrow}')
+
+    cy.get('#editor>p')
+      .eq(0)
+      .should('have.focus')
+      .type('{rightarrow}')
+
+    cy.get('#editor>h1')
+      .should('have.focus')
+      .type('{downarrow}{downarrow}')
+
+    cy.get('#editor>p')
+      .eq(1)
+      .should('have.focus')
+      .type('{leftarrow}')
+
+    cy.get('#editor>h1')
+      .should('have.focus')
+      .type('{rightarrow}')
+
+    cy.get('#editor>p')
+      .eq(1)
+      .should('have.focus')
+
+    cy.get('#editor>h1')
+      .focus()
+      .highlight(0, 5)
+    cy.contains('Header').click()
+
+    cy.get('#editor>p')
+      .should($p => {
+        expect($p).to.have.length(3)
+        expect($p.eq(0)).to.have.text('Content')
+        expect($p.eq(1)).to.have.text('Title')
+        expect($p.eq(2)).to.have.text('Content')
+      })
   })
 })
