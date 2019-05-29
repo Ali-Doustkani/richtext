@@ -4,51 +4,58 @@
  * This function creates a closure for managing a queue of editors.
  * @param {HTMLParagraphElement} editor The main paragraph (editor) which user was typing in
  */
-function createEditorQueue(editor) {
+function createEditorSiblings(editor) {
   const elements = []
   let newEditor
 
-  const add = e => {
+  function add(e) {
     elements.push(e)
     return e
   }
 
-  const editParentOf = item => {
-    if (item.effects) {
-      const parentEffect = extractEditorEffect(item.effects)
-      if (parentEffect) {
-        newEditor = makeEditor(parentEffect)
-        editor.parentElement.replaceChild(newEditor, editor)
-        editor = newEditor
-        return add(newEditor)
-      }
+  function replace(newEditor, oldEditor) {
+    oldEditor.parentElement.replaceChild(newEditor, oldEditor)
+    editor = newEditor
+  }
+
+  function getEditor(item) {
+    const editorEffect = extractEditorEffect(item.effects)
+    if (editorEffect) {
+      newEditor = makeEditor(editorEffect)
+      replace(newEditor, editor)
+      return add(newEditor)
     }
+
     const lastElement = elements[elements.length - 1]
     if (lastElement && lastElement.tagName === 'P') {
       return lastElement
-    } else {
-      if (elements.some(x => x === editor)) {
-        return add(makeEditor())
-      }
-      if (shouldConvertEditorToParagraph(editor, item)) {
-        newEditor = makeEditor()
-        editor.parentElement.replaceChild(newEditor, editor)
-        editor = newEditor
-        return add(newEditor)
-      }
-      return add(editor)
     }
+
+    if (elements.some(x => x === editor)) {
+      return add(makeEditor())
+    }
+
+    if (shouldConvertEditorToParagraph(editor, item)) {
+      newEditor = makeEditor()
+      replace(newEditor, editor)
+      return add(newEditor)
+    }
+
+    return add(editor)
   }
 
   return {
-    editParentOf,
-    getQueue: () => elements,
+    getEditor,
+    siblings: () => elements,
     createdEditor: () => newEditor,
-    getParagraphIndex: () => elements.indexOf(editor)
+    mainElementIndex: () => elements.indexOf(editor)
   }
 }
 
 function extractEditorEffect(effects) {
+  if (!effects) {
+    return
+  }
   let toRemove
   const parentEffect = effects.find((effect, i) => {
     if (effect.parent) {
@@ -62,12 +69,12 @@ function extractEditorEffect(effects) {
   return parentEffect
 }
 
-function makeEditor(parentEffect) {
+function makeEditor(effect) {
   let editor
-  if (parentEffect) {
-    editor = document.createElement(parentEffect.tag)
-    if (parentEffect.className) {
-      editor.className = parentEffect.className
+  if (effect) {
+    editor = document.createElement(effect.tag)
+    if (effect.className) {
+      editor.className = effect.className
     }
   } else {
     editor = document.createElement('p')
@@ -80,4 +87,4 @@ function shouldConvertEditorToParagraph(editor, item) {
   return editor.tagName !== 'P' && (!item.effects || !item.effects.length)
 }
 
-export default createEditorQueue
+export default createEditorSiblings
