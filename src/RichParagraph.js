@@ -1,14 +1,14 @@
 import style from './Stylist/Stylist'
 import createDomReader from './DOM/DomReader'
+import render from './DOM/DomWriter'
 import { absoluteRange, relativeRange } from './Range'
-import { renderTo } from './DOM/DomWriter'
 import { breakAt } from './Stylist/Break'
 
 function createRichParagraph(rules, editor, model) {
   const paragraph = document.createElement('p')
   paragraph.contentEditable = true
   if (model) {
-    renderTo(paragraph, model)
+    render(paragraph, model)
   }
   return toRichParagraph(rules, editor, paragraph)
 }
@@ -37,7 +37,7 @@ function toRichParagraph(rules, editor, paragraph) {
       ),
 
     render: model => {
-      renderTo(paragraph, model)
+      render(paragraph, model)
       return w
     },
 

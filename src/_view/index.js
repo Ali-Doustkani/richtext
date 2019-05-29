@@ -8,41 +8,34 @@ const editor = createRichtext({
   highlight: {
     tag: 'span',
     className: 'text-highlight'
+  },
+  header: {
+    parent: true,
+    tag: 'h1',
+    className: 'header-style'
   }
 })(div)
 div.firstChild.focus()
 
-function mouseDown(e) {
-  e.preventDefault()
+function wire(id, func) {
+  document.getElementById(id).onmousedown = e => e.preventDefault()
+  document.getElementById(id).onclick = () => {
+    const sel = relativeRange(
+      document.activeElement,
+      window.getSelection().getRangeAt(0)
+    )
+    func(sel)
+  }
 }
 
 document.getElementById('staySelected').onchange = e => {
   editor.staySelected(e.target.checked)
 }
 
-document.getElementById('bold').onmousedown = mouseDown
-document.getElementById('bold').onclick = () => {
-  const sel = relativeRange(
-    document.activeElement,
-    window.getSelection().getRangeAt(0)
-  )
-  editor.apply(sel.start, sel.end, 'bold')
-}
+wire('bold', sel => editor.apply(sel.start, sel.end, 'bold'))
 
-document.getElementById('italic').onmousedown = mouseDown
-document.getElementById('italic').onclick = () => {
-  const sel = relativeRange(
-    document.activeElement,
-    window.getSelection().getRangeAt(0)
-  )
-  editor.apply(sel.start, sel.end, 'italic')
-}
+wire('italic', sel => editor.apply(sel.start, sel.end, 'italic'))
 
-document.getElementById('highlight').onmousedown = mouseDown
-document.getElementById('highlight').onclick = () => {
-  const sel = relativeRange(
-    document.activeElement,
-    window.getSelection().getRangeAt(0)
-  )
-  editor.apply(sel.start, sel.end, 'highlight')
-}
+wire('highlight', sel => editor.apply(sel.start, sel.end, 'highlight'))
+
+wire('header', sel => editor.apply(sel.start, sel.end, 'header'))
