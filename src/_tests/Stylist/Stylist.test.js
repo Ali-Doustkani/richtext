@@ -75,7 +75,7 @@ it('bold some new parts with overlap', () => {
   ).toEqual([{ text: 'hello w', effects: [rules.bold] }, { text: 'orld!' }])
 })
 
-it("bold in the middle and doesn't touch some elements", () => {
+it('bold in the middle and some elements not touched', () => {
   expect(
     style({
       type: rules.bold,
@@ -309,4 +309,26 @@ it('bold a long text with different styles inside', () => {
     { text: 'threefou', effects: [rules.bold] },
     { text: 'r' }
   ])
+})
+
+it('style an empty input', () => {
+  expect(
+    style({
+      type: rules.bold,
+      input: [{ text: '' }],
+      from: 0,
+      to: 0
+    })
+  ).toEqual([{ text: '', effects: [rules.bold] }])
+})
+
+it('unstyle an empty input', () => {
+  expect(
+    style({
+      type: rules.bold,
+      input: [{ text: '', effects: [rules.bold] }],
+      from: 0,
+      to: 0
+    })
+  ).toEqual([{ text: '', effects:[] }])
 })

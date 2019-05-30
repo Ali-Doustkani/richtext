@@ -36,10 +36,16 @@ function create(rules) {
 
     return {
       staySelected: value => (staySelected = value),
+
       apply: (start, end, styleName) =>
         editor()
           .style(styleName, start, end)
-          .setPosition(staySelected ? start : end, end)
+          .setPosition(staySelected ? start : end, end),
+
+      make: styleName =>
+        editor()
+          .style(styleName, 0, editor().length)
+          .setPosition(editor().length, editor().length)
     }
   }
 }

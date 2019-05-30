@@ -19,6 +19,9 @@ function check(options) {
 function style(options) {
   const { input, from, to, type } = check(options)
   const context = createContext(from, to)
+  if (emptyInput(options)) {
+    return [{ text: '', effects: context.getEffective(input[0].effects, type) }]
+  }
   context.iterateOver(input, type, (text, originalEffects, newEffects) => {
     when(context.regionUntouched)
       .then(dontTouch)
@@ -34,6 +37,12 @@ function style(options) {
   })
 
   return context.result()
+}
+
+function emptyInput(options) {
+  const { input, from, to } = options
+  const noInput = input.length === 1 && !input[0].text
+  return noInput && !from && !to
 }
 
 function dontTouch({ context, text, originalEffects }) {

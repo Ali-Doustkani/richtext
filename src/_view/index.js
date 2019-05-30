@@ -42,6 +42,18 @@ wire('italic', sel => editor.apply(sel.start, sel.end, 'italic'))
 
 wire('highlight', sel => editor.apply(sel.start, sel.end, 'highlight'))
 
-wire('header', sel => editor.apply(sel.start, sel.end, 'header'))
+wire('header', sel => {
+  if (sel.start === sel.end) {
+    editor.make('header')
+  } else {
+    editor.apply(sel.start, sel.end, 'header')
+  }
+})
 
-wire('codebox', sel => editor.apply(sel.start, sel.end, 'codebox'))
+wire('codebox', sel => {
+  if (sel.start === sel.end) {
+    editor.make('codebox')
+  } else {
+    editor.apply(sel.start, sel.end, 'codebox')
+  }
+})

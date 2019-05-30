@@ -84,7 +84,12 @@ function makeEditor(effect) {
 }
 
 function shouldConvertEditorToParagraph(editor, item) {
-  return editor.tagName !== 'P' && (!item.effects || !item.effects.length)
+  // if it's not a <p> element without effect then it should be converted to <p>
+  // if it's not a <p> element without any parent effect then it should be converted to <p>
+  return (
+    editor.tagName !== 'P' &&
+    (!item.effects || !item.effects.length || !item.effects.some(x => x.parent))
+  )
 }
 
 export default createEditorSiblings

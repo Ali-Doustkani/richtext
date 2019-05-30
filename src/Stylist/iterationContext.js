@@ -49,12 +49,12 @@ function createContext(from, to) {
     for (let i = 0; i < input.length; i++) {
       const { text, effects } = input[i]
       regionHead += text.length
-      const newEffects = mustUndo(effects, type)
-        ? remove(effects, type)
-        : merge(effects, type)
-      func(text, effects, newEffects)
+      func(text, effects, ret.getEffective(effects, type))
     }
   }
+
+  ret.getEffective = (effects, type) =>
+    mustUndo(effects, type) ? remove(effects, type) : merge(effects, type)
 
   ret.regionUntouched = () => {
     return regionHead <= from || state.head >= to

@@ -46,3 +46,19 @@ it('take classNames into account for effect detection', () => {
     { text: 'Title', effects: [effects.styledBold, effects.styledHeader] }
   ])
 })
+
+it('read empty', () => {
+  const editor = document.createElement('p')
+  expect(read(editor)).toEqual([{ text: '' }])
+
+  editor.appendChild(document.createTextNode(''))
+  expect(read(editor)).toEqual([{ text: '' }])
+})
+
+it('read empty with effects', () => {
+  const editor = document.createElement('p')
+  const inner = document.createElement('h1')
+  inner.className = 'header-style'
+  editor.appendChild(inner)
+  expect(read(editor)).toEqual([{ text: '', effects: [effects.styledHeader] }])
+})

@@ -32,6 +32,7 @@ function toRichEditor(rules, richtext, editor) {
           to: end
         })
       )
+      editor.focus()
       if (editor !== lastParagraph) {
         changedStart = start
       }

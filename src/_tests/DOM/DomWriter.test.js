@@ -113,3 +113,11 @@ it('render some part to header and then to paragraph again', () => {
   expect(editor.innerHTML).toBe('2')
   expect(richtext.innerHTML).toBe('<p>1</p><h1>2</h1><p>3</p>')
 })
+
+it('render <pre> to <p> when its effect is absent', () => {
+  richtext.innerHTML = '<pre><b>a bold text</b></pre>'
+  editor = richtext.getElementsByTagName('pre')[0]
+  editor = render(editor, [{ text: 'a bold text', effects: [effects.bold] }])
+  expect(editor.tagName).toBe('P')
+  expect(richtext.innerHTML).toBe('<p><b>a bold text</b></p>')
+})

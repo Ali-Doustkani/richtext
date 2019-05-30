@@ -7,6 +7,9 @@ function create(effects) {
     const ret = []
     const parentEffects = getParentEffects(editor)
     let node = editor.firstChild
+    if (node === null) {
+      return [{ text: '' }]
+    }
     while (node !== null) {
       ret.push(drillDown(node, [...parentEffects]))
       node = node.nextSibling
@@ -15,14 +18,16 @@ function create(effects) {
   }
 
   function drillDown(node, effects) {
+    if (node === null || node.nodeType === Node.TEXT_NODE) {
+      const text = node ? node.textContent : ''
+      if (effects.length == 0) {
+        return { text }
+      }
+      return { text, effects }
+    }
     if (node.nodeType === Node.ELEMENT_NODE) {
       effects.unshift(getEffect(node))
       return drillDown(node.firstChild, effects)
-    } else if (node.nodeType === Node.TEXT_NODE) {
-      if (effects.length == 0) {
-        return { text: node.textContent }
-      }
-      return { text: node.textContent, effects }
     }
   }
 
