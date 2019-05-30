@@ -13,6 +13,10 @@ const editor = createRichtext({
     parent: true,
     tag: 'h1',
     className: 'header-style'
+  },
+  codebox: {
+    parent: true,
+    tag: 'pre'
   }
 })(div)
 div.firstChild.focus()
@@ -39,3 +43,5 @@ wire('italic', sel => editor.apply(sel.start, sel.end, 'italic'))
 wire('highlight', sel => editor.apply(sel.start, sel.end, 'highlight'))
 
 wire('header', sel => editor.apply(sel.start, sel.end, 'header'))
+
+wire('codebox', sel => editor.apply(sel.start, sel.end, 'codebox'))

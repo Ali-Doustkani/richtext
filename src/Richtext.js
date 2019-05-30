@@ -1,35 +1,34 @@
 import { glue } from './Stylist/Break'
 import { standardizeRules } from './DOM/utils'
-import { toRichParagraph, createRichParagraph } from './RichParagraph'
+import { toRichEditor, createRichEditor } from './RichEditor'
 import { relativeRange } from './Range'
 
 /**
  * It creates a configurator function based on the rules.
- * @param {object} rules Rules to configure the editor. Rules contain tags and classes that are used to decorate text in paragraphs.
+ * @param {object} rules Rules to configure the richtext. Rules contain tags and classes that are used to decorate text in editors(p, pre, div, h1, etc.).
  * @returns {Function} The function that configures the given <div> or <article> element as the editor.
  */
 function create(rules) {
   let staySelected = false
   rules = standardizeRules(rules)
 
-  return function(editor) {
-    checkEditor(rules, editor)
-    const paragraph = () =>
-      toRichParagraph(rules, editor, document.activeElement)
+  return function(richtext) {
+    checkEditor(rules, richtext)
+    const editor = () => toRichEditor(rules, richtext, document.activeElement)
 
-    editor.addEventListener(
+    richtext.addEventListener(
       'keydown',
       e => {
         if (e.key === 'Enter') {
-          handleEnterKey(e, paragraph())
+          handleEnterKey(e, editor())
         } else if (e.key === 'Backspace') {
-          handleBackspaceKey(e, paragraph())
+          handleBackspaceKey(e, editor())
         } else if (e.key === 'Delete') {
-          handleDeleteKey(e, paragraph())
+          handleDeleteKey(e, editor())
         } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-          handleArrowUp(e, paragraph())
+          handleArrowUp(e, editor())
         } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-          handleArrowDown(e, paragraph())
+          handleArrowDown(e, editor())
         }
       },
       true
@@ -38,34 +37,33 @@ function create(rules) {
     return {
       staySelected: value => (staySelected = value),
       apply: (start, end, styleName) =>
-        paragraph()
+        editor()
           .style(styleName, start, end)
           .setPosition(staySelected ? start : end, end)
     }
   }
 }
 
-function checkEditor(rules, editor) {
-  if (editor.tagName !== 'DIV' && editor.tagName !== 'ARTICLE') {
-    throw new Error('the editor can only be a <div> or <article> element')
+function checkEditor(rules, richtext) {
+  if (richtext.tagName !== 'DIV' && richtext.tagName !== 'ARTICLE') {
+    throw new Error('the richtext can only be a <div> or <article> element')
   }
-  if (editor.contentEditable === true) {
-    throw new Error(`the contentEditable of <${editor.tagName}> editor must be false`)
+  if (richtext.contentEditable === true) {
+    throw new Error(
+      `the contentEditable of <${richtext.tagName}> richtext must be false`
+    )
   }
-  if (!editor.children.length) {
-    createRichParagraph(rules, editor).attach()
+  if (!richtext.children.length) {
+    createRichEditor(rules, richtext).attach()
   }
-  if (editor.firstChild.nodeName !== 'P') {
-    throw new Error('only <p> element is valid inside editor')
+  if (richtext.firstChild.nodeName !== 'P') {
+    throw new Error('only <p> element is valid inside richtext')
   }
 }
 
 function handleEnterKey(event, p) {
   event.preventDefault() // prevent creating new lines in the same p element
-  const [m1, m2] = p.break()
-  p.render(m1)
-    .create(m2)
-    .addAfter(p)
+  p.break()
 }
 
 function handleBackspaceKey(event, p) {
@@ -100,7 +98,7 @@ function handleArrowUp(event, p) {
 
 function handleArrowDown(event, p) {
   const range = window.getSelection().getRangeAt(0)
-  const relRange = relativeRange(p.paragraph(), range)
+  const relRange = relativeRange(p.element(), range)
   if (relRange.start === p.length && relRange.end === p.length) {
     event.preventDefault()
     p.focusNext()

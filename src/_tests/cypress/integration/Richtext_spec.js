@@ -257,12 +257,35 @@ describe('styling text', () => {
       .highlight(0, 5)
     cy.contains('Header').click()
 
+    cy.get('#editor>p').should($p => {
+      expect($p).to.have.length(3)
+      expect($p.eq(0)).to.have.text('Content')
+      expect($p.eq(1)).to.have.text('Title')
+      expect($p.eq(2)).to.have.text('Content')
+    })
+  })
+
+  it('type code content inside of a pre element', () => {
+    cy.visit('/')
     cy.get('#editor>p')
-      .should($p => {
-        expect($p).to.have.length(3)
-        expect($p.eq(0)).to.have.text('Content')
-        expect($p.eq(1)).to.have.text('Title')
-        expect($p.eq(2)).to.have.text('Content')
-      })
+      .type('const str = "Hello World!"')
+      .highlightAll()
+    cy.contains('Code Box').click()
+    cy.get('#editor>pre')
+      .type('{enter}')
+      .type('const hello = str.slice(0, 5)')
+      .type('{enter}')
+      .type('const world = str.slice(6)')
+      .type('{uparrow}{uparrow}{home}')
+      .type('{enter}{uparrow}')
+      .type('// program beginning')
+      .type('{downarrow}{end}{enter}')
+      .type('// slice beginning')
+      .should('have.html', 
+`// program beginning
+const str = "Hello World!"
+// slice beginning
+const hello = str.slice(0, 5)
+const world = str.slice(6)`)
   })
 })

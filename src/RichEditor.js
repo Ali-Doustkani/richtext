@@ -1,50 +1,60 @@
 import style from './Stylist/Stylist'
 import createDomReader from './DOM/DomReader'
 import render from './DOM/DomWriter'
+import preEditor from './preEditor'
 import { absoluteRange, relativeRange } from './Range'
 import { breakAt } from './Stylist/Break'
 
-function createRichParagraph(rules, editor, model) {
-  const paragraph = document.createElement('p')
-  paragraph.contentEditable = true
+function createRichEditor(rules, richtext, model) {
+  const editor = document.createElement('p')
+  editor.contentEditable = true
   if (model) {
-    render(paragraph, model)
+    render(editor, model)
   }
-  return toRichParagraph(rules, editor, paragraph)
+  return toRichEditor(rules, richtext, editor)
 }
 
-function toRichParagraph(rules, editor, paragraph) {
+function toRichEditor(rules, richtext, editor) {
   let changedStart
   const read = createDomReader(rules)
   const w = {
-    create: model => createRichParagraph(rules, editor, model),
+    create: model => createRichEditor(rules, richtext, model),
 
-    paragraph: () => paragraph,
+    element: () => editor,
 
     style: (styleName, start, end) => {
-      const lastParagraph = paragraph
-      const sdfsdf=read(paragraph)
+      const lastParagraph = editor
       w.render(
         style({
           type: rules[styleName],
-          input: read(paragraph),
+          input: read(editor),
           from: start,
           to: end
         })
       )
-      if (paragraph !== lastParagraph) {
+      if (editor !== lastParagraph) {
         changedStart = start
       }
       return w
     },
-    break: () =>
-      breakAt(
+
+    break: () => {
+      if (w.element().tagName === 'PRE') {
+        preEditor(w).break()
+        return w
+      }
+      const [m1, m2] = breakAt(
         w.model,
-        relativeRange(paragraph, window.getSelection().getRangeAt(0))
-      ),
+        relativeRange(editor, window.getSelection().getRangeAt(0))
+      )
+      w.render(m1)
+        .create(m2)
+        .addAfter(w)
+      return w
+    },
 
     render: model => {
-      paragraph = render(paragraph, model)
+      editor = render(editor, model)
       return w
     },
 
@@ -54,7 +64,7 @@ function toRichParagraph(rules, editor, paragraph) {
         end -= changedStart
       }
       end = end || start
-      const points = absoluteRange(paragraph, { start, end })
+      const points = absoluteRange(editor, { start, end })
       const range = document.createRange()
       range.setStart(points.startContainer, points.startOffset)
       range.setEnd(points.endContainer, points.endOffset)
@@ -67,7 +77,7 @@ function toRichParagraph(rules, editor, paragraph) {
     focusPrev: () => {
       if (!w.isFirst) {
         const prev = w.prev
-        prev.paragraph().focus()
+        prev.element().focus()
         prev.setPosition(prev.length)
       }
     },
@@ -75,80 +85,74 @@ function toRichParagraph(rules, editor, paragraph) {
     focusNext: () => {
       if (!w.isLast) {
         const next = w.next
-        next.paragraph().focus()
+        next.element().focus()
         next.setPosition(0)
       }
     },
 
     attach: () => {
-      editor.appendChild(paragraph)
+      richtext.appendChild(editor)
       return w
     },
 
     replaceWith: (p1, p2) => {
-      p1 = p1.paragraph()
-      p2 = p2.paragraph()
-      editor.removeChild(p1)
-      editor.insertBefore(paragraph, p2)
-      editor.removeChild(p2)
-      paragraph.focus()
+      p1 = p1.element()
+      p2 = p2.element()
+      richtext.removeChild(p1)
+      richtext.insertBefore(editor, p2)
+      richtext.removeChild(p2)
+      editor.focus()
       return w
     },
 
     addAfter: p => {
-      p = p.paragraph()
-      p.insertAdjacentElement('afterend', paragraph)
-      paragraph.focus()
+      p = p.element()
+      p.insertAdjacentElement('afterend', editor)
+      editor.focus()
       return w
     },
 
     get model() {
-      return read(paragraph)
+      return read(editor)
     },
 
     get prev() {
-      if (!paragraph.previousSibling) {
+      if (!editor.previousSibling) {
         return null
       }
-      return toRichParagraph(rules, editor, paragraph.previousSibling)
+      return toRichEditor(rules, richtext, editor.previousSibling)
     },
 
     get next() {
-      if (!paragraph.nextSibling) {
+      if (!editor.nextSibling) {
         return null
       }
-      return toRichParagraph(rules, editor, paragraph.nextSibling)
+      return toRichEditor(rules, richtext, editor.nextSibling)
     },
 
     get length() {
-      return paragraph.textContent.length
+      return editor.textContent.length
     },
 
     get isCursorAtBeginning() {
-      const range = relativeRange(
-        paragraph,
-        window.getSelection().getRangeAt(0)
-      )
+      const range = relativeRange(editor, window.getSelection().getRangeAt(0))
       return range.start === 0 && range.end === 0
     },
 
     get isCursorAtEnd() {
-      const range = relativeRange(
-        paragraph,
-        window.getSelection().getRangeAt(0)
-      )
+      const range = relativeRange(editor, window.getSelection().getRangeAt(0))
       return range.start === w.length && range.end === w.length
     },
 
     get isFirst() {
-      return paragraph.previousSibling === null
+      return editor.previousSibling === null
     },
 
     get isLast() {
-      return paragraph.nextSibling === null
+      return editor.nextSibling === null
     }
   }
   return w
 }
 
-export { toRichParagraph, createRichParagraph }
+export { toRichEditor, createRichEditor }
