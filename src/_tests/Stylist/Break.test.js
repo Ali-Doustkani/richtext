@@ -1,5 +1,16 @@
 import { breakAt, glue } from './../../Stylist/Break'
 
+const effects = {
+  bold: {
+    tag: 'b'
+  },
+  header: {
+    parent: true,
+    tag: 'h1',
+    toString: () => 'sdfsdf'
+  }
+}
+
 it('creates a new array for result', () => {
   const model = [{ text: '123456' }]
   const [m1, m2] = breakAt(model, 3)
@@ -100,4 +111,13 @@ it('glue when second model is empty', () => {
   const m1 = [{ text: 'Hello World' }]
   const m2 = []
   expect(glue(m1, m2)).toEqual([{ text: 'Hello World' }])
+})
+
+it('glue a regular model to a parent model', () => {
+  const regular = [{ text: 'Hello', effects: [effects.bold] }]
+  const parent = [{ text: 'World', effects: [effects.header] }]
+  expect(glue(regular, parent)).toEqual([
+    { text: 'Hello', effects: [effects.bold] },
+    { text: 'World' }
+  ])
 })

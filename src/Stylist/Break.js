@@ -76,7 +76,7 @@ function iterateOver(model, selection, func) {
 }
 
 function copy(text, effects) {
-  if (!effects) {
+  if (!effects || !effects.length) {
     return { text }
   }
   return { text, effects: [...effects] }
@@ -90,7 +90,13 @@ function copy(text, effects) {
  */
 function glue(model1, model2) {
   const result = []
-  const push = item => result.push(copy(item.text, item.effects))
+  const push = item => {
+    const effects =
+      item.effects && item.effects.length
+        ? item.effects.filter(x => !x.parent)
+        : undefined
+    result.push(copy(item.text, effects))
+  }
   model1.forEach(push)
   if (result.length && model2.length) {
     const lastEffect = result[result.length - 1].effects
