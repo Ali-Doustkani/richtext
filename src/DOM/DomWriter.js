@@ -1,4 +1,4 @@
-import createRenderListManager from './editorSiblings'
+import { createEditorListManager, createNewEditor } from './editors'
 
 /**
  * Renders the model to the editor and creates new elements surround it if needed.
@@ -9,7 +9,7 @@ import createRenderListManager from './editorSiblings'
  */
 function render(richtext, editor, model) {
   editor.innerHTML = ''
-  const manager = createRenderListManager(richtext, editor)
+  const manager = createEditorListManager(richtext, editor)
   model.forEach(item =>
     manager.getOrCreateEditor(item).appendChild(children(item))
   )
@@ -56,4 +56,4 @@ function generateList(richtext, elements, original) {
   }
 }
 
-export default render
+export { render, createNewEditor }

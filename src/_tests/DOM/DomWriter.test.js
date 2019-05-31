@@ -1,4 +1,4 @@
-import render from './../../DOM/DomWriter'
+import { render } from './../../DOM/DomWriter'
 
 const effects = {
   bold: {

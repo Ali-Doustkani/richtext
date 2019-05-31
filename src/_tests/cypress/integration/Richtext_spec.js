@@ -281,11 +281,22 @@ describe('styling text', () => {
       .type('// program beginning')
       .type('{downarrow}{end}{enter}')
       .type('// slice beginning')
-      .should('have.html', 
-`// program beginning
+      .should(
+        'have.html',
+        `// program beginning
 const str = "Hello World!"
 // slice beginning
 const hello = str.slice(0, 5)
-const world = str.slice(6)`)
+const world = str.slice(6)`
+      )
+      .type('{home}{ctrl}{enter}')
+    cy.get('#editor').should(
+      'have.html',
+      `<pre contenteditable="true">// program beginning
+const str = "Hello World!"
+</pre><pre contenteditable="true">// slice beginning
+const hello = str.slice(0, 5)
+const world = str.slice(6)</pre>`
+    )
   })
 })

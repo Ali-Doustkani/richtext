@@ -1,10 +1,10 @@
 /**
  * Creates a list of editors that can be rendered by order.
  * The 'original' item is the initial editor that user typed in.
- * @param {HTMLElement} richtext 
+ * @param {HTMLElement} richtext
  * @param {HTMLElement} editor
  */
-function renderListManager(richtext, editor) {
+function createEditorListManager(richtext, editor) {
   const elements = []
   let original = editor
   let active = editor
@@ -17,12 +17,7 @@ function renderListManager(richtext, editor) {
   }
 
   const makeEditor = effect => {
-    const tag = effect ? effect.tag : 'p'
-    const editor = document.createElement(tag)
-    if (effect && effect.className) {
-      editor.className = effect.className
-    }
-    editor.contentEditable = true
+    const editor = createNewEditor(effect)
     elements.push(editor)
     return editor
   }
@@ -67,4 +62,14 @@ function renderListManager(richtext, editor) {
   }
 }
 
-export default renderListManager
+function createNewEditor(effect) {
+  const tag = effect && effect.parent ? effect.tag : 'p'
+  const editor = document.createElement(tag)
+  if (effect && effect.className) {
+    editor.className = effect.className
+  }
+  editor.contentEditable = true
+  return editor
+}
+
+export { createEditorListManager, createNewEditor }

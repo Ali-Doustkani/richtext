@@ -1,13 +1,16 @@
 import style from './Stylist/Stylist'
 import createDomReader from './DOM/DomReader'
-import render from './DOM/DomWriter'
+import { render, createNewEditor } from './DOM/DomWriter'
 import preEditor from './preEditor'
 import { absoluteRange, relativeRange } from './Range'
 import { breakAt } from './Stylist/Break'
 
 function createRichEditor(rules, richtext, model) {
-  const editor = document.createElement('p')
-  editor.contentEditable = true
+  const effect =
+    model && model.length && model[0].effects && model[0].effects.length
+      ? model[0].effects[0]
+      : undefined
+  const editor = createNewEditor(effect)
   if (model) {
     render(richtext, editor, model)
   }
@@ -39,8 +42,8 @@ function toRichEditor(rules, richtext, editor) {
       return w
     },
 
-    break: () => {
-      if (w.element().tagName === 'PRE') {
+    break: (ctrl) => {
+      if (w.element().tagName === 'PRE' && !ctrl) {
         preEditor(w).break()
         return w
       }

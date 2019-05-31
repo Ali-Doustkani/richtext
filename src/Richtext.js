@@ -14,8 +14,7 @@ function create(rules) {
 
   return function(richtext) {
     checkEditor(rules, richtext)
-    const editor = () =>
-      toRichEditor(rules,  richtext,  document.activeElement)
+    const editor = () => toRichEditor(rules, richtext, document.activeElement)
 
     richtext.addEventListener(
       'keydown',
@@ -70,7 +69,7 @@ function checkEditor(rules, richtext) {
 
 function handleEnterKey(event, p) {
   event.preventDefault() // prevent creating new lines in the same p element
-  p.break()
+  p.break(event.ctrlKey)
 }
 
 function handleBackspaceKey(event, p) {
