@@ -33,20 +33,4 @@ function standardizeRules(rules) {
   return initObj
 }
 
-/**
- * Generates all the elements in the array as siblings on the parent.
- * The main element that other sibling are added relative to it also exists in this array.
- * @param {HTMLElement} parent
- * @param {Array} elements
- * @param {number} mainElementIndex
- */
-function generateSiblings(parent, elements, mainElementIndex) {
-  for (let i = mainElementIndex; i > 0; i--) {
-    parent.insertBefore(elements[i - 1], elements[i])
-  }
-  for (let i = mainElementIndex; i < elements.length - 1; i++) {
-    parent.insertBefore(elements[i + 1], elements[i + 1].nextSibling)
-  }
-}
-
-export { effectsAreOk, standardizeRules, generateSiblings }
+export { effectsAreOk, standardizeRules }

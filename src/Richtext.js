@@ -14,7 +14,8 @@ function create(rules) {
 
   return function(richtext) {
     checkEditor(rules, richtext)
-    const editor = () => toRichEditor(rules, richtext, document.activeElement)
+    const editor = () =>
+      toRichEditor(rules,  richtext,  document.activeElement)
 
     richtext.addEventListener(
       'keydown',

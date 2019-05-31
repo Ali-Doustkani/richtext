@@ -217,7 +217,7 @@ describe('styling text', () => {
       .shouldHavePosition(el => el.firstChild, 0)
   })
 
-  it('apply header editor', () => {
+  it.only('apply header editor', () => {
     cy.visit('/')
     cy.get('#editor>p')
       .type('ContentTitleContent')
