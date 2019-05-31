@@ -1,13 +1,19 @@
 /**
- * Any element that user can type in is called an editor.
- * A richtext element contains one or more editors.
- * This function creates a closure for managing a queue of editors.
- * @param {HTMLParagraphElement} editor The main paragraph (editor) which user was typing in
+ * Creates a list of editors that can be rendered by order.
+ * The 'original' item is the initial editor that user typed in.
+ * @param {HTMLElement} richtext 
+ * @param {HTMLElement} editor
  */
-function createEditorSiblings(theEditor, elements) {
-  const replace = newEditor => {
-    theEditor.richtext.replaceChild(newEditor, theEditor.editor)
-    theEditor.editor = newEditor
+function renderListManager(richtext, editor) {
+  const elements = []
+  let original = editor
+  let active = editor
+
+  const setActive = (editor, item) => (active = item.active ? editor : active)
+
+  const replaceOriginal = newEditor => {
+    richtext.replaceChild(newEditor, editor)
+    original = newEditor
   }
 
   const makeEditor = effect => {
@@ -21,32 +27,44 @@ function createEditorSiblings(theEditor, elements) {
     return editor
   }
 
-  const editorHasToChange = pe =>
-    (pe && theEditor.editor.tagName !== pe.tag.toUpperCase()) ||
-    (!pe && theEditor.editor.tagName !== 'P')
+  const editorShouldChange = effect =>
+    (effect && editor.tagName !== effect.tag.toUpperCase()) ||
+    (!effect && editor.tagName !== 'P')
 
-  return function(item) {
+  const getOrCreateEditor = item => {
     const parentEffect = item.effects
       ? item.effects.filter(x => x.parent)[0]
       : undefined
-    if (editorHasToChange(parentEffect)) {
+    if (editorShouldChange(parentEffect)) {
       const newEditor = makeEditor(parentEffect)
-      replace(newEditor)
+      replaceOriginal(newEditor)
+      setActive(newEditor, item)
       return newEditor
     }
 
     const lastElement = elements[elements.length - 1]
     if (lastElement && lastElement.tagName === 'P') {
+      setActive(lastElement, item)
       return lastElement
     }
 
-    if (elements.some(x => x === theEditor.editor)) {
-      return makeEditor()
+    if (elements.some(x => x === editor)) {
+      const newEditor = makeEditor()
+      setActive(newEditor, item)
+      return newEditor
     }
 
-    elements.push(theEditor.editor)
-    return theEditor.editor
+    elements.push(editor)
+    setActive(editor, item)
+    return editor
+  }
+
+  return {
+    getActive: () => active,
+    getOriginal: () => original,
+    getRenderList: () => elements,
+    getOrCreateEditor
   }
 }
 
-export default createEditorSiblings
+export default renderListManager

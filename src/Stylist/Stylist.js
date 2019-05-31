@@ -20,7 +20,13 @@ function style(options) {
   const { input, from, to, type } = check(options)
   const context = createContext(from, to)
   if (emptyInput(options)) {
-    return [{ text: '', effects: context.getEffective(input[0].effects, type) }]
+    return [
+      {
+        text: '',
+        effects: context.getEffective(input[0].effects, type),
+        active: true
+      }
+    ]
   }
   context.iterateOver(input, type, (text, originalEffects, newEffects) => {
     when(context.regionUntouched)
@@ -46,29 +52,33 @@ function emptyInput(options) {
 }
 
 function dontTouch({ context, text, originalEffects }) {
-  context.addResult(text, originalEffects)
+  context.addResult(text, originalEffects, false)
 }
 
 function takeAll({ context, text, newEffects }) {
-  context.addResult(text, newEffects)
+  context.addResult(text, newEffects, true)
 }
 
 function takeMiddlePart({ context, text, originalEffects, newEffects }) {
   const [first, middle, last] = context.threePieces(text)
   context
-    .addResult(first, originalEffects)
-    .addResult(middle, newEffects)
-    .addResult(last, originalEffects)
+    .addResult(first, originalEffects, false)
+    .addResult(middle, newEffects, true)
+    .addResult(last, originalEffects, false)
 }
 
 function takeFirstPart({ context, text, originalEffects, newEffects }) {
   const [first, second] = context.twoPieces(text)
-  context.addResult(first, originalEffects).addResult(second, newEffects)
+  context
+    .addResult(first, originalEffects, false)
+    .addResult(second, newEffects, true)
 }
 
 function takeSecondPart({ context, text, originalEffects, newEffects }) {
   const [first, second] = context.twoPieces(text)
-  context.addResult(first, newEffects).addResult(second, originalEffects)
+  context
+    .addResult(first, newEffects, true)
+    .addResult(second, originalEffects, false)
 }
 
 export default style

@@ -9,7 +9,7 @@ function createRichEditor(rules, richtext, model) {
   const editor = document.createElement('p')
   editor.contentEditable = true
   if (model) {
-    render({ richtext, editor }, model)
+    render(richtext, editor, model)
   }
   return toRichEditor(rules, richtext, editor)
 }
@@ -55,9 +55,7 @@ function toRichEditor(rules, richtext, editor) {
     },
 
     render: model => {
-      const control = { richtext, editor }
-      render(control, model)
-      editor = control.editor
+      editor = render(richtext, editor, model)
       return w
     },
 

@@ -7,7 +7,7 @@ function create(result, head) {
   })
 }
 
-function addToResult(state, text, effects) {
+function addToResult(state, text, effects, active) {
   if (text === '') {
     return state
   }
@@ -16,8 +16,12 @@ function addToResult(state, text, effects) {
   const lastElement = result[result.length - 1]
   if (lastElement && areEqual(lastElement.effects, effects)) {
     lastElement.text += text
+    lastElement.active = active || lastElement.active
   } else {
-    result.push({ text, effects })
+    if (active && lastElement) {
+      lastElement.active = false
+    }
+    result.push({ text, effects, active })
   }
   return create(result, state.head + text.length)
 }
@@ -38,10 +42,15 @@ function createContext(from, to) {
     return hasTheEffect && (regionFitToPoints || pointsAreInRegion)
   }
 
-  ret.result = () => state.result
+  ret.result = () => {
+    if (state.result.length === 1) {
+      state.result[0].active = true
+    }
+    return state.result
+  }
 
-  ret.addResult = (text, effects) => {
-    state = addToResult(state, text, effects)
+  ret.addResult = (text, effects, active) => {
+    state = addToResult(state, text, effects, active)
     return ret
   }
 
