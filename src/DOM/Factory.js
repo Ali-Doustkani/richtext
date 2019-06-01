@@ -1,11 +1,10 @@
+import { el } from './Query'
+
 function createNewEditor(effect) {
   const tag = effect && effect.parent ? effect.tag : 'p'
-  const editor = document.createElement(tag)
-  if (effect && effect.className) {
-    editor.className = effect.className
-  }
-  editor.contentEditable = true
-  return editor
+  return el(tag)
+    .setClassFrom(effect)
+    .isEditable()
 }
 
 /**
@@ -20,7 +19,8 @@ function generateRenderModel(styleModel) {
   const list = []
   let active
 
-  const setActive = (editor, item) => (active = item.active ? editor : active)
+  const setActive = (editor, item) =>
+    (active = item.active ? editor.element : active)
 
   const parentOf = effects => {
     const result = effects ? effects.filter(x => x.parent)[0] : undefined
@@ -29,7 +29,7 @@ function generateRenderModel(styleModel) {
 
   const lastEditorOf = pe => {
     const lastElement = list[list.length - 1]
-    if (lastElement && lastElement.tagName === pe.tag.toUpperCase()) {
+    if (lastElement && lastElement.element.tagName === pe.tag.toUpperCase()) {
       return lastElement
     }
   }
@@ -42,53 +42,30 @@ function generateRenderModel(styleModel) {
       list.push(editor)
     }
     setActive(editor, item)
-    const children = createChildren(item)
-    if (children) {
-      editor.appendChild(children)
+    let children
+
+    const notParentEffects = (item.effects || []).filter(x => !x.parent)
+    if (notParentEffects.length) {
+      children = item.text
+      notParentEffects.forEach(
+        effect => {
+          children = el(effect.tag).setClassFrom(effect).val(children)
+        }
+      )
+    editor.append(children)
+
+    } else {
+      editor.appendText(item.text)
     }
   })
 
-  return { list, active }
+  const a = list.map(x => x.element)  // return Wrapped Elements
+  return { list: a, active }
 }
 
 function empty() {
   const p = createNewEditor()
-  return { list: [p], active: p }
-}
-
-function createChildren(item) {
-  let element
-  const notParentEffects = (item.effects || []).filter(x => !x.parent)
-  if (notParentEffects.length) {
-    element = item.text
-    notParentEffects.forEach(effect => (element = el(effect).value(element)))
-  } else {
-    element = el(item.text)
-  }
-  return element
-}
-
-function el(option) {
-  if (!option) {
-    return null
-  }
-  if (typeof option === 'string') {
-    return document.createTextNode(option)
-  }
-  const element = document.createElement(option.tag)
-  if (option.className) {
-    element.setAttribute('class', option.className)
-  }
-  return {
-    value: value => {
-      if (!value) {
-        return element
-      }
-      value = typeof value === 'string' ? document.createTextNode(value) : value
-      element.appendChild(value)
-      return element
-    }
-  }
+  return { list: [p.element], active: p.element }
 }
 
 export { generateRenderModel, createNewEditor }

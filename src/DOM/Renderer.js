@@ -1,30 +1,25 @@
-function render(richtext, editor, renderModel) {
-  const { list, active } = renderModel
-  richtext.replaceChild(list[0], editor)
-  for (let i = 1; i < list.length; i++) {
-    richtext.insertBefore(list[i], list[i - 1].nextSibling)
+function check(renderModel) {
+  if (!renderModel || !renderModel.list || !renderModel.list.length) {
+    throw new Error(
+      "'renderModel' object be valid and contain a non-empty list"
+    )
   }
-  return active
 }
 
-function render2(richtext, editor, r1, r2) {
-  let next
-  if (r1.list.length) {
-    richtext.replaceChild(r1.list[0], editor)
-    next = r1.list[0]
-    for (let i = 1; i < r1.list.length; i++) {
-      next = r1.list[i - 1]
-      richtext.insertBefore(r1.list[i], next.nextSibling)
-    }
-  } else {
-    editor.innerHTML = ''
-    next = editor
+function render(richtext, editor, renderModel1, renderModel2) {
+  if (renderModel2) {
+    check(renderModel1)
+    check(renderModel2)
+    renderList(richtext, editor, [...renderModel1.list, ...renderModel2.list])
+    return renderModel2.active
   }
-  richtext.insertBefore(r2.list[0], next.nextSibling)
-  for (let i = 1; i < r2.list.length; i++) {
-    richtext.insertBefore(r2.list[i], r2.list[i - 1].nextSibling)
-  }
-  return r2.active
+  check(renderModel1)
+  renderList(richtext, editor, renderModel1.list)
+  return renderModel1.active
 }
 
-export { render, render2 }
+function renderList(richtext, editor, list) {
+  richtext.insertAfter(editor, list).remove(editor)
+}
+
+export { render }
