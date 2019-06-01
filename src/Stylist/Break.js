@@ -31,6 +31,12 @@ function breakAt(model, range) {
     }
   })
 
+  if (newModel.length) {
+    newModel[newModel.length - 1].active = true
+  } else {
+    newModel.push({ text: '', active: true })
+  }
+
   return [originalModel, newModel]
 }
 
@@ -77,9 +83,9 @@ function iterateOver(model, selection, func) {
 
 function copy(text, effects) {
   if (!effects || !effects.length) {
-    return { text }
+    return { text, active: false }
   }
-  return { text, effects: [...effects] }
+  return { text, effects: [...effects], active: false }
 }
 
 /**
@@ -108,6 +114,7 @@ function glue(model1, model2) {
     }
   }
   model2.forEach(push)
+  result[result.length - 1].active = true
   return result
 }
 

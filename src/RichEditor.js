@@ -1,6 +1,7 @@
 import style from './Stylist/Stylist'
 import createDomReader from './DOM/DomReader'
-import { render, createNewEditor } from './DOM/DomWriter'
+import { createRenderModel, createNewEditor } from './DOM/Factory'
+import { render, render2 } from './DOM/Renderer'
 import preEditor from './preEditor'
 import { absoluteRange, relativeRange } from './Range'
 import { breakAt } from './Stylist/Break'
@@ -42,7 +43,7 @@ function toRichEditor(rules, richtext, editor) {
       return w
     },
 
-    break: (ctrl) => {
+    break: ctrl => {
       if (w.element().tagName === 'PRE' && !ctrl) {
         preEditor(w).break()
         return w
@@ -51,14 +52,22 @@ function toRichEditor(rules, richtext, editor) {
         w.model,
         relativeRange(editor, window.getSelection().getRangeAt(0))
       )
-      w.render(m1)
-        .create(m2)
-        .addAfter(w)
+
+      // w.render(m1)
+      //   .create(m2)
+      //   .addAfter(w)
+      editor = render2(
+        richtext,
+        editor,
+        createRenderModel(m1),
+        createRenderModel(m2)
+      )
+      editor.focus()
       return w
     },
 
     render: model => {
-      editor = render(richtext, editor, model)
+      editor = render(richtext, editor, createRenderModel(model))
       return w
     },
 

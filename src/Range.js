@@ -32,6 +32,9 @@ function relativeRange(rootNode, range) {
     incrementEndOffset(node)
     incrementStartOffset(node)
     node = nextText(node, rootNode)
+    if (node === null) {
+      break
+    }
   }
 
   return {

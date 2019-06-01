@@ -87,7 +87,7 @@ it('calculate reletive range of one root with different children', () => {
   ).toEqual({ start: 6, end: 11 })
 })
 
-it('calculate reletive range of when container is empty', () => {
+it('calculate reletive range when container is empty', () => {
   render('<p></p>')
   const p_root = document.getElementsByTagName('p')[0]
   expect(
@@ -96,6 +96,20 @@ it('calculate reletive range of when container is empty', () => {
       startContainer: p_root,
       startOffset: 0,
       endContainer: p_root,
+      endOffset: 0
+    })
+  ).toEqual({ start: 0, end: 0 })
+})
+
+it('calculate relative range when container has empty text', () => {
+  const p = document.createElement('p')
+  p.appendChild(document.createTextNode(''))
+  expect(
+    relativeRange(p, {
+      commonAncestorContainer: p,
+      startContainer: p,
+      startOffset: 0,
+      endContainer: p,
       endOffset: 0
     })
   ).toEqual({ start: 0, end: 0 })
