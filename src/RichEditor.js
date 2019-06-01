@@ -1,6 +1,6 @@
 import style from './Stylist/Stylist'
 import createDomReader from './DOM/DomReader'
-import { createRenderModel, createNewEditor } from './DOM/Factory'
+import { generateRenderModel, createNewEditor } from './DOM/Factory'
 import { render, render2 } from './DOM/Renderer'
 import preEditor from './preEditor'
 import { absoluteRange, relativeRange } from './Range'
@@ -59,15 +59,15 @@ function toRichEditor(rules, richtext, editor) {
       editor = render2(
         richtext,
         editor,
-        createRenderModel(m1),
-        createRenderModel(m2)
+        generateRenderModel(m1),
+        generateRenderModel(m2)
       )
       editor.focus()
       return w
     },
 
     render: model => {
-      editor = render(richtext, editor, createRenderModel(model))
+      editor = render(richtext, editor, generateRenderModel(model))
       return w
     },
 

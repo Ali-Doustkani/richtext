@@ -9,11 +9,14 @@ function createNewEditor(effect) {
 }
 
 /**
- * Generates a list of elements with their contents that must be rendered in the richtext.
- * @param {object} model The style model.
- * @returns {object} The render model.
+ * Generates a list of elements with their contents that should be put into the richtext.
+ * It returns the list and the active element that should be focused.
  */
-function createRenderModel(model) {
+function generateRenderModel(styleModel) {
+  if (!styleModel.length) {
+    return empty()
+  }
+
   const list = []
   let active
 
@@ -24,31 +27,36 @@ function createRenderModel(model) {
     return result || { tag: 'p' }
   }
 
-  const lastElementOf = pe => {
+  const lastEditorOf = pe => {
     const lastElement = list[list.length - 1]
     if (lastElement && lastElement.tagName === pe.tag.toUpperCase()) {
       return lastElement
     }
   }
 
-  model.forEach(item => {
+  styleModel.forEach(item => {
     const pe = parentOf(item.effects)
-    let ret = lastElementOf(pe)
-    if (!ret) {
-      ret = createNewEditor(pe)
-      list.push(ret)
+    let editor = lastEditorOf(pe)
+    if (!editor) {
+      editor = createNewEditor(pe)
+      list.push(editor)
     }
-    setActive(ret, item)
-    const cc = children(item)
-    if (cc) {
-      ret.appendChild(cc)
+    setActive(editor, item)
+    const children = createChildren(item)
+    if (children) {
+      editor.appendChild(children)
     }
   })
 
   return { list, active }
 }
 
-function children(item) {
+function empty() {
+  const p = createNewEditor()
+  return { list: [p], active: p }
+}
+
+function createChildren(item) {
   let element
   const notParentEffects = (item.effects || []).filter(x => !x.parent)
   if (notParentEffects.length) {
@@ -61,10 +69,10 @@ function children(item) {
 }
 
 function el(option) {
+  if (!option) {
+    return null
+  }
   if (typeof option === 'string') {
-    if (option === '') {
-      return null
-    }
     return document.createTextNode(option)
   }
   const element = document.createElement(option.tag)
@@ -73,6 +81,9 @@ function el(option) {
   }
   return {
     value: value => {
+      if (!value) {
+        return element
+      }
       value = typeof value === 'string' ? document.createTextNode(value) : value
       element.appendChild(value)
       return element
@@ -80,4 +91,4 @@ function el(option) {
   }
 }
 
-export { createRenderModel, createNewEditor }
+export { generateRenderModel, createNewEditor }

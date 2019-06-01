@@ -1,4 +1,4 @@
-import { createRenderModel } from './../../DOM/Factory'
+import { generateRenderModel } from './../../DOM/Factory'
 
 const effects = {
   bold: {
@@ -19,15 +19,30 @@ const effects = {
   }
 }
 
+it('model empty style model', () => {
+  const model = generateRenderModel([])
+  expect(model.list.length).toBe(1)
+  expect(model.active).toBe(model.list[0])
+  expect(model.list[0].outerHTML).toBe('<p></p>')
+})
+
+it('model empty paragraphs with null child', () => {
+  let model = generateRenderModel([{ text: '' }])
+  expect(model.list.length).toBe(1)
+
+  model = generateRenderModel([{ text: '', effects: [effects.bold] }])
+  expect(model.list[0].firstChild.firstChild).toBeNull()
+})
+
 it('model simple text', () => {
-  const model = createRenderModel([{ text: 'hello world', active: true }])
+  const model = generateRenderModel([{ text: 'hello world', active: true }])
   expect(model.list.length).toBe(1)
   expect(model.active).toBe(model.list[0])
   expect(model.list[0].outerHTML).toBe('<p>hello world</p>')
 })
 
 it('model two items with different effects', () => {
-  const model = createRenderModel([
+  const model = generateRenderModel([
     { text: 'Hello', effects: [effects.highlight], active: true },
     { text: 'World', effects: [effects.bold], active: false }
   ])
@@ -38,7 +53,7 @@ it('model two items with different effects', () => {
 })
 
 it('model two items with some effects intersection', () => {
-  const model = createRenderModel([
+  const model = generateRenderModel([
     {
       text: 'Hello',
       effects: [effects.bold, effects.highlight],
@@ -54,7 +69,7 @@ it('model two items with some effects intersection', () => {
 })
 
 it('model parent effect beginning with paragraph', () => {
-  const model = createRenderModel([
+  const model = generateRenderModel([
     { text: 'Title', effects: [effects.bigHeader, effects.bold], active: true },
     { text: 'Content', active: false }
   ])
@@ -66,7 +81,7 @@ it('model parent effect beginning with paragraph', () => {
 })
 
 it('model parent effect ending with paragraph', () => {
-  const model = createRenderModel([
+  const model = generateRenderModel([
     { text: 'Content', active: true },
     { text: 'Title', effects: [effects.smallHeader], active: false }
   ])
@@ -77,7 +92,7 @@ it('model parent effect ending with paragraph', () => {
 })
 
 it('model parent effect surrounded by paragraphs', () => {
-  const model = createRenderModel([
+  const model = generateRenderModel([
     { text: 'Content1', active: false },
     { text: 'Title', effects: [effects.bigHeader], active: false },
     { text: 'Content2', active: true }
@@ -90,7 +105,7 @@ it('model parent effect surrounded by paragraphs', () => {
 })
 
 it('model empty effects', () => {
-  const model = createRenderModel([
+  const model = generateRenderModel([
     { text: 'Hello', active: true },
     { text: 'World', active: false }
   ])
