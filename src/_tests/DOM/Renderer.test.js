@@ -17,7 +17,7 @@ it('render a lists', () => {
   }
   const active = render(richtext, editor, renderModel)
   expect(active).toBe(renderModel.active)
-  expect(richtext.html()).toBe('<p>Hey</p><pre>Code</pre>')
+  expect(richtext.element.innerHTML).toBe('<p>Hey</p><pre>Code</pre>')
 })
 
 it('throw error on empty list', () => {
@@ -27,5 +27,5 @@ it('throw error on empty list', () => {
 
 it('render an empty list with a non-empty list', () => {
   render(richtext, editor, { list: [el('p')] }, { list: [el('p')] })
-  expect(richtext.html()).toBe('<p></p><p></p>')
+  expect(richtext.element.innerHTML).toBe('<p></p><p></p>')
 })

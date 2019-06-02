@@ -6,46 +6,43 @@ function create(effects) {
   return editor => {
     const ret = []
     const parentEffects = getParentEffects(editor)
-    let node = editor.firstChild
-    if (node === null) {
+    let node = editor.firstChild()
+    if (!node) {
       return [{ text: '' }]
     }
-    while (node !== null) {
+    while (node) {
       ret.push(drillDown(node, [...parentEffects]))
-      node = node.nextSibling
+      node = node.nextSibling()
     }
     return ret
   }
 
-  function drillDown(node, effects) {
-    if (node === null || node.nodeType === Node.TEXT_NODE) {
-      const text = node ? node.textContent : ''
+  function drillDown(el, effects) {
+    if (!el || el.is(Node.TEXT_NODE)) {
+      const text = el ? el.val() : ''
       if (effects.length == 0) {
         return { text }
       }
       return { text, effects }
     }
-    if (node.nodeType === Node.ELEMENT_NODE) {
-      effects.unshift(getEffect(node))
-      return drillDown(node.firstChild, effects)
+    if (el.is(Node.ELEMENT_NODE)) {
+      effects.unshift(getEffect(el))
+      return drillDown(el.firstChild(), effects)
     }
   }
 
-  function getEffect(node) {
+  function getEffect(el) {
     for (let prop in effects) {
       const e = effects[prop]
-      const classEquals =
-        node.className || e.className ? e.className === node.className : true
-
-      if (e.tag && e.tag.toUpperCase() === node.nodeName && classEquals) {
+      if (e.tag && el.is(e.tag) && el.hasClassFrom(e)) {
         return effects[prop]
       }
     }
-    throw new Error('Unsupported nodeName: ' + nodeName)
+    throw new Error('Unsupported node')
   }
 
   function getParentEffects(editor) {
-    return editor.tagName === 'P' ? [] : [getEffect(editor, editor.tagName)]
+    return editor.is('p') ? [] : [getEffect(editor)]
   }
 }
 

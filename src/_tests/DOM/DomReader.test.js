@@ -1,4 +1,5 @@
 import createDomReader from './../../DOM/DomReader'
+import { el } from './../../DOM/Query'
 
 const effects = {
   bold: { tag: 'b' },
@@ -20,8 +21,11 @@ const effects = {
 const read = createDomReader(effects)
 
 it('read from paragraph editors', () => {
-  const editor = document.createElement('p')
-  editor.innerHTML = '<b><i>hello</i></b> <i>world</i>'
+  const editor = el('p')
+    .append(el('b').val(el('i').val('hello')))
+    .append(' ')
+    .append(el('i').val('world'))
+  //editor.innerHTML = '<b><i>hello</i></b> <i>world</i>'
 
   expect(read(editor)).toEqual([
     { text: 'hello', effects: [effects.italic, effects.bold] },
@@ -31,34 +35,32 @@ it('read from paragraph editors', () => {
 })
 
 it('read from non paragraph editors', () => {
-  const editor = document.createElement('h1')
-  editor.innerHTML = 'Title'
+  const editor = el('h1').val('Title')
   expect(read(editor)).toEqual([
     { text: 'Title', effects: [effects.bigHeader] }
   ])
 })
 
 it('take classNames into account for effect detection', () => {
-  const editor = document.createElement('h1')
-  editor.className = 'header-style'
-  editor.innerHTML = '<b class="bold-style">Title</b>'
+  const editor = el('h1')
+    .className('header-style')
+    .append(
+      el('b')
+        .val('Title')
+        .className('bold-style')
+    )
   expect(read(editor)).toEqual([
     { text: 'Title', effects: [effects.styledBold, effects.styledHeader] }
   ])
 })
 
 it('read empty', () => {
-  const editor = document.createElement('p')
-  expect(read(editor)).toEqual([{ text: '' }])
-
-  editor.appendChild(document.createTextNode(''))
+  const editor = el('p')
   expect(read(editor)).toEqual([{ text: '' }])
 })
 
 it('read empty with effects', () => {
-  const editor = document.createElement('p')
-  const inner = document.createElement('h1')
-  inner.className = 'header-style'
-  editor.appendChild(inner)
-  expect(read(editor)).toEqual([{ text: '', effects: [effects.styledHeader] }])
+  expect(read(el('p').val(el('h1').className('header-style')))).toEqual([
+    { text: '', effects: [effects.styledHeader] }
+  ])
 })

@@ -19,10 +19,7 @@ QueryElement.prototype.append = function(child) {
 
   if (typeof child === 'string') {
     const text = this.element.firstChild
-    if (text && text.nodeType !== Node.TEXT_NODE) {
-      throw new Error('This element is not a text element')
-    }
-    if (text) {
+    if (text && text.nodeType === Node.TEXT_NODE) {
       text.data += child
     } else {
       this.element.appendChild(document.createTextNode(child))
@@ -40,6 +37,9 @@ QueryElement.prototype.appendTo = function(target) {
 }
 
 QueryElement.prototype.val = function(value) {
+  if (value === undefined) {
+    return this.element.textContent
+  }
   this.element.innerHTML = ''
   if (!value) {
     return this
@@ -77,6 +77,11 @@ QueryElement.prototype.remove = function(child) {
   return this
 }
 
+QueryElement.prototype.className = function(classname) {
+  this.element.className = classname
+  return this
+}
+
 QueryElement.prototype.setClassFrom = function(obj) {
   if (obj && obj.className) {
     this.element.className = obj.className
@@ -84,9 +89,33 @@ QueryElement.prototype.setClassFrom = function(obj) {
   return this
 }
 
+QueryElement.prototype.hasClassFrom = function(obj) {
+  return this.element.className || obj.className
+    ? obj.className === this.element.className
+    : true
+}
+
+QueryElement.prototype.is = function(type) {
+  if (typeof type === 'string') {
+    return this.element.tagName === type.toUpperCase()
+  }
+  if (typeof type === 'number') {
+    return this.element.nodeType === type
+  }
+  throw new Error('Unsupported type for comparing')
+}
+
 QueryElement.prototype.isEditable = function() {
   this.element.contentEditable = true
   return this
+}
+
+QueryElement.prototype.firstChild = function() {
+  return el(this.element.firstChild)
+}
+
+QueryElement.prototype.nextSibling = function() {
+  return el(this.element.nextSibling)
 }
 
 export { el }

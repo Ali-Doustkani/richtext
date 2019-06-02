@@ -5,11 +5,11 @@ beforeEach(() => {
   owner = el('div')
 })
 
-it('falsy val empties the content', () => {
+it('null val empties the content', () => {
   expect(
     el('p')
       .val('HelloWorld')
-      .val().element.innerHTML
+      .val(null).element.innerHTML
   ).toBe('')
 })
 
@@ -18,6 +18,14 @@ it('create new el with value', () => {
     .val(el('b').val('HelloWorld'))
     .appendTo(owner)
   expect(owner.element.innerHTML).toBe('<p><b>HelloWorld</b></p>')
+})
+
+it('return textContent when val hos no argument', () => {
+  expect(
+    el('p')
+      .val('Hey')
+      .val()
+  ).toBe('Hey')
 })
 
 it('replace children', () => {
@@ -56,6 +64,12 @@ it('remove', () => {
   ).toBe('<h1></h1><h3></h3>')
 })
 
+it('set classs name', () => {
+  expect(owner.className('owner-style').element.outerHTML).toBe(
+    '<div class="owner-style"></div>'
+  )
+})
+
 it('set class from an object', () => {
   expect(owner.append(el('p').setClassFrom(undefined)).element.innerHTML).toBe(
     '<p></p>'
@@ -81,10 +95,50 @@ it('append text', () => {
   expect(wrapper.element.innerHTML).toBe('HelloWorld')
 })
 
-it('append text to text elements only', () => {
-  expect(() =>
+it('check tagname', () => {
+  expect(el('p').is('p')).toBe(true)
+})
+
+it('check element type', () => {
+  expect(
     el('p')
-      .append(el('b').val('Hey'))
-      .append('You')
-  ).toThrow()
+      .val('text')
+      .firstChild()
+      .is(Node.TEXT_NODE)
+  ).toBe(true)
+})
+
+it('get first child', () => {
+  expect(
+    el('p')
+      .val(el('h1'))
+      .firstChild()
+      .is('h1')
+  ).toBe(true)
+})
+
+it('get next sibling', () => {
+  expect(
+    el('p')
+      .append(el('h1'))
+      .append(el('h2'))
+      .firstChild()
+      .nextSibling()
+      .is('h2')
+  ).toBe(true)
+})
+
+it('check className from an object', () => {
+  expect(el('p').hasClassFrom({})).toBe(true)
+  expect(
+    el('p')
+      .className('style')
+      .hasClassFrom({})
+  ).toBe(false)
+  expect(el('p').hasClassFrom({ className: 'sth' })).toBe(false)
+  expect(
+    el('p')
+      .className('s')
+      .hasClassFrom({ className: 's' })
+  ).toBe(true)
 })
