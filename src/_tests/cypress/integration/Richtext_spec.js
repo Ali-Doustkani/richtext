@@ -124,7 +124,11 @@ describe('styling text', () => {
 
   it('handle backspace key at the beginning of a paragraph', () => {
     cy.visit('/')
-    cy.get('#editor>p').type('123{enter}456{enter}789')
+    cy.get('#editor>p')
+      .eq(0)
+      .type('123{enter}')
+    cy.focused().type('456{enter}')
+    cy.focused().type('789')
     cy.get('#editor>p')
       .eq(1)
       .highlight(0, 3)
@@ -148,7 +152,9 @@ describe('styling text', () => {
 
   it('handle del key at the beginning of a paragraph', () => {
     cy.visit('/')
-    cy.get('#editor>p').type('123{enter}456{enter}789')
+    cy.get('#editor>p').type('123{enter}')
+    cy.focused().type('456{enter}')
+    cy.focused().type('789')
     cy.get('#editor>p')
       .eq(1)
       .highlight(0, 3)

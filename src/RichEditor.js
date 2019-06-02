@@ -1,7 +1,7 @@
 import style from './Stylist/Stylist'
 import createDomReader from './DOM/DomReader'
 import { generateRenderModel, createNewEditor } from './DOM/Factory'
-import { render, render2 } from './DOM/Renderer'
+import { render } from './DOM/Renderer'
 import preEditor from './preEditor'
 import { absoluteRange, relativeRange } from './Range'
 import { breakAt } from './Stylist/Break'
@@ -53,16 +53,13 @@ function toRichEditor(rules, richtext, editor) {
         relativeRange(editor, window.getSelection().getRangeAt(0))
       )
 
-      // w.render(m1)
-      //   .create(m2)
-      //   .addAfter(w)
-      editor = render2(
+      editor = render(
         richtext,
         editor,
         generateRenderModel(m1),
         generateRenderModel(m2)
       )
-      editor.focus()
+      editor.element.focus()
       return w
     },
 

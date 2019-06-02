@@ -20,12 +20,24 @@ it('render a lists', () => {
   expect(richtext.element.innerHTML).toBe('<p>Hey</p><pre>Code</pre>')
 })
 
+it('render an array of editors', () => {
+  const list = [el('strong').val('deleted')]
+  const renderModel = { list, active: list[0] }
+  const editors = [el('p').val('first'), el('p').val('second')]
+  richtext.append(editors[0]).append(editors[1])
+  const active = render(richtext, editors, renderModel)
+  expect(active).toBe(list[0])
+  expect(richtext.element.innerHTML).toBe(
+    '<p>Initial Value</p><strong>deleted</strong>'
+  )
+})
+
 it('throw error on empty list', () => {
   expect(() => render(richtext, editor)).toThrow()
   expect(() => render(richtext, editor, { list: [] })).toThrow()
 })
 
-it('render an empty list with a non-empty list', () => {
-  render(richtext, editor, { list: [el('p')] }, { list: [el('p')] })
+it('render an array of model', () => {
+  render(richtext, editor, [{ list: [el('p')] }, { list: [el('p')] }])
   expect(richtext.element.innerHTML).toBe('<p></p><p></p>')
 })

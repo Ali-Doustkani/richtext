@@ -76,7 +76,11 @@ QueryElement.prototype.insertAfter = function(base, newChild) {
 }
 
 QueryElement.prototype.remove = function(child) {
-  this.element.removeChild(child.element)
+  if (Array.isArray(child)) {
+    child.forEach(item => this.element.removeChild(item.element))
+  } else {
+    this.element.removeChild(child.element)
+  }
   return this
 }
 
@@ -141,6 +145,10 @@ QueryElement.prototype.lastChild = function() {
 
 QueryElement.prototype.nextSibling = function() {
   return el(this.element.nextSibling)
+}
+
+QueryElement.prototype.previousSibling = function() {
+  return el(this.element.previousSibling)
 }
 
 QueryElement.prototype.hasChildren = function() {

@@ -1,5 +1,6 @@
 import createRichtext from './../Richtext'
 import { relativeRange } from './../Range'
+import {el}from './../DOM/Query'
 
 const div = document.getElementById('editor')
 const editor = createRichtext({
@@ -25,7 +26,7 @@ function wire(id, func) {
   document.getElementById(id).onmousedown = e => e.preventDefault()
   document.getElementById(id).onclick = () => {
     const sel = relativeRange(
-      document.activeElement,
+      el(document.activeElement),
       window.getSelection().getRangeAt(0)
     )
     func(sel)

@@ -6,20 +6,28 @@ function check(renderModel) {
   }
 }
 
-function render(richtext, editor, renderModel1, renderModel2) {
-  if (renderModel2) {
-    check(renderModel1)
-    check(renderModel2)
-    renderList(richtext, editor, [...renderModel1.list, ...renderModel2.list])
-    return renderModel2.active
+function render(richtext, editors, renderModel) {
+  if (Array.isArray(renderModel)) {
+    let list = []
+    renderModel.forEach(item => {
+      check(item)
+      list = list.concat(item.list)
+    })
+    renderList(richtext, editors, list)
+    return renderModel[renderModel.length - 1].active
   }
-  check(renderModel1)
-  renderList(richtext, editor, renderModel1.list)
-  return renderModel1.active
+  check(renderModel)
+  renderList(richtext, editors, renderModel.list)
+  return renderModel.active
 }
 
-function renderList(richtext, editor, list) {
-  richtext.insertAfter(editor, list).remove(editor)
+function renderList(richtext, editors, list) {
+  if (Array.isArray(editors)) {
+    const lastEditor = editors[editors.length - 1]
+    richtext.insertAfter(lastEditor, list).remove(editors)
+  } else {
+    richtext.insertAfter(editors, list).remove(editors)
+  }
 }
 
 export { render }
