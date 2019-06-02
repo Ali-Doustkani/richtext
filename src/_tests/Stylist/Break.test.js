@@ -95,12 +95,18 @@ it('break beginning of line', () => {
   expect(m2).toEqual([{ text: '123456', active: true }])
 })
 
+it('is active in the last item when breaking', () => {
+  const [m1, m2] = breakAt([{ text: 'HelloWorld' }], 5)
+  expect(m1).toEqual([{ text: 'Hello', active: false }])
+  expect(m2).toEqual([{ text: 'World', active: true }])
+})
+
 it('glue same effects', () => {
   const m1 = [{ text: '123', effects: [1] }, { text: 'abc', effects: ['e1'] }]
   const m2 = [{ text: 'def', effects: ['e1'] }]
   expect(glue(m1, m2)).toEqual([
-    { text: '123', effects: [1], active: false },
-    { text: 'abcdef', effects: ['e1'], active: true }
+    { text: '123', effects: [1], active: true },
+    { text: 'abcdef', effects: ['e1'], active: false }
   ])
 })
 
@@ -108,8 +114,8 @@ it('glue different effects', () => {
   const m1 = [{ text: 'Hello', effects: [1] }]
   const m2 = [{ text: 'World', effects: [2] }]
   expect(glue(m1, m2)).toEqual([
-    { text: 'Hello', effects: [1], active: false },
-    { text: 'World', effects: [2], active: true }
+    { text: 'Hello', effects: [1], active: true },
+    { text: 'World', effects: [2], active: false }
   ])
 })
 
@@ -125,11 +131,27 @@ it('glue when second model is empty', () => {
   expect(glue(m1, m2)).toEqual([{ text: 'Hello World', active: true }])
 })
 
+it('glue when both models are empty', () => {
+  expect(glue([], [])).toEqual([{ text: '', active: true }])
+})
+
 it('glue a regular model to a parent model', () => {
   const regular = [{ text: 'Hello', effects: [effects.bold] }]
   const parent = [{ text: 'World', effects: [effects.header] }]
   expect(glue(regular, parent)).toEqual([
-    { text: 'Hello', effects: [effects.bold], active: false },
-    { text: 'World', active: true }
+    { text: 'Hello', effects: [effects.bold], active: true },
+    { text: 'World', active: false }
+  ])
+})
+
+it('is active in the first item when breaking', () => {
+  expect(
+    glue(
+      [{ text: 'Hello', effects: [effects.bold] }],
+      [{ text: 'World', effects: [effects.header] }]
+    )
+  ).toEqual([
+    { text: 'Hello', effects: [effects.bold], active: true },
+    { text: 'World', active: false }
   ])
 })

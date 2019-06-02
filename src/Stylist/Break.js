@@ -1,6 +1,36 @@
 import { areEqual } from './utils'
 
 /**
+ * Concats two models.
+ * @param {Array} model1
+ * @param {Array} model2
+ * @returns {Array}       a new model that contains both model1 and model2
+ */
+function glue(model1, model2) {
+  const result = []
+  const push = item => {
+    const effects =
+      item.effects && item.effects.length
+        ? item.effects.filter(x => !x.parent)
+        : undefined
+    result.push(copy(item.text, effects))
+  }
+  model1.forEach(push)
+  if (result.length && model2.length) {
+    const lastEffect = result[result.length - 1].effects
+    const firstModel = model2.shift()
+    if (areEqual(lastEffect, firstModel.effects)) {
+      result[result.length - 1].text += firstModel.text
+    } else {
+      push(firstModel)
+    }
+  }
+  model2.forEach(push)
+  setLastActive(result, 0)
+  return result
+}
+
+/**
  * Splits the model into two different models.
  * @param {Array} model The model which will be broke into two different models.
  * @param {object} range The relative range object that specifies the breaking point.
@@ -30,13 +60,7 @@ function breakAt(model, range) {
       newModel.push(ctx.whole(item))
     }
   })
-
-  if (newModel.length) {
-    newModel[newModel.length - 1].active = true
-  } else {
-    newModel.push({ text: '', active: true })
-  }
-
+  setLastActive(newModel, newModel.length - 1)
   return [originalModel, newModel]
 }
 
@@ -88,34 +112,12 @@ function copy(text, effects) {
   return { text, effects: [...effects], active: false }
 }
 
-/**
- * Concats two models.
- * @param {Array} model1
- * @param {Array} model2
- * @returns {Array}       a new model that contains both model1 and model2
- */
-function glue(model1, model2) {
-  const result = []
-  const push = item => {
-    const effects =
-      item.effects && item.effects.length
-        ? item.effects.filter(x => !x.parent)
-        : undefined
-    result.push(copy(item.text, effects))
+function setLastActive(array, index) {
+  if (array.length) {
+    array[index].active = true
+  } else {
+    array.push({ text: '', active: true })
   }
-  model1.forEach(push)
-  if (result.length && model2.length) {
-    const lastEffect = result[result.length - 1].effects
-    const firstModel = model2.shift()
-    if (areEqual(lastEffect, firstModel.effects)) {
-      result[result.length - 1].text += firstModel.text
-    } else {
-      push(firstModel)
-    }
-  }
-  model2.forEach(push)
-  result[result.length - 1].active = true
-  return result
 }
 
 export { breakAt, glue }
