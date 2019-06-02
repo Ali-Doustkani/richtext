@@ -1,5 +1,6 @@
 import { glue } from './Stylist/Break'
 import { standardizeRules } from './DOM/utils'
+import { el } from './DOM/Query'
 import { toRichEditor, createRichEditor } from './RichEditor'
 import { relativeRange } from './Range'
 
@@ -14,7 +15,8 @@ function create(rules) {
 
   return function(richtext) {
     checkEditor(rules, richtext)
-    const editor = () => toRichEditor(rules, richtext, document.activeElement)
+    const editor = () =>
+      toRichEditor(rules, el(richtext), el(document.activeElement))
 
     richtext.addEventListener(
       'keydown',
@@ -60,7 +62,8 @@ function checkEditor(rules, richtext) {
     )
   }
   if (!richtext.children.length) {
-    createRichEditor(rules, richtext).attach()
+    el(richtext).append(el('p').isEditable())
+    // createRichEditor(rules, el(richtext)).attach()
   }
   if (richtext.firstChild.nodeName !== 'P') {
     throw new Error('only <p> element is valid inside richtext')

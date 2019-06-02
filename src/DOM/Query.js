@@ -5,7 +5,10 @@ function el(element) {
   if (typeof element === 'string') {
     return new QueryElement(document.createElement(element))
   }
-  return new QueryElement(element)
+  if (element instanceof Node) {
+    return new QueryElement(element)
+  }
+  throw new Error('Unsupported type to wrap')
 }
 
 function QueryElement(element) {
@@ -18,7 +21,7 @@ QueryElement.prototype.append = function(child) {
   }
 
   if (typeof child === 'string') {
-    const text = this.element.firstChild
+    const text = this.element.lastChild
     if (text && text.nodeType === Node.TEXT_NODE) {
       text.data += child
     } else {
@@ -95,14 +98,24 @@ QueryElement.prototype.hasClassFrom = function(obj) {
     : true
 }
 
-QueryElement.prototype.is = function(type) {
-  if (typeof type === 'string') {
-    return this.element.tagName === type.toUpperCase()
+QueryElement.prototype.is = function(target) {
+  if (typeof target === 'string') {
+    return this.element.tagName === target.toUpperCase()
   }
-  if (typeof type === 'number') {
-    return this.element.nodeType === type
+  if (typeof target === 'number') {
+    return this.element.nodeType === target
+  }
+  if (target instanceof QueryElement) {
+    return this.element === target.element
+  }
+  if (target instanceof Node) {
+    return this.element === target
   }
   throw new Error('Unsupported type for comparing')
+}
+
+QueryElement.prototype.isNot = function(type) {
+  return !this.is(type)
 }
 
 QueryElement.prototype.isEditable = function() {
@@ -110,12 +123,31 @@ QueryElement.prototype.isEditable = function() {
   return this
 }
 
+QueryElement.prototype.parent = function() {
+  return el(this.element.parentNode)
+}
+
+QueryElement.prototype.child = function(index) {
+  return el(this.element.childNodes[index])
+}
+
 QueryElement.prototype.firstChild = function() {
   return el(this.element.firstChild)
+}
+
+QueryElement.prototype.lastChild = function() {
+  return el(this.element.lastChild)
 }
 
 QueryElement.prototype.nextSibling = function() {
   return el(this.element.nextSibling)
 }
 
+QueryElement.prototype.hasChildren = function() {
+  return Boolean(this.element.childNodes.length)
+}
+
+QueryElement.prototype.hasNoChildren = function() {
+  return !this.hasChildren()
+}
 export { el }

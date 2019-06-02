@@ -95,17 +95,37 @@ it('append text', () => {
   expect(wrapper.element.innerHTML).toBe('HelloWorld')
 })
 
-it('check tagname', () => {
+it('append text and element', () => {
+  expect(
+    el('p')
+      .append('ab')
+      .append(el('b').val('c'))
+      .append('d').element.outerHTML
+  ).toBe('<p>ab<b>c</b>d</p>')
+})
+
+it('check with tagname', () => {
   expect(el('p').is('p')).toBe(true)
 })
 
-it('check element type', () => {
+it('check with element type', () => {
   expect(
     el('p')
       .val('text')
       .firstChild()
       .is(Node.TEXT_NODE)
   ).toBe(true)
+})
+
+it('check with HTMLElement', () => {
+  const p = document.createElement('p')
+  expect(el(p).is(p)).toBe(true)
+})
+
+it('check with QueryElement', () => {
+  const p = el('p')
+  expect(p.is(p)).toBe(true)
+  expect(p.is(el('p'))).toBe(false)
 })
 
 it('get first child', () => {
@@ -140,5 +160,14 @@ it('check className from an object', () => {
     el('p')
       .className('s')
       .hasClassFrom({ className: 's' })
+  ).toBe(true)
+})
+
+it('check whether there is any children', () => {
+  expect(el('p').hasChildren()).toBe(false)
+  expect(
+    el('p')
+      .val('text')
+      .hasChildren()
   ).toBe(true)
 })

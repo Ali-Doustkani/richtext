@@ -1,88 +1,90 @@
+import { el } from './DOM/Query'
+
 /**
  * Calculates the selection range relative to the parent element.
- * @param {HTMLElement} rootNode All the points are calculated relative to this element.
- * @param {Range} range The document range object.
+ * @param {QueryElement} rootEl All the points are calculated relative to this element.
+ * @param {Range} docRange The document range object.
  * @returns {object} The result object containing a 'start' and 'end' prop.
  */
-function relativeRange(rootNode, range) {
-  if (!rootNode) {
-    rootNode = range.commonAncestorContainer
+function relativeRange(rootEl, docRange) {
+  if (!rootEl) {
+    rootEl = el(docRange.commonAncestorContainer)
   }
 
-  if (rootNode.nodeType !== Node.TEXT_NODE && !rootNode.childNodes.length) {
+  if (rootEl.isNot(Node.TEXT_NODE) && rootEl.hasNoChildren()) {
     return { start: 0, end: 0 }
   }
 
-  let node = firstText(rootNode),
+  let node = firstText(rootEl),
     startOffset = 0,
     enoughReadingForStart = false,
     endOffset = 0
 
-  const incrementEndOffset = node => (endOffset += node.textContent.length)
+  const incrementEndOffset = node => (endOffset += node.val().length)
   const incrementStartOffset = node => {
-    if (node === range.startContainer) {
+    if (node.is(docRange.startContainer)) {
       enoughReadingForStart = true
     }
     if (!enoughReadingForStart) {
-      startOffset += node.textContent.length
+      startOffset += node.val().length
     }
   }
 
-  while (node !== range.endContainer) {
+  while (node.isNot(docRange.endContainer)) {
     incrementEndOffset(node)
     incrementStartOffset(node)
-    node = nextText(node, rootNode)
+    node = nextText(node, rootEl)
     if (node === null) {
       break
     }
   }
 
   return {
-    start: startOffset + range.startOffset,
-    end: endOffset + range.endOffset
+    start: startOffset + docRange.startOffset,
+    end: endOffset + docRange.endOffset
   }
 }
 
 /**
  * Generates an absolute range object that is ready to use with Range API.
- * @param {HTMLElement} rootNode The starting point will be calculated relative to this node.
+ * @param {QueryElement} rootEl The starting point will be calculated relative to this node.
  * @param {object} selection Relative selection object with 'start' and 'end'.
  */
-function absoluteRange(rootNode, selection) {
-  if (!rootNode) {
+function absoluteRange(rootEl, selection) {
+  if (!rootEl) {
     throw new Error("'rootNode' is required")
   }
   if (selection.start > selection.end) {
     throw new Error('The start point must comes before the end point')
   }
 
-  if (!rootNode.firstChild) {
+  if (!rootEl.firstChild()) {
     return {
-      startContainer: rootNode,
+      startContainer: rootEl.element,
       startOffset: 0,
-      endContainer: rootNode,
+      endContainer: rootEl.element,
       endOffset: 0
     }
   }
 
-  let node = firstText(rootNode),
+  let node = firstText(rootEl),
     read = 0,
     startContainer,
     endContainer,
     startOffset,
     endOffset
   while (!startContainer || !endContainer) {
-    read += node.data.length
-    const r = read - node.data.length
+    read += node.val().length
+    const r = read - node.val().length
     if (!startContainer && read >= selection.start) {
-      startContainer = node
+      startContainer = node.element
       startOffset = selection.start - r
     }
     if (read >= selection.end) {
-      endContainer = node
+      endContainer = node.element
       endOffset = selection.end - r
     }
-    node = nextText(node, rootNode)
+    node = nextText(node, rootEl)
   }
   return {
     startContainer,
@@ -94,25 +96,25 @@ function absoluteRange(rootNode, selection) {
 
 // dig the tree until a text node is found
 function firstText(node) {
-  if (node.nodeType === Node.TEXT_NODE) {
+  if (node.is(Node.TEXT_NODE)) {
     return node
   }
-  return firstText(node.firstChild)
+  return firstText(node.firstChild())
 }
 
 // navigate the entire tree under 'rootNode' until a text node is found
-function nextText(node, rootNode) {
-  if (node.nextSibling !== null) {
-    if (node.nextSibling.nodeType === Node.TEXT_NODE) {
-      return node.nextSibling
+function nextText(node, rootEl) {
+  if (node.nextSibling() !== null) {
+    if (node.nextSibling().is(Node.TEXT_NODE)) {
+      return node.nextSibling()
     } else {
-      return firstText(node.nextSibling.firstChild)
+      return firstText(node.nextSibling().firstChild())
     }
   }
-  if (node.parentNode === rootNode) {
+  if (node.parent() && node.parent().is(rootEl)) {
     return null
   }
-  return nextText(node.parentNode, rootNode)
+  return nextText(node.parent(), rootEl)
 }
 
 export { relativeRange, absoluteRange }

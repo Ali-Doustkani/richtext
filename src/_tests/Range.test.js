@@ -1,188 +1,203 @@
 import { relativeRange, absoluteRange } from './../Range'
+import { el } from './../DOM/Query'
 
-function render(html) {
-  document.body.innerHTML = html.replace(/\s{2,}/g, '')
-}
+describe('calculate realtive range', () => {
+  it('select empty paragraph', () => {
+    const p = el('p')
+    expect(
+      relativeRange(p, {
+        commonAncestorContainer: p,
+        startContainer: p,
+        startOffset: 0,
+        endContainer: p,
+        endOffset: 0
+      })
+    ).toEqual({ start: 0, end: 0 })
+  })
 
-it('calculate relative range of an empty paragraph', () => {
-  render('<p></p>')
-  const p = document.getElementsByTagName('p')[0]
-  expect(
-    relativeRange(p, {
-      commonAncestorContainer: p,
-      startContainer: p,
-      startOffset: 0,
-      endContainer: p,
-      endOffset: 0
-    })
-  ).toEqual({ start: 0, end: 0 })
-})
+  it('select simple text', () => {
+    const p_root = el('p')
+      .val('simple text')
+      .firstChild()
+    expect(
+      relativeRange(p_root, {
+        commonAncestorContainer: p_root,
+        startContainer: p_root,
+        startOffset: 1,
+        endContainer: p_root,
+        endOffset: 3
+      })
+    ).toEqual({ start: 1, end: 3 })
+  })
 
-it('calculate reletive range of a simple text selection', () => {
-  render('<p>simple text</p>')
-  const p_root = document.getElementsByTagName('p')[0].firstChild
-  expect(
-    relativeRange(p_root, {
-      commonAncestorContainer: p_root,
-      startContainer: p_root,
-      startOffset: 1,
-      endContainer: p_root,
-      endOffset: 3
-    })
-  ).toEqual({ start: 1, end: 3 })
-})
+  it('select two elements in a paragraph', () => {
+    const p_start = el('p')
+      .append('abc')
+      .append(el('b').val('defg'))
+      .append('hi')
+    const b_end = el('b')
+      .val('jklmn')
+      .appendTo(p_start)
+    expect(
+      relativeRange(p_start, {
+        commonAncestorContainer: p_start,
+        startContainer: p_start.firstChild(),
+        startOffset: 2,
+        endContainer: b_end.firstChild(),
+        endOffset: 5
+      })
+    ).toEqual({ start: 2, end: 14 })
+  })
 
-it('calculate reletive range of two elements in a paragraph', () => {
-  render(`
-  <p id="start">
-    abc<b>defg</b>hi<b id="end">jklmn</b>
-  </p>`)
-  const p_start = document.getElementById('start')
-  const b_end = document.getElementById('end')
-  expect(
-    relativeRange(p_start, {
-      commonAncestorContainer: p_start,
-      startContainer: p_start.firstChild,
-      startOffset: 2,
-      endContainer: b_end.firstChild,
-      endOffset: 5
-    })
-  ).toEqual({ start: 2, end: 14 })
-})
+  it('find common ancestor', () => {
+    const div = el('div')
+    const p_first = el('p')
+      .append('ab')
+      .append(el('b').val(el('i').val('c')))
+      .append('d')
+      .appendTo(div)
+    const p_second = el('p')
+      .append('e')
+      .append(el('strong').val('f'))
+      .append('ghij')
+      .appendTo(div)
+    expect(
+      relativeRange(null, {
+        commonAncestorContainer: div.element,
+        startContainer: p_first.firstChild().element,
+        startOffset: 1,
+        endContainer: p_second.lastChild().element,
+        endOffset: 1
+      })
+    ).toEqual({ start: 1, end: 7 })
+  })
 
-it('find common ancestor of relative range', () => {
-  render(`
-  <div id="ancestor">
-    <p id="first">ab<b><i>c</i></b>d</p>
-    <div>
-      <p id="second">e<strong>f</strong>ghij</p>
-    </div>
-  </div>`)
-  const div = document.getElementById('ancestor')
-  const p_first = document.getElementById('first')
-  const p_second = document.getElementById('second')
-  expect(
-    relativeRange(null, {
-      commonAncestorContainer: div,
-      startContainer: p_first.firstChild,
-      startOffset: 1,
-      endContainer: p_second.lastChild,
-      endOffset: 1
-    })
-  ).toEqual({ start: 1, end: 7 })
-})
+  it('select one root with different children', () => {
+    const p_root = el('p').append('hello ')
+    const strong_start = el('strong')
+      .val('world')
+      .appendTo(p_root)
+      .firstChild()
+    expect(
+      relativeRange(p_root, {
+        commonAncestorContainer: strong_start,
+        startContainer: strong_start,
+        startOffset: 0,
+        endContainer: strong_start,
+        endOffset: 5
+      })
+    ).toEqual({ start: 6, end: 11 })
+  })
 
-it('calculate reletive range of one root with different children', () => {
-  render(`<p>hello <strong>world</strong></p>`)
-  const p_root = document.getElementsByTagName('p')[0]
-  const strong_start = document.getElementsByTagName('strong')[0]
-  expect(
-    relativeRange(p_root, {
-      commonAncestorContainer: strong_start.firstChild,
-      startContainer: strong_start.firstChild,
-      startOffset: 0,
-      endContainer: strong_start.firstChild,
-      endOffset: 5
-    })
-  ).toEqual({ start: 6, end: 11 })
-})
-
-it('calculate reletive range when container is empty', () => {
-  render('<p></p>')
-  const p_root = document.getElementsByTagName('p')[0]
-  expect(
-    relativeRange(p_root, {
-      commonAncestorContainer: p_root,
-      startContainer: p_root,
-      startOffset: 0,
-      endContainer: p_root,
-      endOffset: 0
-    })
-  ).toEqual({ start: 0, end: 0 })
-})
-
-it('calculate relative range when container has empty text', () => {
-  const p = document.createElement('p')
-  p.appendChild(document.createTextNode(''))
-  expect(
-    relativeRange(p, {
-      commonAncestorContainer: p,
-      startContainer: p,
-      startOffset: 0,
-      endContainer: p,
-      endOffset: 0
-    })
-  ).toEqual({ start: 0, end: 0 })
-})
-
-it('calculate reletive range without selection', () => {
-  render('<p>Hello</p>')
-  const p_root = document.getElementsByTagName('p')[0]
-  expect(
-    relativeRange(p_root, {
-      commonAncestorContainer: p_root,
-      startContainer: p_root.firstChild,
-      startOffset: 4,
-      endContainer: p_root.firstChild,
-      endOffset: 4
-    })
-  ).toEqual({ start: 4, end: 4 })
-})
-
-it('calculate absolute range of an empty paragraph', () => {
-  render('<p></p>')
-  const p = document.getElementsByTagName('p')[0]
-  expect(absoluteRange(p, { start: 10, end: 50 })).toEqual({
-    startContainer: p,
-    startOffset: 0,
-    endContainer: p,
-    endOffset: 0
+  it('select without selection', () => {
+    const p_root = el('p').val('Hello')
+    expect(
+      relativeRange(p_root, {
+        commonAncestorContainer: p_root,
+        startContainer: p_root.firstChild(),
+        startOffset: 4,
+        endContainer: p_root.firstChild(),
+        endOffset: 4
+      })
+    ).toEqual({ start: 4, end: 4 })
   })
 })
 
-it('calculate absolute range on a simple tree', () => {
-  render('<p>Hello World</p>')
-  const p = document.getElementsByTagName('p')[0]
-  expect(absoluteRange(p, { start: 6, end: 11 })).toEqual({
-    startContainer: p.firstChild,
-    startOffset: 6,
-    endContainer: p.firstChild,
-    endOffset: 11
+describe('calculate absolute range', () => {
+  it('select empty paragraph', () => {
+    const p = el('p')
+    expect(absoluteRange(p, { start: 10, end: 50 })).toEqual({
+      startContainer: p.element,
+      startOffset: 0,
+      endContainer: p.element,
+      endOffset: 0
+    })
+  })
+
+  it('select simple text', () => {
+    const p = el('p').val('Hello World')
+    expect(absoluteRange(p, { start: 6, end: 11 })).toEqual({
+      startContainer: p.firstChild().element,
+      startOffset: 6,
+      endContainer: p.firstChild().element,
+      endOffset: 11
+    })
+  })
+
+  describe('complex tree selection', () => {
+    const p = el('p')
+    el('b')
+      .append(el('i').val('1'))
+      .appendTo(p)
+    p.append('234')
+    el('b')
+      .val('5')
+      .appendTo(p)
+    p.append('67')
+    el('b')
+      .append(el('i').val('89'))
+      .appendTo(p)
+
+    it('1', () =>
+      expect(absoluteRange(p, { start: 1, end: 7 })).toEqual({
+        startContainer: p
+          .firstChild()
+          .firstChild()
+          .firstChild().element,
+        startOffset: 1,
+        endContainer: p.child(3).element,
+        endOffset: 2
+      }))
+
+    it('2', () =>
+      expect(absoluteRange(p, { start: 0, end: 9 })).toEqual({
+        startContainer: p
+          .firstChild()
+          .firstChild()
+          .firstChild().element,
+        startOffset: 0,
+        endContainer: p
+          .child(4)
+          .firstChild()
+          .firstChild().element,
+        endOffset: 2
+      }))
+
+    it('3', () =>
+      expect(absoluteRange(p, { start: 2, end: 8 })).toEqual({
+        startContainer: p.child(1).element,
+        startOffset: 1,
+        endContainer: p
+          .child(4)
+          .firstChild()
+          .firstChild().element,
+        endOffset: 1
+      }))
+
+    it('4', () => {
+      expect(absoluteRange(p, { start: 7, end: 9 })).toEqual({
+        startContainer: p.child(3).element,
+        startOffset: 2,
+        endContainer: p
+          .child(4)
+          .firstChild()
+          .firstChild().element,
+        endOffset: 2
+      })
+    })
+
+    it('5', () =>
+      expect(absoluteRange(p, { start: 1, end: 1 })).toEqual({
+        startContainer: p
+          .firstChild()
+          .firstChild()
+          .firstChild().element,
+        startOffset: 1,
+        endContainer: p
+          .firstChild()
+          .firstChild()
+          .firstChild().element,
+        endOffset: 1
+      }))
   })
 })
-
-it.each`
-  from | to   | target                                | startOffset | destination                             | endOffset
-  ${0} | ${9} | ${'firstChild.firstChild.firstChild'} | ${0}        | ${'childNodes.4.firstChild.firstChild'} | ${2}
-  ${1} | ${7} | ${'firstChild.firstChild.firstChild'} | ${1}        | ${'childNodes.3'}                       | ${2}
-  ${2} | ${8} | ${'childNodes.1'}                     | ${1}        | ${'childNodes.4.firstChild.firstChild'} | ${1}
-  ${7} | ${9} | ${'childNodes.3'}                     | ${2}        | ${'childNodes.4.firstChild.firstChild'} | ${2}
-  ${1} | ${1} | ${'firstChild.firstChild.firstChild'} | ${1}        | ${'firstChild.firstChild.firstChild'}   | ${1}
-`(
-  'calculate absolute range on a complex tree',
-  ({ from, to, target, startOffset, destination, endOffset }) => {
-    render(`
-  <p>
-    <b>
-      <i>1</i>
-    </b>
-    234
-    <b>5</b>
-    67
-    <b>
-      <i>89</i>
-    </b>
-  </p>`)
-    const p = document.getElementsByTagName('p')[0]
-    let startContainer = p,
-      endContainer = p
-    target.split('.').forEach(sec => (startContainer = startContainer[sec]))
-    destination.split('.').forEach(sec => (endContainer = endContainer[sec]))
-    expect(absoluteRange(p, { start: from, end: to })).toEqual({
-      startContainer,
-      startOffset,
-      endContainer,
-      endOffset
-    })
-  }
-)
