@@ -1,14 +1,13 @@
 import { el } from './Query'
 
 function createNewEditor(effect) {
-  const tag = effect && effect.parent ? effect.tag : 'p'
-  return el(tag)
+  return el(effect && effect.parent ? effect.tag : 'p')
     .setClassFrom(effect)
     .isEditable()
 }
 
 /**
- * Generates a list of elements with their contents that should be put into the richtext.
+ * Generates a list of QueryElement with their contents that should be put into the richtext.
  * It returns the list and the active element that should be focused.
  */
 function generateRenderModel(styleModel) {
@@ -19,8 +18,7 @@ function generateRenderModel(styleModel) {
   const list = []
   let active
 
-  const setActive = (editor, item) =>
-    (active = item.active ? editor.element : active)
+  const setActive = (editor, item) => (active = item.active ? editor : active)
 
   const parentOf = effects => {
     const result = effects ? effects.filter(x => x.parent)[0] : undefined
@@ -34,7 +32,7 @@ function generateRenderModel(styleModel) {
     }
   }
 
-  styleModel.forEach(item => {
+  const editorOf = item => {
     const pe = parentOf(item.effects)
     let editor = lastEditorOf(pe)
     if (!editor) {
@@ -42,30 +40,29 @@ function generateRenderModel(styleModel) {
       list.push(editor)
     }
     setActive(editor, item)
-    let children
+    return editor
+  }
 
-    const notParentEffects = (item.effects || []).filter(x => !x.parent)
-    if (notParentEffects.length) {
-      children = item.text
-      notParentEffects.forEach(
-        effect => {
-          children = el(effect.tag).setClassFrom(effect).val(children)
-        }
+  styleModel.forEach(item => {
+    let children = item.text
+    const nonParentEffects = (item.effects || []).filter(x => !x.parent)
+    if (nonParentEffects.length) {
+      nonParentEffects.forEach(
+        effect =>
+          (children = el(effect.tag)
+            .setClassFrom(effect)
+            .val(children))
       )
-    editor.append(children)
-
-    } else {
-      editor.appendText(item.text)
     }
+    editorOf(item).append(children)
   })
 
-  const a = list.map(x => x.element)  // return Wrapped Elements
-  return { list: a, active }
+  return { list, active }
 }
 
 function empty() {
   const p = createNewEditor()
-  return { list: [p.element], active: p.element }
+  return { list: [p], active: p }
 }
 
 export { generateRenderModel, createNewEditor }

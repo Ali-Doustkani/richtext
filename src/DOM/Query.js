@@ -3,35 +3,50 @@ function el(element) {
     return null
   }
   if (typeof element === 'string') {
-    return new ElementWrapper(document.createElement(element))
+    return new QueryElement(document.createElement(element))
   }
-  return new ElementWrapper(element)
+  return new QueryElement(element)
 }
 
-function ElementWrapper(element) {
+function QueryElement(element) {
   this.element = element
 }
 
-ElementWrapper.prototype.append = function(child) {
-  if (child) {
+QueryElement.prototype.append = function(child) {
+  if (!child) {
+    return this
+  }
+
+  if (typeof child === 'string') {
+    const text = this.element.firstChild
+    if (text && text.nodeType !== Node.TEXT_NODE) {
+      throw new Error('This element is not a text element')
+    }
+    if (text) {
+      text.data += child
+    } else {
+      this.element.appendChild(document.createTextNode(child))
+    }
+  } else {
     this.element.appendChild(child.element)
   }
+
   return this
 }
 
-ElementWrapper.prototype.appendTo = function(target) {
+QueryElement.prototype.appendTo = function(target) {
   target.append(this)
   return this
 }
 
-ElementWrapper.prototype.val = function(value) {
+QueryElement.prototype.val = function(value) {
   this.element.innerHTML = ''
   if (!value) {
     return this
   }
   if (typeof value === 'string') {
     this.element.appendChild(document.createTextNode(value))
-  } else if (value instanceof ElementWrapper) {
+  } else if (value instanceof QueryElement) {
     this.append(value)
   } else {
     throw new Error('Unsupported value')
@@ -39,28 +54,12 @@ ElementWrapper.prototype.val = function(value) {
   return this
 }
 
-ElementWrapper.prototype.appendText = function(value) {
-  if (!value) {
-    return this
-  }
-  const text = this.element.firstChild
-  if (text && text.nodeType !== Node.TEXT_NODE) {
-    throw new Error('This element is not a text element')
-  }
-  if (text) {
-    text.data += value
-  } else {
-    this.element.appendChild(document.createTextNode(value))
-  }
-  return this
-}
-
-ElementWrapper.prototype.replace = function(newChild, oldChild) {
+QueryElement.prototype.replace = function(newChild, oldChild) {
   this.element.replaceChild(newChild.element, oldChild.element)
   return this
 }
 
-ElementWrapper.prototype.insertAfter = function(base, newChild) {
+QueryElement.prototype.insertAfter = function(base, newChild) {
   if (Array.isArray(newChild)) {
     newChild
       .reverse()
@@ -73,29 +72,21 @@ ElementWrapper.prototype.insertAfter = function(base, newChild) {
   return this
 }
 
-ElementWrapper.prototype.remove = function(child) {
+QueryElement.prototype.remove = function(child) {
   this.element.removeChild(child.element)
   return this
 }
 
-ElementWrapper.prototype.setClassFrom = function(obj) {
+QueryElement.prototype.setClassFrom = function(obj) {
   if (obj && obj.className) {
     this.element.className = obj.className
   }
   return this
 }
 
-ElementWrapper.prototype.isEditable = function() {
+QueryElement.prototype.isEditable = function() {
   this.element.contentEditable = true
   return this
-}
-
-ElementWrapper.prototype.html = function() {
-  return this.element.innerHTML
-}
-
-ElementWrapper.prototype.outerHtml = function() {
-  return this.element.outerHtml
 }
 
 export { el }
