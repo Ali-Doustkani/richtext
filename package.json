@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "main": "Richtext.js",
   "scripts": {
-    "start": "parcel ./src/_view/index.html",
+    "start": "parcel ./example/index.html",
     "test": "jest",
     "test:watch": "jest --watchAll",
     "test:integration": "npm-run-all --parallel --race start cy:run",
