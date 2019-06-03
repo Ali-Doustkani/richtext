@@ -1,5 +1,6 @@
 import { canBackspace, canDelete } from './../editor'
-import { el, relativeRange } from '../DOM'
+import { relativeRange } from '../DOM/Range'
+import { el } from '../DOM/Query'
 
 jest.mock('../DOM/Range')
 window.getSelection = () => ({

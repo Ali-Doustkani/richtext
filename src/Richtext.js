@@ -4,8 +4,8 @@ import { breakAt, glue, style } from './Stylist'
 import * as Editor from './editor'
 
 /**
- * It creates a configurator function based on the rules.
- * @param {object} effects Rules to configure the richtext. Rules contain tags and classes that are used to decorate text in editors(p, pre, div, h1, etc.).
+ * It creates a configurator function based on the effects.
+ * @param {object} effects Effects to configure the richtext. Effects contain tags and classes that are used to decorate text in editors(p, pre, div, h1, etc.).
  * @returns {Function} The function that configures the given <div> or <article> element as the editor.
  */
 function create(effects) {
@@ -51,12 +51,8 @@ function create(effects) {
 
       make: styleName => {
         const editor = el.active()
-        render(
-          richtext,
-          editor,
-          style(effects, 0, editor.val().length, styleName)
-        )
-        Editor.setCursor(editor, editor.val().length, editor.val().length)
+        render(richtext, editor, style(effects, 0, editor.length, styleName))
+        Editor.setCursor(editor, editor.length, editor.length)
       }
     }
   }
@@ -72,10 +68,7 @@ function handleEnterKey(event, effects, richtextQuery) {
   render(
     richtextQuery,
     editor,
-    breakAt(
-      read(effects, editor),
-      relativeRange(editor, window.getSelection().getRangeAt(0))
-    )
+    breakAt(read(effects, editor), relativeRange(editor))
   ).element.focus()
 }
 
@@ -99,7 +92,7 @@ function handleDeleteKey(event, effects, richtextQuery) {
   if (!Editor.canDelete(editor)) {
     return
   }
-  const len = editor.val().length
+  const len = editor.length
   event.preventDefault()
 
   const active = render(
@@ -121,8 +114,8 @@ function handleArrowUp(event) {
 
 function handleArrowDown(event) {
   const editor = el.active()
-  const relRange = relativeRange(editor, window.getSelection().getRangeAt(0))
-  const len = editor.val().length
+  const relRange = relativeRange(editor)
+  const len = editor.length
   if (relRange.start === len && relRange.end === len) {
     event.preventDefault()
     Editor.focusNext(editor)
