@@ -1,7 +1,8 @@
 {
-  "integrationFolder":"src/_tests/cypress/integration",
+  "integrationFolder": "cypress/integration",
   "fixturesFolder": false,
   "pluginsFile": false,
-  "supportFile": "src/_tests/cypress/support/index.js",
-  "baseUrl": "http://localhost:1234"
+  "supportFile": "cypress/support/index.js",
+  "baseUrl": "http://localhost:1234",
+  "video": false
 }

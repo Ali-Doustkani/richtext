@@ -59,7 +59,7 @@ it('bold plain text completely', () => {
   ).toEqual([{ text: 'ali', effects: [rules.bold], active: true }])
 })
 
-it('bold some new parts with overlap', () => {
+it('bold some new parts before a bolded text', () => {
   expect(
     style({
       type: rules.bold,
@@ -73,7 +73,7 @@ it('bold some new parts with overlap', () => {
   ])
 })
 
-it('bold some new parts with overlap', () => {
+it('bold some new parts after a bolded text', () => {
   expect(
     style({
       type: rules.bold,

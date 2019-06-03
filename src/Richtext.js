@@ -1,13 +1,7 @@
-import { glue } from './Stylist/Break'
 import createDomReader from './DOM/DomReader'
 import { render } from './DOM/Renderer'
-
 import { standardizeRules } from './DOM/utils'
 import { el } from './DOM/Query'
-import { toRichEditor, createRichEditor } from './RichEditor'
-import { breakAt } from './Stylist/Break'
-import style from './Stylist/Stylist'
-import { generateRenderModel, createNewEditor } from './DOM/Factory'
 import preEditor from './preEditor'
 import { absoluteRange, relativeRange } from './Range'
 import createService from './Facade'
@@ -113,7 +107,7 @@ function handleEnterKey(event, { controller, services, render }) {
   event.preventDefault() // prevent creating new lines in the same p element
   if (controller.editor().is('PRE') && !event.ctrlKey) {
     preEditor(controller).break()
-    return 
+    return
   }
   render(
     services.breakAt(controller.model(), controller.relativeRange())
