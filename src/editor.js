@@ -1,4 +1,4 @@
-import { absoluteRange, relativeRange } from './Range'
+import { absoluteRange, relativeRange } from './DOM'
 
 function canBackspace(editor) {
   const { start, end } = relRange(editor)

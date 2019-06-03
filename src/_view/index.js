@@ -1,6 +1,5 @@
 import createRichtext from './../Richtext'
-import { relativeRange } from './../Range'
-import {el}from './../DOM/Query'
+import { el, relativeRange } from './../DOM'
 
 const div = document.getElementById('editor')
 const editor = createRichtext({

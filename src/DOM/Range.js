@@ -1,4 +1,4 @@
-import { el } from './DOM/Query'
+import { el } from './Query'
 
 /**
  * Calculates the selection range relative to the parent element.

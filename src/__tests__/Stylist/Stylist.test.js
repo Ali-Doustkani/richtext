@@ -1,4 +1,4 @@
-import style from './../../Stylist/Stylist'
+import { style } from './../../Stylist/Stylist'
 
 const rules = {
   bold: { tag: 'strong' },

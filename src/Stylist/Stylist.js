@@ -81,4 +81,4 @@ function takeSecondPart({ context, text, originalEffects, newEffects }) {
     .addResult(second, originalEffects, false)
 }
 
-export default style
+export { style }

@@ -1,11 +1,10 @@
-import { generateRenderModel } from './DOM/Factory'
-import stylist_style from './Stylist/Stylist'
 import {
+  style as stylist_style,
   glue as stylist_glue,
   breakAt as stylist_breakAt
-} from './Stylist/Break'
-import { read } from './DOM/DomReader'
-import { el } from './DOM/Query'
+} from './Stylist'
+
+import { generateRenderModel, el, read } from './DOM'
 
 function createFacade(rules) {
   return {

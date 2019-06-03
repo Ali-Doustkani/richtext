@@ -1,6 +1,5 @@
-import { render } from './DOM/Renderer'
 import { standardizeRules } from './DOM/utils'
-import { el } from './DOM/Query'
+import { el, read, render, relativeRange } from './DOM'
 import * as preEditor from './preEditor'
 import createService from './Facade'
 import {
@@ -10,8 +9,6 @@ import {
   focusPrev,
   setCursor
 } from './editor'
-import { read } from './DOM/DomReader'
-import { relativeRange } from './Range'
 
 /**
  * It creates a configurator function based on the rules.

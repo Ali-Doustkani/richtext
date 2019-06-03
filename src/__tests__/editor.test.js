@@ -1,8 +1,7 @@
 import { canBackspace, canDelete } from './../editor'
-import { el } from '../DOM/Query'
-import { relativeRange } from '../Range'
+import { el, relativeRange } from '../DOM'
 
-jest.mock('./../Range')
+jest.mock('../DOM/Range')
 window.getSelection = () => ({
   getRangeAt: () => null
 })
@@ -19,7 +18,7 @@ describe('checking editor gluing with backspace', () => {
   })
 
   it('is false when editor is the first', () => {
-    const editor = el('p') 
+    const editor = el('p')
     relativeRange.mockImplementation(() => ({ start: 0, end: 0 }))
 
     expect(canBackspace(editor)).toBe(false)

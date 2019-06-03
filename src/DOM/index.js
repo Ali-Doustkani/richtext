@@ -1,0 +1,5 @@
+export { read } from './DomReader'
+export { generateRenderModel, createNewEditor } from './Factory'
+export { el } from './Query'
+export { render } from './Renderer'
+export { relativeRange, absoluteRange } from './Range'
