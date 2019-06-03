@@ -1,4 +1,4 @@
-import { standardizeRules } from './DOM/utils'
+import { standardizeEffects, effectsAreOk, checkEditor } from './args'
 import { el, read, render, relativeRange } from './DOM'
 import * as preEditor from './preEditor'
 import createService from './Facade'
@@ -17,7 +17,8 @@ import {
  */
 function create(effects) {
   let staySelected = false
-  effects = standardizeRules(effects)
+  effects = standardizeEffects(effects)
+  effectsAreOk(effects)
 
   return function(richtext) {
     checkEditor(richtext)
@@ -70,23 +71,6 @@ function create(effects) {
   }
 }
 
-function checkEditor(richtext) {
-  if (richtext.tagName !== 'DIV' && richtext.tagName !== 'ARTICLE') {
-    throw new Error('the richtext can only be a <div> or <article> element')
-  }
-  if (richtext.contentEditable === true) {
-    throw new Error(
-      `the contentEditable of <${richtext.tagName}> richtext must be false`
-    )
-  }
-  if (!richtext.children.length) {
-    el(richtext).append(el('p').isEditable())
-  }
-  if (richtext.firstChild.nodeName !== 'P') {
-    throw new Error('only <p> element is valid inside richtext')
-  }
-}
-
 function handleEnterKey(event, effects, richtextQuery, services) {
   event.preventDefault() // prevent creating new lines in the same p element
   const editor = el(document.activeElement)
@@ -114,7 +98,10 @@ function handleBackspaceKey(event, effects, richtextQuery, services) {
   const active = render(
     richtextQuery,
     [editor.previousSibling(), editor],
-    services.glue(read(effects, editor.previousSibling()), read(effects, editor))
+    services.glue(
+      read(effects, editor.previousSibling()),
+      read(effects, editor)
+    )
   )
   setCursor(active, len)
 }

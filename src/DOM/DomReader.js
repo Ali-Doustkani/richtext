@@ -1,7 +1,4 @@
-import { effectsAreOk } from './utils'
-
 function read(effects, editor) {
-  effectsAreOk(effects)
   
   const ret = []
   const parentEffects = getParentEffects(editor)
