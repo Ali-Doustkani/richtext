@@ -10,47 +10,35 @@ import {
   focusPrev,
   setCursor
 } from './editor'
-import createDomReader from './DOM/DomReader'
+import { read } from './DOM/DomReader'
 import { relativeRange } from './Range'
 
 /**
  * It creates a configurator function based on the rules.
- * @param {object} rules Rules to configure the richtext. Rules contain tags and classes that are used to decorate text in editors(p, pre, div, h1, etc.).
+ * @param {object} effects Rules to configure the richtext. Rules contain tags and classes that are used to decorate text in editors(p, pre, div, h1, etc.).
  * @returns {Function} The function that configures the given <div> or <article> element as the editor.
  */
-function create(rules) {
+function create(effects) {
   let staySelected = false
-  rules = standardizeRules(rules)
+  effects = standardizeRules(effects)
 
   return function(richtext) {
-    checkEditor(rules, richtext)
+    checkEditor(richtext)
     const richtextQuery = el(richtext)
-
-    const services = createService(rules)
-
+    const services = createService(effects)
     richtext.addEventListener(
       'keydown',
       e => {
-        const editor = el(document.activeElement)
-        const context = {
-          render: model => render(richtextQuery, editor, model),
-          render2: (editor, model) => render(richtextQuery, editor, model),
-          services,
-          rules,
-          richtextQuery,
-          editor
-        }
-
         if (e.key === 'Enter') {
-          handleEnterKey(e, context)
+          handleEnterKey(e, effects, richtextQuery, services)
         } else if (e.key === 'Backspace') {
-          handleBackspaceKey(e, context)
+          handleBackspaceKey(e, effects, richtextQuery, services)
         } else if (e.key === 'Delete') {
-          handleDeleteKey(e, context)
+          handleDeleteKey(e, effects, richtextQuery, services)
         } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-          handleArrowUp(e, context)
+          handleArrowUp(e)
         } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-          handleArrowDown(e, context)
+          handleArrowDown(e)
         }
       },
       true
@@ -85,7 +73,7 @@ function create(rules) {
   }
 }
 
-function checkEditor(rules, richtext) {
+function checkEditor(richtext) {
   if (richtext.tagName !== 'DIV' && richtext.tagName !== 'ARTICLE') {
     throw new Error('the richtext can only be a <div> or <article> element')
   }
@@ -102,50 +90,56 @@ function checkEditor(rules, richtext) {
   }
 }
 
-function handleEnterKey(event, { editor, services, render, rules }) {
+function handleEnterKey(event, effects, richtextQuery, services) {
   event.preventDefault() // prevent creating new lines in the same p element
+  const editor = el(document.activeElement)
   if (editor.is('PRE') && !event.ctrlKey) {
     preEditor.handleEnter(editor)
     return
   }
   render(
+    richtextQuery,
+    editor,
     services.breakAt(
-      createDomReader(rules)(editor),
+      read(effects, editor),
       relativeRange(editor, window.getSelection().getRangeAt(0))
     )
   ).element.focus()
 }
 
-function handleBackspaceKey(event, { services, render2, rules, editor }) {
+function handleBackspaceKey(event, effects, richtextQuery, services) {
+  const editor = el(document.activeElement)
   if (!canBackspace(editor)) {
     return
   }
   event.preventDefault()
-  const read = createDomReader(rules)
   const len = editor.previousSibling().val().length
-  const active = render2(
+  const active = render(
+    richtextQuery,
     [editor.previousSibling(), editor],
-    services.glue(read(editor.previousSibling()), read(editor))
+    services.glue(read(effects, editor.previousSibling()), read(effects, editor))
   )
   setCursor(active, len)
 }
 
-function handleDeleteKey(event, { services, render2, editor, rules }) {
+function handleDeleteKey(event, effects, richtextQuery, services) {
+  const editor = el(document.activeElement)
   if (!canDelete(editor)) {
     return
   }
   const len = editor.val().length
-  const read = createDomReader(rules)
   event.preventDefault()
 
-  const active = render2(
+  const active = render(
+    richtextQuery,
     [editor, editor.nextSibling()],
-    services.glue(read(editor), read(editor.nextSibling()))
+    services.glue(read(effects, editor), read(effects, editor.nextSibling()))
   )
   setCursor(active, len)
 }
 
-function handleArrowUp(event, { editor }) {
+function handleArrowUp(event) {
+  const editor = el(document.activeElement)
   const range = window.getSelection().getRangeAt(0)
   if (range.startOffset === 0 && range.endOffset === 0) {
     event.preventDefault()
@@ -153,7 +147,8 @@ function handleArrowUp(event, { editor }) {
   }
 }
 
-function handleArrowDown(event, { editor }) {
+function handleArrowDown(event) {
+  const editor = el(document.activeElement)
   const relRange = relativeRange(editor, window.getSelection().getRangeAt(0))
   const len = editor.val().length
   if (relRange.start === len && relRange.end === len) {

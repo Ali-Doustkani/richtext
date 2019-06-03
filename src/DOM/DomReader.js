@@ -1,21 +1,19 @@
 import { effectsAreOk } from './utils'
 
-function create(effects) {
+function read(effects, editor) {
   effectsAreOk(effects)
-
-  return editor => {
-    const ret = []
-    const parentEffects = getParentEffects(editor)
-    let node = editor.firstChild()
-    if (!node) {
-      return [{ text: '' }]
-    }
-    while (node) {
-      ret.push(drillDown(node, [...parentEffects]))
-      node = node.nextSibling()
-    }
-    return ret
+  
+  const ret = []
+  const parentEffects = getParentEffects(editor)
+  let node = editor.firstChild()
+  if (!node) {
+    return [{ text: '' }]
   }
+  while (node) {
+    ret.push(drillDown(node, [...parentEffects]))
+    node = node.nextSibling()
+  }
+  return ret
 
   function drillDown(el, effects) {
     if (!el || el.is(Node.TEXT_NODE)) {
@@ -46,4 +44,4 @@ function create(effects) {
   }
 }
 
-export default create
+export { read }

@@ -1,4 +1,4 @@
-import createDomReader from './../../DOM/DomReader'
+import { read } from './../../DOM/DomReader'
 import { el } from './../../DOM/Query'
 
 const effects = {
@@ -18,16 +18,13 @@ const effects = {
   }
 }
 
-const read = createDomReader(effects)
-
 it('read from paragraph editors', () => {
   const editor = el('p')
     .append(el('b').val(el('i').val('hello')))
     .append(' ')
     .append(el('i').val('world'))
-  //editor.innerHTML = '<b><i>hello</i></b> <i>world</i>'
 
-  expect(read(editor)).toEqual([
+  expect(read(effects, editor)).toEqual([
     { text: 'hello', effects: [effects.italic, effects.bold] },
     { text: ' ' },
     { text: 'world', effects: [effects.italic] }
@@ -36,7 +33,7 @@ it('read from paragraph editors', () => {
 
 it('read from non paragraph editors', () => {
   const editor = el('h1').val('Title')
-  expect(read(editor)).toEqual([
+  expect(read(effects, editor)).toEqual([
     { text: 'Title', effects: [effects.bigHeader] }
   ])
 })
@@ -49,18 +46,18 @@ it('take classNames into account for effect detection', () => {
         .val('Title')
         .className('bold-style')
     )
-  expect(read(editor)).toEqual([
+  expect(read(effects, editor)).toEqual([
     { text: 'Title', effects: [effects.styledBold, effects.styledHeader] }
   ])
 })
 
 it('read empty', () => {
   const editor = el('p')
-  expect(read(editor)).toEqual([{ text: '' }])
+  expect(read(effects, editor)).toEqual([{ text: '' }])
 })
 
 it('read empty with effects', () => {
-  expect(read(el('p').val(el('h1').className('header-style')))).toEqual([
-    { text: '', effects: [effects.styledHeader] }
-  ])
+  expect(
+    read(effects, el('p').val(el('h1').className('header-style')))
+  ).toEqual([{ text: '', effects: [effects.styledHeader] }])
 })
