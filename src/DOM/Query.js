@@ -11,6 +11,10 @@ function el(element) {
   throw new Error('Unsupported type to wrap')
 }
 
+el.active = function() {
+  return el(document.activeElement)
+}
+
 function QueryElement(element) {
   this.element = element
 }

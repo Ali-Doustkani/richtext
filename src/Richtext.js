@@ -1,14 +1,7 @@
-import { standardizeEffects, effectsAreOk, checkEditor } from './args'
+import { checkEffects, checkEditor } from './args'
 import { el, read, render, relativeRange } from './DOM'
-import * as preEditor from './preEditor'
-import createService from './Facade'
-import {
-  canBackspace,
-  canDelete,
-  focusNext,
-  focusPrev,
-  setCursor
-} from './editor'
+import { breakAt, glue, style } from './Stylist'
+import * as Editor from './editor'
 
 /**
  * It creates a configurator function based on the rules.
@@ -17,22 +10,20 @@ import {
  */
 function create(effects) {
   let staySelected = false
-  effects = standardizeEffects(effects)
-  effectsAreOk(effects)
+  effects = checkEffects(effects)
 
-  return function(richtext) {
-    checkEditor(richtext)
-    const richtextQuery = el(richtext)
-    const services = createService(effects)
-    richtext.addEventListener(
+  return function(richtextElement) {
+    checkEditor(richtextElement)
+    const richtext = el(richtextElement)
+    richtextElement.addEventListener(
       'keydown',
       e => {
         if (e.key === 'Enter') {
-          handleEnterKey(e, effects, richtextQuery, services)
+          handleEnterKey(e, effects, richtext)
         } else if (e.key === 'Backspace') {
-          handleBackspaceKey(e, effects, richtextQuery, services)
+          handleBackspaceKey(e, effects, richtext)
         } else if (e.key === 'Delete') {
-          handleDeleteKey(e, effects, richtextQuery, services)
+          handleDeleteKey(e, effects, richtext)
         } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
           handleArrowUp(e)
         } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
@@ -47,50 +38,50 @@ function create(effects) {
 
       apply: (start, end, styleName) => {
         const active = render(
-          richtextQuery,
-          el(document.activeElement),
-          services.style(start, end, styleName)
+          richtext,
+          el.active(),
+          style(effects, start, end, styleName)
         )
         if (styleName === 'header') {
           start = 0
           end = active.val().length
         }
-        setCursor(active, staySelected ? start : end, end)
+        Editor.setCursor(active, staySelected ? start : end, end)
       },
 
       make: styleName => {
-        const editor = el(document.activeElement)
+        const editor = el.active()
         render(
-          richtextQuery,
+          richtext,
           editor,
-          services.style(0, editor.val().length, styleName)
+          style(effects, 0, editor.val().length, styleName)
         )
-        setCursor(editor, editor.val().length, editor.val().length)
+        Editor.setCursor(editor, editor.val().length, editor.val().length)
       }
     }
   }
 }
 
-function handleEnterKey(event, effects, richtextQuery, services) {
+function handleEnterKey(event, effects, richtextQuery) {
   event.preventDefault() // prevent creating new lines in the same p element
-  const editor = el(document.activeElement)
+  const editor = el.active()
   if (editor.is('PRE') && !event.ctrlKey) {
-    preEditor.handleEnter(editor)
+    Editor.handlePreEnter(editor)
     return
   }
   render(
     richtextQuery,
     editor,
-    services.breakAt(
+    breakAt(
       read(effects, editor),
       relativeRange(editor, window.getSelection().getRangeAt(0))
     )
   ).element.focus()
 }
 
-function handleBackspaceKey(event, effects, richtextQuery, services) {
-  const editor = el(document.activeElement)
-  if (!canBackspace(editor)) {
+function handleBackspaceKey(event, effects, richtextQuery) {
+  const editor = el.active()
+  if (!Editor.canBackspace(editor)) {
     return
   }
   event.preventDefault()
@@ -98,17 +89,14 @@ function handleBackspaceKey(event, effects, richtextQuery, services) {
   const active = render(
     richtextQuery,
     [editor.previousSibling(), editor],
-    services.glue(
-      read(effects, editor.previousSibling()),
-      read(effects, editor)
-    )
+    glue(read(effects, editor.previousSibling()), read(effects, editor))
   )
-  setCursor(active, len)
+  Editor.setCursor(active, len)
 }
 
-function handleDeleteKey(event, effects, richtextQuery, services) {
-  const editor = el(document.activeElement)
-  if (!canDelete(editor)) {
+function handleDeleteKey(event, effects, richtextQuery) {
+  const editor = el.active()
+  if (!Editor.canDelete(editor)) {
     return
   }
   const len = editor.val().length
@@ -117,27 +105,27 @@ function handleDeleteKey(event, effects, richtextQuery, services) {
   const active = render(
     richtextQuery,
     [editor, editor.nextSibling()],
-    services.glue(read(effects, editor), read(effects, editor.nextSibling()))
+    glue(read(effects, editor), read(effects, editor.nextSibling()))
   )
-  setCursor(active, len)
+  Editor.setCursor(active, len)
 }
 
 function handleArrowUp(event) {
-  const editor = el(document.activeElement)
+  const editor = el.active()
   const range = window.getSelection().getRangeAt(0)
   if (range.startOffset === 0 && range.endOffset === 0) {
     event.preventDefault()
-    focusPrev(editor)
+    Editor.focusPrev(editor)
   }
 }
 
 function handleArrowDown(event) {
-  const editor = el(document.activeElement)
+  const editor = el.active()
   const relRange = relativeRange(editor, window.getSelection().getRangeAt(0))
   const len = editor.val().length
   if (relRange.start === len && relRange.end === len) {
     event.preventDefault()
-    focusNext(editor)
+    Editor.focusNext(editor)
   }
 }
 

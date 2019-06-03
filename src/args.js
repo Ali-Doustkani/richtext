@@ -35,6 +35,12 @@ function standardizeEffects(effects) {
   return initObj
 }
 
+function checkEffects(effects) {
+  effects = standardizeEffects(effects)
+  effectsAreOk(effects)
+  return effects
+}
+
 function checkEditor(richtext) {
   if (richtext.tagName !== 'DIV' && richtext.tagName !== 'ARTICLE') {
     throw new Error('the richtext can only be a <div> or <article> element')
@@ -52,4 +58,4 @@ function checkEditor(richtext) {
   }
 }
 
-export { effectsAreOk, standardizeEffects, checkEditor }
+export { checkEffects, checkEditor }
