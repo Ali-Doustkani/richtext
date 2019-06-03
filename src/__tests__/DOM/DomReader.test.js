@@ -26,7 +26,7 @@ it('read from paragraph editors', () => {
     .append(' ')
     .append(el('i').val('world'))
   //editor.innerHTML = '<b><i>hello</i></b> <i>world</i>'
-
+expect(true).toBe(false)
   expect(read(editor)).toEqual([
     { text: 'hello', effects: [effects.italic, effects.bold] },
     { text: ' ' },
