@@ -1,10 +1,17 @@
-import createDomReader from './DOM/DomReader'
 import { render } from './DOM/Renderer'
 import { standardizeRules } from './DOM/utils'
 import { el } from './DOM/Query'
-import preEditor from './preEditor'
-import { absoluteRange, relativeRange } from './Range'
+import * as preEditor from './preEditor'
 import createService from './Facade'
+import {
+  canBackspace,
+  canDelete,
+  focusNext,
+  focusPrev,
+  setCursor
+} from './editor'
+import createDomReader from './DOM/DomReader'
+import { relativeRange } from './Range'
 
 /**
  * It creates a configurator function based on the rules.
@@ -29,8 +36,9 @@ function create(rules) {
           render: model => render(richtextQuery, editor, model),
           render2: (editor, model) => render(richtextQuery, editor, model),
           services,
-          controller: editorController(rules, richtextQuery, editor),
-          newController: ed => editorController(rules, richtextQuery, ed)
+          rules,
+          richtextQuery,
+          editor
         }
 
         if (e.key === 'Enter') {
@@ -61,26 +69,17 @@ function create(rules) {
           start = 0
           end = active.val().length
         }
-        editorController(rules, richtextQuery, active).setPosition(
-          staySelected ? start : end,
-          end
-        )
+        setCursor(active, staySelected ? start : end, end)
       },
 
       make: styleName => {
         const editor = el(document.activeElement)
-        editorController(
-          rules,
+        render(
           richtextQuery,
-          render(
-            richtextQuery,
-            editor,
-            services.style(0, editor.val().length, styleName)
-          )
-        ).setPosition(editor.val().length, editor.val().length)
-        // editorQuery()
-        //   .style(styleName, 0, editorQuery().length)
-        //   .setPosition(editorQuery().length, editorQuery().length)
+          editor,
+          services.style(0, editor.val().length, styleName)
+        )
+        setCursor(editor, editor.val().length, editor.val().length)
       }
     }
   }
@@ -103,121 +102,64 @@ function checkEditor(rules, richtext) {
   }
 }
 
-function handleEnterKey(event, { controller, services, render }) {
+function handleEnterKey(event, { editor, services, render, rules }) {
   event.preventDefault() // prevent creating new lines in the same p element
-  if (controller.editor().is('PRE') && !event.ctrlKey) {
-    preEditor(controller).break()
+  if (editor.is('PRE') && !event.ctrlKey) {
+    preEditor.handleEnter(editor)
     return
   }
   render(
-    services.breakAt(controller.model(), controller.relativeRange())
+    services.breakAt(
+      createDomReader(rules)(editor),
+      relativeRange(editor, window.getSelection().getRangeAt(0))
+    )
   ).element.focus()
 }
 
-function handleBackspaceKey(
-  event,
-  { controller, newController, services, render2 }
-) {
-  if (!controller.isCursorAtBeginning() || controller.isFirst()) {
+function handleBackspaceKey(event, { services, render2, rules, editor }) {
+  if (!canBackspace(editor)) {
     return
   }
   event.preventDefault()
-  const len = controller
-    .previousSibling()
-    .editor()
-    .val().length
-  newController(
-    render2(
-      [controller.previousSibling().editor(), controller.editor()],
-      services.glue(controller.previousSibling().model(), controller.model())
-    )
-  ).setPosition(len)
+  const read = createDomReader(rules)
+  const len = editor.previousSibling().val().length
+  const active = render2(
+    [editor.previousSibling(), editor],
+    services.glue(read(editor.previousSibling()), read(editor))
+  )
+  setCursor(active, len)
 }
 
-function handleDeleteKey(
-  event,
-  { controller, newController, services, render2 }
-) {
-  if (!controller.isCursorAtEnd() || controller.isLast()) {
+function handleDeleteKey(event, { services, render2, editor, rules }) {
+  if (!canDelete(editor)) {
     return
   }
-  const len = controller.editor().val().length
+  const len = editor.val().length
+  const read = createDomReader(rules)
   event.preventDefault()
-  newController(
-    render2(
-      [controller.editor(), controller.nextSibling().editor()],
-      services.glue(controller.model(), controller.nextSibling().model())
-    )
-  ).setPosition(len)
+
+  const active = render2(
+    [editor, editor.nextSibling()],
+    services.glue(read(editor), read(editor.nextSibling()))
+  )
+  setCursor(active, len)
 }
 
-function handleArrowUp(event, { controller }) {
+function handleArrowUp(event, { editor }) {
   const range = window.getSelection().getRangeAt(0)
   if (range.startOffset === 0 && range.endOffset === 0) {
     event.preventDefault()
-    controller.focusPrev()
+    focusPrev(editor)
   }
 }
 
-function handleArrowDown(event, { controller }) {
-  const relRange = controller.relativeRange()
-  const len = controller.editor().val().length
+function handleArrowDown(event, { editor }) {
+  const relRange = relativeRange(editor, window.getSelection().getRangeAt(0))
+  const len = editor.val().length
   if (relRange.start === len && relRange.end === len) {
     event.preventDefault()
-    controller.focusNext()
+    focusNext(editor)
   }
-}
-
-////////////////
-function editorController(rules, richtext, editor) {
-  const read = createDomReader(rules)
-  const w = {
-    richtext: () => el(richtext),
-    editor: () => editor,
-    model: () => read(editor),
-    relativeRange: () =>
-      relativeRange(editor, window.getSelection().getRangeAt(0)),
-    isCursorAtBeginning: () => {
-      const range = relativeRange(editor, window.getSelection().getRangeAt(0))
-      return range.start === 0 && range.end === 0
-    },
-    isFirst: () => editor.previousSibling() === null,
-    previousSibling: () =>
-      editorController(rules, richtext, editor.previousSibling()),
-    nextSibling: () => editorController(rules, richtext, editor.nextSibling()),
-    isCursorAtEnd: () => {
-      const range = relativeRange(editor, window.getSelection().getRangeAt(0))
-      const len = editor.val().length
-      return range.start === len && range.end === len
-    },
-    isLast: () => editor.nextSibling() === null,
-    setPosition: (start, end) => {
-      end = end || start
-      const points = absoluteRange(editor, { start, end })
-      const range = document.createRange()
-      range.setStart(points.startContainer, points.startOffset)
-      range.setEnd(points.endContainer, points.endOffset)
-      const sel = window.getSelection()
-      sel.removeAllRanges()
-      sel.addRange(range)
-    },
-    focus: () => editor.element.focus(),
-    focusPrev: () => {
-      if (!w.isFirst()) {
-        const prev = w.previousSibling()
-        prev.focus()
-        prev.setPosition(prev.editor().val().length)
-      }
-    },
-    focusNext: () => {
-      if (!w.isLast()) {
-        const next = w.nextSibling()
-        next.focus()
-        next.setPosition(0)
-      }
-    }
-  }
-  return w
 }
 
 export default create
