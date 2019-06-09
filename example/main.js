@@ -17,6 +17,10 @@ const editor = createRichtext({
   codebox: {
     parent: true,
     tag: 'pre'
+  },
+  list: {
+    parent: true,
+    tag: 'li'
   }
 })(div)
 div.firstChild.focus()
@@ -55,5 +59,13 @@ wire('codebox', sel => {
     editor.make('codebox')
   } else {
     editor.apply(sel.start, sel.end, 'codebox')
+  }
+})
+
+wire('list', sel => {
+  if (sel.start === sel.end) {
+    editor.make('list')
+  } else {
+    editor.apply(sel.start, sel.end, 'list')
   }
 })
