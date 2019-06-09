@@ -10,10 +10,11 @@ const effects = {
     className: 'text-highlight'
   },
   bigHeader: {
+    parent: true,
     tag: 'h1'
   },
-  styledHeader: {
-    tag: 'h1',
+  smallHeader: {
+    tag: 'h2',
     className: 'header-style'
   }
 }
@@ -39,7 +40,7 @@ it('read from non paragraph editors', () => {
 })
 
 it('take classNames into account for effect detection', () => {
-  const editor = el('h1')
+  const editor = el('h2')
     .className('header-style')
     .append(
       el('b')
@@ -47,7 +48,7 @@ it('take classNames into account for effect detection', () => {
         .className('bold-style')
     )
   expect(read(effects, editor)).toEqual([
-    { text: 'Title', effects: [effects.styledBold, effects.styledHeader] }
+    { text: 'Title', effects: [effects.styledBold, effects.smallHeader] }
   ])
 })
 
@@ -56,8 +57,14 @@ it('read empty', () => {
   expect(read(effects, editor)).toEqual([{ text: '' }])
 })
 
-it('read empty with effects', () => {
+it('read paragraph with empty effects', () => {
   expect(
-    read(effects, el('p').val(el('h1').className('header-style')))
-  ).toEqual([{ text: '', effects: [effects.styledHeader] }])
+    read(effects, el('p').val(el('h2').className('header-style')))
+  ).toEqual([{ text: '', effects: [effects.smallHeader] }])
+})
+
+it('read empty parent effect', () => {
+  expect(read(effects, el('h1'))).toEqual([
+    { text: '', effects: [effects.bigHeader] }
+  ])
 })

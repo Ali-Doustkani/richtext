@@ -1,9 +1,11 @@
 function read(effects, editor) {
-  
   const ret = []
   const parentEffects = getParentEffects(editor)
   let node = editor.firstChild()
   if (!node) {
+    if (parentEffects.length) {
+      return [{ text: '', effects: parentEffects }]
+    }
     return [{ text: '' }]
   }
   while (node) {
