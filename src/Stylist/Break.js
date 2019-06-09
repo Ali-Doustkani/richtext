@@ -47,10 +47,7 @@ function breakAt(model, range) {
     if (ctx.notStartedYet()) {
       originalModel.push(ctx.whole(item))
     } else if (ctx.starting()) {
-      const copied = ctx.leftSlice(item)
-      if (copied.text) {
-        originalModel.push(copied)
-      }
+      originalModel.push(ctx.leftSlice(item))
       if (ctx.justEnter()) {
         newModel.push(ctx.rightSlice(item))
       }
@@ -60,7 +57,13 @@ function breakAt(model, range) {
       newModel.push(ctx.whole(item))
     }
   })
-  setLastActive(newModel, newModel.length - 1)
+
+  if (newModel.length) {
+    newModel[newModel.length - 1].active = true
+  } else {
+    newModel.push(copy('', originalModel[originalModel.length - 1].effects))
+    newModel[0].active = true
+  }
   return [originalModel, newModel]
 }
 
