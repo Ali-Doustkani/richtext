@@ -3,10 +3,7 @@ function read(effects, editor) {
   const parentEffects = getParentEffects(editor)
   let node = editor.firstChild()
   if (!node) {
-    if (parentEffects.length) {
-      return [{ text: '', effects: parentEffects }]
-    }
-    return [{ text: '' }]
+    return [{ text: '', effects: parentEffects }]
   }
   while (node) {
     ret.push(drillDown(node, [...parentEffects]))
@@ -17,9 +14,6 @@ function read(effects, editor) {
   function drillDown(el, effects) {
     if (!el || el.is(Node.TEXT_NODE)) {
       const text = el ? el.val() : ''
-      if (effects.length == 0) {
-        return { text }
-      }
       return { text, effects }
     }
     if (el.is(Node.ELEMENT_NODE)) {

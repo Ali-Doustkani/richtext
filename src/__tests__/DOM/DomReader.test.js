@@ -27,7 +27,7 @@ it('read from paragraph editors', () => {
 
   expect(read(effects, editor)).toEqual([
     { text: 'hello', effects: [effects.italic, effects.bold] },
-    { text: ' ' },
+    { text: ' ', effects: [] },
     { text: 'world', effects: [effects.italic] }
   ])
 })
@@ -54,7 +54,7 @@ it('take classNames into account for effect detection', () => {
 
 it('read empty', () => {
   const editor = el('p')
-  expect(read(effects, editor)).toEqual([{ text: '' }])
+  expect(read(effects, editor)).toEqual([{ text: '', effects: [] }])
 })
 
 it('read paragraph with empty effects', () => {

@@ -12,7 +12,7 @@ const ef = {
 
 describe('when breaking', () => {
   it('create a new array for result', () => {
-    const model = [{ text: '123456' }]
+    const model = [{ text: '123456', effects: [] }]
     const [m1, m2] = breakAt(model, 3)
     expect(m1).not.toBe(model)
     expect(m2).not.toBe(model)
@@ -28,20 +28,23 @@ describe('when breaking', () => {
 
   it('at a point in a multi-item model', () => {
     const [m1, m2] = breakAt(
-      [{ text: 'one', effects: ['a'] }, { text: 'two' }],
+      [{ text: 'one', effects: ['a'] }, { text: 'two', effects: [] }],
       2
     )
     expect(m1).toEqual([{ text: 'on', effects: ['a'], active: false }])
     expect(m2).toEqual([
       { text: 'e', effects: ['a'], active: false },
-      { text: 'two', active: true }
+      { text: 'two', effects: [], active: true }
     ])
   })
 
   it('a selection from a single-item model', () => {
-    const [m1, m2] = breakAt([{ text: 'hello world' }], { start: 4, end: 9 })
-    expect(m1).toEqual([{ text: 'hell', active: false }])
-    expect(m2).toEqual([{ text: 'ld', active: true }])
+    const [m1, m2] = breakAt([{ text: 'hello world', effects: [] }], {
+      start: 4,
+      end: 9
+    })
+    expect(m1).toEqual([{ text: 'hell', effects: [], active: false }])
+    expect(m2).toEqual([{ text: 'ld', effects: [], active: true }])
   })
 
   it('a selection from middle of an item to its next', () => {
@@ -50,7 +53,7 @@ describe('when breaking', () => {
         { text: '1', effects: ['a'] },
         { text: '234', effects: ['b'] },
         { text: '5678', effects: ['a', 'c'] },
-        { text: 'abc' }
+        { text: 'abc', effects: [] }
       ],
       { start: 2, end: 6 }
     )
@@ -60,28 +63,28 @@ describe('when breaking', () => {
     ])
     expect(m2).toEqual([
       { text: '78', effects: ['a', 'c'], active: false },
-      { text: 'abc', active: true }
+      { text: 'abc', effects: [], active: true }
     ])
   })
 
   it('a long selection', () => {
     const [m1, m2] = breakAt(
       [
-        { text: '12' },
-        { text: '34' },
-        { text: '56' },
-        { text: '78' },
-        { text: '90' }
+        { text: '12', effects: [] },
+        { text: '34', effects: [] },
+        { text: '56', effects: [] },
+        { text: '78', effects: [] },
+        { text: '90', effects: [] }
       ],
       { start: 3, end: 7 }
     )
     expect(m1).toEqual([
-      { text: '12', active: false },
-      { text: '3', active: false }
+      { text: '12', effects: [], active: false },
+      { text: '3', effects: [], active: false }
     ])
     expect(m2).toEqual([
-      { text: '8', active: false },
-      { text: '90', active: true }
+      { text: '8', effects: [], active: false },
+      { text: '90', effects: [], active: true }
     ])
   })
 
@@ -108,9 +111,9 @@ describe('when breaking', () => {
   })
 
   it('activate the last item', () => {
-    const [m1, m2] = breakAt([{ text: 'HelloWorld' }], 5)
-    expect(m1).toEqual([{ text: 'Hello', active: false }])
-    expect(m2).toEqual([{ text: 'World', active: true }])
+    const [m1, m2] = breakAt([{ text: 'HelloWorld', effects: [] }], 5)
+    expect(m1).toEqual([{ text: 'Hello', effects: [], active: false }])
+    expect(m2).toEqual([{ text: 'World', effects: [], active: true }])
   })
 })
 
@@ -135,18 +138,22 @@ describe('when gluing', () => {
 
   it('when first model is empty', () => {
     const m1 = []
-    const m2 = [{ text: 'Hello World' }]
-    expect(glue(m1, m2)).toEqual([{ text: 'Hello World', active: true }])
+    const m2 = [{ text: 'Hello World', effects: [] }]
+    expect(glue(m1, m2)).toEqual([
+      { text: 'Hello World', effects: [], active: true }
+    ])
   })
 
   it('when second model is empty', () => {
-    const m1 = [{ text: 'Hello World' }]
+    const m1 = [{ text: 'Hello World', effects: [] }]
     const m2 = []
-    expect(glue(m1, m2)).toEqual([{ text: 'Hello World', active: true }])
+    expect(glue(m1, m2)).toEqual([
+      { text: 'Hello World', effects: [], active: true }
+    ])
   })
 
   it('when both models are empty', () => {
-    expect(glue([], [])).toEqual([{ text: '', active: true }])
+    expect(glue([], [])).toEqual([{ text: '', effects: [], active: true }])
   })
 
   it('a regular model to a parent model', () => {
@@ -154,13 +161,16 @@ describe('when gluing', () => {
     const parent = [{ text: 'World', effects: [ef.h] }]
     expect(glue(regular, parent)).toEqual([
       { text: 'Hello', effects: [ef.b], active: true },
-      { text: 'World', active: false }
+      { text: 'World', effects: [], active: false }
     ])
   })
 
   it('take parent effects from the first model', () => {
     const m1 = [{ text: 'Hello', effects: [ef.b, ef.h] }]
-    const m2 = [{ text: 'Beautiful' }, { text: 'World', effects: [ef.b] }]
+    const m2 = [
+      { text: 'Beautiful', effects: [] },
+      { text: 'World', effects: [ef.b] }
+    ]
     expect(glue(m1, m2)).toEqual([
       { text: 'Hello', effects: [ef.b, ef.h], active: true },
       { text: 'Beautiful', effects: [ef.h], active: false },
@@ -173,16 +183,19 @@ describe('when gluing', () => {
     const m2 = [{ text: 'World', effects: [ef.h] }]
     expect(glue(m1, m2)).toEqual([
       { text: 'Hello', effects: [ef.b], active: true },
-      { text: 'World', active: false }
+      { text: 'World', effects: [], active: false }
     ])
   })
 
   it('activate the first item', () => {
     expect(
-      glue([{ text: 'Hello', effects: [ef.b] }], [{ text: 'World' }])
+      glue(
+        [{ text: 'Hello', effects: [ef.b] }],
+        [{ text: 'World', effects: [] }]
+      )
     ).toEqual([
       { text: 'Hello', effects: [ef.b], active: true },
-      { text: 'World', active: false }
+      { text: 'World', effects: [], active: false }
     ])
   })
 })

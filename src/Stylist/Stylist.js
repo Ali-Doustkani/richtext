@@ -4,13 +4,14 @@ import { when } from './utils'
 function check(options) {
   if (options) {
     if (typeof options.input === 'string') {
-      options.input = [{ text: options.input }]
+      options.input = [{ text: options.input, effects: [] }]
     } else if (
       typeof options.input === 'object' &&
       !Array.isArray(options.input)
     ) {
       options.input = [options.input]
     }
+    options.input.forEach(item => (item.effects = item.effects || []))
     return options
   }
   throw new Error('Invalid options')

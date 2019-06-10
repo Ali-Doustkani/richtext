@@ -11,7 +11,6 @@ function addToResult(state, text, effects, active) {
   if (text === '') {
     return state
   }
-  effects = effects && effects.length ? effects : undefined // empty array is not acceptable
   const result = [...state.result]
   const lastElement = result[result.length - 1]
   if (lastElement && areEqual(lastElement.effects, effects)) {
@@ -32,7 +31,7 @@ function createContext(from, to) {
   const ret = {}
 
   const mustUndo = (effects, type) => {
-    const hasTheEffect = effects && effects.includes(type)
+    const hasTheEffect = effects.includes(type)
     const regionFitToPoints = state.head === from && regionHead === to
     const pointsAreInRegion =
       from >= state.head &&

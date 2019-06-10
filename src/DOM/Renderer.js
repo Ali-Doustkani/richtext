@@ -15,6 +15,9 @@ function render(richtext, editors, renderModels) {
     return renderModels.active
   }
   surroundItemsAndInsert(richtext, editors, renderModels)
+  if (renderModels.length) {
+    return renderModels[renderModels.length - 1].active
+  }
   return renderModels.active
 }
 

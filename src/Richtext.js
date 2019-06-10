@@ -84,14 +84,14 @@ function handleBackspaceKey(event, effects, richtextQuery) {
     return
   }
   event.preventDefault()
-  const len = editor.previousSibling().val().length
-  let prevEditor = editor.previousSibling()
+  const len = editor.previous().val().length
+  let prevEditor = editor.previous()
   if (prevEditor.is('ul')) {
     prevEditor = prevEditor.lastChild()
   }
   const active = render(
     richtextQuery,
-    [editor.previousSibling(), editor],
+    [editor.previous(), editor],
     glue(read(effects, prevEditor), read(effects, editor))
   )
   Editor.setCursor(active, len)
@@ -107,8 +107,8 @@ function handleDeleteKey(event, effects, richtextQuery) {
 
   const active = render(
     richtextQuery,
-    [editor, editor.nextSibling()],
-    glue(read(effects, editor), read(effects, editor.nextSibling()))
+    [editor, editor.next()],
+    glue(read(effects, editor), read(effects, editor.next()))
   )
   Editor.setCursor(active, len)
 }

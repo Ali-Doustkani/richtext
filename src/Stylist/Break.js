@@ -12,21 +12,14 @@ function glue(model1, model2) {
     model.forEach(item => result.push(copy(item.text, item.effects)))
   pushAll(model1)
 
-  const parentEffect =
-    model1.length && model1[0].effects
-      ? model1[0].effects.filter(x => x.parent)[0]
-      : undefined
+  const parentEffect = model1.length
+    ? model1[0].effects.filter(x => x.parent)[0]
+    : null
 
   model2.forEach(item => {
-    if (item.effects) {
-      item.effects = item.effects.filter(x => !x.parent)
-    }
+    item.effects = item.effects.filter(x => !x.parent)
     if (parentEffect) {
-      if (item.effects) {
-        item.effects.push(parentEffect)
-      } else {
-        item.effects = [parentEffect]
-      }
+      item.effects.push(parentEffect)
     }
   })
   if (result.length && model2.length) {
@@ -122,9 +115,6 @@ function iterateOver(model, selection, func) {
 }
 
 function copy(text, effects) {
-  if (!effects || !effects.length) {
-    return { text, active: false }
-  }
   return { text, effects: [...effects], active: false }
 }
 
@@ -132,7 +122,7 @@ function setLastActive(array, index) {
   if (array.length) {
     array[index].active = true
   } else {
-    array.push({ text: '', active: true })
+    array.push({ text: '', effects: [], active: true })
   }
 }
 
