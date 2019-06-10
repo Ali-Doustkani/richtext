@@ -43,6 +43,11 @@ class QueryElement {
     return this
   }
 
+  shift(children) {
+    this.element.insertBefore(children.element, this.element.firstChild)
+    return this
+  }
+
   val(value) {
     if (value === undefined) {
       return this.element.textContent
@@ -80,10 +85,19 @@ class QueryElement {
   }
 
   remove(child) {
-    if (Array.isArray(child)) {
+    if (child === undefined) {
+      this.element.parentNode.removeChild(this.element)
+    } else if (Array.isArray(child)) {
       child.forEach(item => this.element.removeChild(item.element))
     } else {
       this.element.removeChild(child.element)
+    }
+    return this
+  }
+
+  moveChildrenTo(targetParent) {
+    while (this.element.childNodes.length) {
+      targetParent.element.append(this.element.firstChild)
     }
     return this
   }

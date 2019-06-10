@@ -36,7 +36,7 @@ describe('manipulations', () => {
     ).toBe('<h1>You</h1>')
   })
 
-  it('insert after', () => {
+  it('insert single item after', () => {
     const h1 = el('h1')
     expect(
       owner
@@ -52,6 +52,13 @@ describe('manipulations', () => {
     expect(owner.append(h1).insertAfter(h1, arr).element.innerHTML).toBe(
       '<h1></h1><h2></h2><h3></h3>'
     )
+  })
+
+  it('shift single item to the beginning of parent', () => {
+    const parent = el('div')
+      .append(el('p').val('Original'))
+      .shift(el('h1').val('New'))
+    expect(parent.element.innerHTML).toBe('<h1>New</h1><p>Original</p>')
   })
 
   it('remove single item', () => {
@@ -74,6 +81,15 @@ describe('manipulations', () => {
         .append(b)
         .remove([a, b]).element.innerHTML
     ).toBe('')
+  })
+
+  it('remove itself', () => {
+    const parent = el('div')
+    el('p')
+      .val('Hey')
+      .appendTo(parent)
+      .remove()
+    expect(parent.element.innerHTML).toBe('')
   })
 
   it('set classs name', () => {
@@ -124,6 +140,21 @@ describe('manipulations', () => {
       .appendTo(parent)
       .to('p')
     expect(li.element.outerHTML).toBe('<p>some text</p>')
+  })
+
+  it('move children to other element', () => {
+    const parent = el('div')
+    const firstList = el('ul')
+      .append(el('li').val('1'))
+      .appendTo(parent)
+    const secondList = el('ul')
+      .append(el('li').val('2'))
+      .append(el('li').val('3'))
+      .appendTo(parent)
+    secondList.moveChildrenTo(firstList)
+    expect(parent.element.innerHTML).toBe(
+      '<ul><li>1</li><li>2</li><li>3</li></ul><ul></ul>'
+    )
   })
 })
 
