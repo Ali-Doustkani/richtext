@@ -10,7 +10,7 @@ const ef = {
   }
 }
 
-describe('breaking', () => {
+describe('when breaking', () => {
   it('create a new array for result', () => {
     const model = [{ text: '123456' }]
     const [m1, m2] = breakAt(model, 3)
@@ -107,14 +107,14 @@ describe('breaking', () => {
     expect(m2).toEqual([{ text: '', effects: [ef.h], active: true }])
   })
 
-  it('is active in the last item when breaking', () => {
+  it('activate the last item', () => {
     const [m1, m2] = breakAt([{ text: 'HelloWorld' }], 5)
     expect(m1).toEqual([{ text: 'Hello', active: false }])
     expect(m2).toEqual([{ text: 'World', active: true }])
   })
 })
 
-describe('gluing', () => {
+describe('when gluing', () => {
   it('same effects', () => {
     const m1 = [{ text: '123', effects: [1] }, { text: 'abc', effects: ['e1'] }]
     const m2 = [{ text: 'def', effects: ['e1'] }]
@@ -158,12 +158,28 @@ describe('gluing', () => {
     ])
   })
 
-  it('is active in the first item when breaking', () => {
+  it('take parent effects from the first model', () => {
+    const m1 = [{ text: 'Hello', effects: [ef.b, ef.h] }]
+    const m2 = [{ text: 'Beautiful' }, { text: 'World', effects: [ef.b] }]
+    expect(glue(m1, m2)).toEqual([
+      { text: 'Hello', effects: [ef.b, ef.h], active: true },
+      { text: 'Beautiful', effects: [ef.h], active: false },
+      { text: 'World', effects: [ef.b, ef.h], active: false }
+    ])
+  })
+
+  it('remove parent effect from the second model', () => {
+    const m1 = [{ text: 'Hello', effects: [ef.b] }]
+    const m2 = [{ text: 'World', effects: [ef.h] }]
+    expect(glue(m1, m2)).toEqual([
+      { text: 'Hello', effects: [ef.b], active: true },
+      { text: 'World', active: false }
+    ])
+  })
+
+  it('activate the first item', () => {
     expect(
-      glue(
-        [{ text: 'Hello', effects: [ef.b] }],
-        [{ text: 'World', effects: [ef.h] }]
-      )
+      glue([{ text: 'Hello', effects: [ef.b] }], [{ text: 'World' }])
     ).toEqual([
       { text: 'Hello', effects: [ef.b], active: true },
       { text: 'World', active: false }

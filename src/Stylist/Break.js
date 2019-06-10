@@ -8,24 +8,37 @@ import { areEqual } from './utils'
  */
 function glue(model1, model2) {
   const result = []
-  const push = item => {
-    const effects =
-      item.effects && item.effects.length
-        ? item.effects.filter(x => !x.parent)
-        : undefined
-    result.push(copy(item.text, effects))
-  }
-  model1.forEach(push)
+  const pushAll = model =>
+    model.forEach(item => result.push(copy(item.text, item.effects)))
+  pushAll(model1)
+
+  const parentEffect =
+    model1.length && model1[0].effects
+      ? model1[0].effects.filter(x => x.parent)[0]
+      : undefined
+
+  model2.forEach(item => {
+    if (item.effects) {
+      item.effects = item.effects.filter(x => !x.parent)
+    }
+    if (parentEffect) {
+      if (item.effects) {
+        item.effects.push(parentEffect)
+      } else {
+        item.effects = [parentEffect]
+      }
+    }
+  })
   if (result.length && model2.length) {
     const lastEffect = result[result.length - 1].effects
     const firstModel = model2.shift()
     if (areEqual(lastEffect, firstModel.effects)) {
       result[result.length - 1].text += firstModel.text
     } else {
-      push(firstModel)
+      result.push(copy(firstModel.text, firstModel.effects))
     }
   }
-  model2.forEach(push)
+  pushAll(model2)
   setLastActive(result, 0)
   return result
 }
