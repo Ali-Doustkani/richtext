@@ -46,25 +46,23 @@ function appendToList(editors, renderModels) {
 function shouldMergeList(editors) {
   return (
     editors.length === 1 &&
-    ((editors[0].previousSibling() && editors[0].previousSibling().is('ul')) ||
-      (editors[0].nextSibling() && editors[0].nextSibling().is('ul')))
+    (editors[0].previousIs('ul') || editors[0].nextIs('ul'))
   )
 }
 
 function merge(richtext, editors, renderModels) {
   const cur = editors[0]
-  if (cur.previousSibling() && cur.previousSibling().is('ul')) {
-    const prevList = cur.previousSibling().append(renderModels.list[0])
-    if (cur.nextSibling() && cur.nextSibling().is('ul')) {
+  if (cur.previousIs('ul')) {
+    const prevList = cur.previous().append(renderModels.list[0])
+    if (cur.nextIs('ul')) {
       cur
-        .nextSibling()
+        .next()
         .moveChildrenTo(prevList)
         .remove()
     }
-  } else if (cur.nextSibling() && cur.nextSibling().is('ul')) {
-    cur.nextSibling().shift(renderModels.list[0])
+  } else if (cur.nextIs('ul')) {
+    cur.next().shift(renderModels.list[0])
   }
-
   richtext.remove(editors)
 }
 
@@ -77,9 +75,8 @@ function array(value) {
 
 function surroundItemsAndInsert(richtext, editors, renderModels) {
   const list = flattenModels(renderModels)
-  const lastEditor = editors[0]
   surroundListItems(list)
-  richtext.insertAfter(lastEditor, list).remove(editors)
+  richtext.insertAfter(editors[0], list).remove(editors)
 }
 
 function surroundListItems(list) {

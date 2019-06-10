@@ -13,7 +13,7 @@ function canDelete(editor) {
 
 function focusPrev(editor) {
   if (isNotFirst(editor)) {
-    const prev = editor.previousSibling()
+    const prev = editor.previous()
     prev.element.focus()
     setCursor(prev, prev.val().length)
   }
@@ -21,7 +21,7 @@ function focusPrev(editor) {
 
 function focusNext(editor) {
   if (isNotLast(editor)) {
-    const next = editor.nextSibling()
+    const next = editor.next()
     next.element.focus()
     setCursor(next, 0)
   }
@@ -43,11 +43,11 @@ function relRange(editor) {
 }
 
 function isNotFirst(editor) {
-  return editor.previousSibling() !== null
+  return editor.previous() !== null
 }
 
 function isNotLast(editor) {
-  return editor.nextSibling() !== null
+  return editor.next() !== null
 }
 
 function handlePreEnter(editor) {

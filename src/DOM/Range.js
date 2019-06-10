@@ -104,11 +104,11 @@ function firstText(node) {
 
 // navigate the entire tree under 'rootNode' until a text node is found
 function nextText(node, rootEl) {
-  if (node.nextSibling() !== null) {
-    if (node.nextSibling().is(Node.TEXT_NODE)) {
-      return node.nextSibling()
+  if (node.next() !== null) {
+    if (node.next().is(Node.TEXT_NODE)) {
+      return node.next()
     } else {
-      return firstText(node.nextSibling().firstChild())
+      return firstText(node.next().firstChild())
     }
   }
   if (node.parent() && node.parent().is(rootEl)) {

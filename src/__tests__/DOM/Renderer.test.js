@@ -73,7 +73,7 @@ it('merge with prev list', () => {
   richtext = el('article')
     .append(el('ul').val(el('li').val('First')))
     .append(el('p').val('Second'))
-  editor = richtext.firstChild().nextSibling()
+  editor = richtext.firstChild().next()
 
   render(richtext, editor, { list: [el('li').val('Second')] })
 
@@ -100,7 +100,7 @@ it('merge with prev & next lists', () => {
     .append(el('ul').val(el('li').val('First')))
     .append(el('p').val('Second'))
     .append(el('ul').val(el('li').val('Third')))
-  editor = richtext.firstChild().nextSibling()
+  editor = richtext.firstChild().next()
 
   render(richtext, editor, { list: [el('li').val('Second')] })
 
@@ -171,7 +171,7 @@ it('append a paragraph to a list', () => {
   richtext = el('article')
     .append(el('ul').append(el('li').val('1')))
     .append(el('p').val('2'))
-  const editors = [richtext.firstChild(), richtext.firstChild().nextSibling()]
+  const editors = [richtext.firstChild(), richtext.firstChild().next()]
 
   render(richtext, editors, { list: [el('li').val('12')] })
 

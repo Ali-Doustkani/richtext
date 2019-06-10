@@ -234,7 +234,7 @@ describe('navigationals', () => {
         .append(el('h1'))
         .append(el('h2'))
         .firstChild()
-        .nextSibling()
+        .next()
         .is('h2')
     ).toBe(true)
   })
@@ -242,6 +242,6 @@ describe('navigationals', () => {
   it('get previous sibling', () => {
     const p = el('p').appendTo(owner)
     const pre = el('pre').appendTo(owner)
-    expect(pre.previousSibling().is(p)).toBe(true)
+    expect(pre.previousIs(p)).toBe(true)
   })
 })

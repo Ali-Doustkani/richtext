@@ -10,7 +10,7 @@ function read(effects, editor) {
   }
   while (node) {
     ret.push(drillDown(node, [...parentEffects]))
-    node = node.nextSibling()
+    node = node.next()
   }
   return ret
 

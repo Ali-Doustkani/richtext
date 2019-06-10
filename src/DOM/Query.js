@@ -173,14 +173,22 @@ class QueryElement {
     return el(this.element.lastChild)
   }
 
-  nextSibling() {
+  next() {
     return el(this.element.nextSibling)
   }
 
-  previousSibling() {
+  previous() {
     return el(this.element.previousSibling)
   }
 
+  nextIs(target){
+    return this.next() && this.next().is(target)
+  }
+
+  previousIs(target){
+    return this.previous() && this.previous().is(target)
+  }
+  
   hasChildren() {
     return Boolean(this.element.childNodes.length)
   }
