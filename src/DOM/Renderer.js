@@ -4,21 +4,14 @@ function render(richtext, editors, renderModels) {
   editors = array(editors)
   if (shouldMoveToList(editors)) {
     moveToList(editors, renderModels)
-    return renderModels.active
-  }
-  if (shouldAppendToList(editors)) {
+  } else if (shouldAppendToList(editors)) {
     appendToList(editors, renderModels)
-    return renderModels.active
-  }
-  if (shouldMergeList(editors)) {
+  } else if (shouldMergeList(editors)) {
     merge(richtext, editors, renderModels)
-    return renderModels.active
+  } else {
+    surroundItemsAndInsert(richtext, editors, renderModels)
   }
-  surroundItemsAndInsert(richtext, editors, renderModels)
-  if (renderModels.length) {
-    return renderModels[renderModels.length - 1].active
-  }
-  return renderModels.active
+  return active(renderModels)
 }
 
 function shouldMoveToList(editors) {
@@ -67,6 +60,13 @@ function merge(richtext, editors, renderModels) {
     cur.next().shift(renderModels.list[0])
   }
   richtext.remove(editors)
+}
+
+function active(renderModels) {
+  if (renderModels.length) {
+    return renderModels[renderModels.length - 1].active
+  }
+  return renderModels.active
 }
 
 function array(value) {

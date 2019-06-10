@@ -51,8 +51,8 @@ function create(effects) {
 
       make: styleName => {
         const editor = el.active()
-        render(richtext, editor, style(effects, 0, editor.length, styleName))
-        Editor.setCursor(editor, editor.length, editor.length)
+        const active = render(richtext, editor, style(effects, 0, editor.length, styleName))
+        Editor.setCursor(active, editor.length, editor.length)
       }
     }
   }
