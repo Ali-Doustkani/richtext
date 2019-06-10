@@ -61,8 +61,14 @@ function create(effects) {
 function handleEnterKey(event, effects, richtextQuery) {
   event.preventDefault() // prevent creating new lines in the same p element
   const editor = el.active()
-  if (editor.is('PRE') && !event.ctrlKey) {
+  if (editor.is('pre') && !event.ctrlKey) {
     Editor.handlePreEnter(editor)
+    return
+  }
+  if (editor.is('li') && event.ctrlKey) {
+    const [m1, m2] = breakAt(read(effects, editor), relativeRange(editor))
+    m2.list[0].to('p').isEditable()
+    render(richtextQuery, editor, [m1, m2]).element.focus()
     return
   }
   render(
@@ -79,10 +85,14 @@ function handleBackspaceKey(event, effects, richtextQuery) {
   }
   event.preventDefault()
   const len = editor.previousSibling().val().length
+  let prevEditor = editor.previousSibling()
+  if (prevEditor.is('ul')) {
+    prevEditor = prevEditor.lastChild()
+  }
   const active = render(
     richtextQuery,
     [editor.previousSibling(), editor],
-    glue(read(effects, editor.previousSibling()), read(effects, editor))
+    glue(read(effects, prevEditor), read(effects, editor))
   )
   Editor.setCursor(active, len)
 }
