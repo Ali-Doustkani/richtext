@@ -88,6 +88,18 @@ class QueryElement {
     return this
   }
 
+  to(target) {
+    const targetEl = document.createElement(target)
+    if (this.element.parentNode) {
+      this.element.parentNode.replaceChild(targetEl, this.element)
+    }
+    while (this.element.childNodes.length) {
+      targetEl.appendChild(this.element.childNodes[0])
+    }
+    this.element = targetEl
+    return this
+  }
+
   className(classname) {
     this.element.className = classname
     return this

@@ -116,6 +116,15 @@ describe('manipulations', () => {
         .append('d').element.outerHTML
     ).toBe('<p>ab<b>c</b>d</p>')
   })
+
+  it('convert element type', () => {
+    const parent = el('div')
+    const li = el('li')
+      .val('some text')
+      .appendTo(parent)
+      .to('p')
+    expect(li.element.outerHTML).toBe('<p>some text</p>')
+  })
 })
 
 describe('checkings', () => {
