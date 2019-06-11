@@ -1,5 +1,5 @@
 import { el } from './../../DOM/Query'
-import { render } from './../../DOM/Renderer'
+import { render as _render } from './../../DOM/Renderer'
 
 let richtext
 let editor
@@ -8,16 +8,24 @@ beforeEach(() => {
   richtext = el('div')
 })
 
+function render(elements) {
+  _render(richtext, editor, elements)
+}
+
+function expectHtml(html) {
+  expect(richtext.element.innerHTML).toBe(html)
+}
+
 describe('non lists', () => {
   it('render simple elements', () => {
     editor = el('p').appendTo(richtext)
-    render(richtext, editor, [el('p'), el('strong')])
-    expect(richtext.element.innerHTML).toBe('<p></p><strong></strong>')
+    render([el('p'), el('strong')])
+    expectHtml('<p></p><strong></strong>')
   })
 
   it('throw error on empty list', () => {
-    expect(() => render(richtext, editor)).toThrow()
-    expect(() => render(richtext, editor, [])).toThrow()
+    expect(() => render()).toThrow()
+    expect(() => render([])).toThrow()
   })
 
   it('render an array of editors', () => {
@@ -30,9 +38,9 @@ describe('non lists', () => {
         .appendTo(richtext)
     ]
 
-    render(richtext, editor, [el('strong').val('deleted')])
+    render([el('strong').val('deleted')])
 
-    expect(richtext.element.innerHTML).toBe('<strong>deleted</strong>')
+    expectHtml('<strong>deleted</strong>')
   })
 })
 
@@ -44,9 +52,9 @@ describe('lists', () => {
         .appendTo(richtext)
       editor = richtext.firstChild().firstChild()
 
-      render(richtext, editor, [el('li').append(el('b').val('Hello'))])
+      render([el('li').append(el('b').val('Hello'))])
 
-      expect(richtext.element.innerHTML).toBe('<ul><li><b>Hello</b></li></ul>')
+      expectHtml('<ul><li><b>Hello</b></li></ul>')
     })
   })
 
@@ -56,9 +64,9 @@ describe('lists', () => {
         .val('item')
         .appendTo(richtext)
 
-      render(richtext, editor, [el('li').val('item')])
+      render([el('li').val('item')])
 
-      expect(richtext.element.innerHTML).toBe('<ul><li>item</li></ul>')
+      expectHtml('<ul><li>item</li></ul>')
     })
 
     it('append item to previous sibling list', () => {
@@ -69,9 +77,9 @@ describe('lists', () => {
         .val('2')
         .appendTo(richtext)
 
-      render(richtext, editor, [el('li').val('2')])
+      render([el('li').val('2')])
 
-      expect(richtext.element.innerHTML).toBe('<ul><li>1</li><li>2</li></ul>')
+      expectHtml('<ul><li>1</li><li>2</li></ul>')
     })
 
     it('append item to next sibling list', () => {
@@ -82,9 +90,9 @@ describe('lists', () => {
         .append(el('li').val('2'))
         .appendTo(richtext)
 
-      render(richtext, editor, [el('li').val('1')])
+      render([el('li').val('1')])
 
-      expect(richtext.element.innerHTML).toBe('<ul><li>1</li><li>2</li></ul>')
+      expectHtml('<ul><li>1</li><li>2</li></ul>')
     })
 
     it('merge lists when appending items in between', () => {
@@ -98,11 +106,9 @@ describe('lists', () => {
         .append(el('li').val('3'))
         .appendTo(richtext)
 
-      render(richtext, editor, [el('li').val('2')])
+      render([el('li').val('2')])
 
-      expect(richtext.element.innerHTML).toBe(
-        '<ul><li>1</li><li>2</li><li>3</li></ul>'
-      )
+      expectHtml('<ul><li>1</li><li>2</li><li>3</li></ul>')
     })
   })
 
@@ -121,9 +127,9 @@ describe('lists', () => {
           .next()
       ] // <li>1</li> <li>2</li>
 
-      render(richtext, editor, [el('li').val('12')])
+      render([el('li').val('12')])
 
-      expect(richtext.element.innerHTML).toBe('<ul><li>12</li></ul>')
+      expectHtml('<ul><li>12</li></ul>')
     })
 
     it('append a paragraph to an item', () => {
@@ -138,9 +144,9 @@ describe('lists', () => {
         richtext.firstChild().next()
       ]
 
-      render(richtext, editor, [el('li').val('12')])
+      render([el('li').val('12')])
 
-      expect(richtext.element.innerHTML).toBe('<ul><li>12</li></ul>')
+      expectHtml('<ul><li>12</li></ul>')
     })
 
     it('delete an item', () => {
@@ -157,9 +163,9 @@ describe('lists', () => {
           .next()
       ]
 
-      render(richtext, editor, [el('li').val('2')])
+      render([el('li').val('2')])
 
-      expect(richtext.element.innerHTML).toBe('<ul><li>2</li></ul>')
+      expectHtml('<ul><li>2</li></ul>')
     })
   })
 
@@ -172,9 +178,9 @@ describe('lists', () => {
 
       editor = richtext.firstChild().firstChild() // <li>1</li>
 
-      render(richtext, editor, [el('p').val('1')])
+      render([el('p').val('1')])
 
-      expect(richtext.element.innerHTML).toBe('<p>1</p><ul><li>2</li></ul>')
+      expectHtml('<p>1</p><ul><li>2</li></ul>')
     })
 
     it('middle item', () => {
@@ -188,11 +194,9 @@ describe('lists', () => {
         .firstChild()
         .next() // <li>2</li>
 
-      render(richtext, editor, [el('p').val('2')])
+      render([el('p').val('2')])
 
-      expect(richtext.element.innerHTML).toBe(
-        '<ul><li>1</li></ul><p>2</p><ul><li>3</li></ul>'
-      )
+      expectHtml('<ul><li>1</li></ul><p>2</p><ul><li>3</li></ul>')
     })
 
     it('last item', () => {
@@ -205,9 +209,9 @@ describe('lists', () => {
         .firstChild()
         .next() // <li>2</li>
 
-      render(richtext, editor, [el('p').val('2')])
+      render([el('p').val('2')])
 
-      expect(richtext.element.innerHTML).toBe('<ul><li>1</li></ul><p>2</p>')
+      expectHtml('<ul><li>1</li></ul><p>2</p>')
     })
 
     it('change list to element completely', () => {
@@ -225,9 +229,9 @@ describe('lists', () => {
           .firstChild()
       ]
 
-      render(richtext, editor, [el('p').val('12')])
+      render([el('p').val('12')])
 
-      expect(richtext.element.innerHTML).toBe('<p>12</p>')
+      expectHtml('<p>12</p>')
     })
   })
 
@@ -238,9 +242,9 @@ describe('lists', () => {
         .appendTo(richtext)
       editor = richtext.firstChild().firstChild() // <li>12</li>
 
-      render(richtext, editor, [el('li').val('1'), el('li').val('2')])
+      render([el('li').val('1'), el('li').val('2')])
 
-      expect(richtext.element.innerHTML).toBe('<ul><li>1</li><li>2</li></ul>')
+      expectHtml('<ul><li>1</li><li>2</li></ul>')
     })
 
     it('first item', () => {
@@ -250,11 +254,9 @@ describe('lists', () => {
         .appendTo(richtext)
       editor = richtext.firstChild().firstChild() // <li>12</li>
 
-      render(richtext, editor, [el('li').val('1'), el('p').val('2')])
+      render([el('li').val('1'), el('p').val('2')])
 
-      expect(richtext.element.innerHTML).toBe(
-        '<ul><li>1</li></ul><p>2</p><ul><li>3</li></ul>'
-      )
+      expectHtml('<ul><li>1</li></ul><p>2</p><ul><li>3</li></ul>')
     })
 
     it('middle item', () => {
@@ -268,11 +270,9 @@ describe('lists', () => {
         .firstChild()
         .next()
 
-      render(richtext, editor, [el('li').val('2'), el('p').val('3')])
+      render([el('li').val('2'), el('p').val('3')])
 
-      expect(richtext.element.innerHTML).toBe(
-        '<ul><li>1</li><li>2</li></ul><p>3</p><ul><li>4</li></ul>'
-      )
+      expectHtml('<ul><li>1</li><li>2</li></ul><p>3</p><ul><li>4</li></ul>')
     })
 
     it('last item', () => {
@@ -285,11 +285,9 @@ describe('lists', () => {
         .firstChild()
         .next()
 
-      render(richtext, editor, [el('li').val('2'), el('p').val('3')])
+      render([el('li').val('2'), el('p').val('3')])
 
-      expect(richtext.element.innerHTML).toBe(
-        '<ul><li>1</li><li>2</li></ul><p>3</p>'
-      )
+      expectHtml('<ul><li>1</li><li>2</li></ul><p>3</p>')
     })
   })
 })
