@@ -5,15 +5,7 @@ beforeEach(() => {
   owner = el('div')
 })
 
-describe('manipulations', () => {
-  it('null val empties the content', () => {
-    expect(
-      el('p')
-        .val('HelloWorld')
-        .val(null).element.innerHTML
-    ).toBe('')
-  })
-
+describe('adding children', () => {
   it('create new el with value', () => {
     el('p')
       .val(el('b').val('HelloWorld'))
@@ -21,19 +13,27 @@ describe('manipulations', () => {
     expect(owner.element.innerHTML).toBe('<p><b>HelloWorld</b></p>')
   })
 
-  it('return textContent when val hos no argument', () => {
-    expect(
-      el('p')
-        .val('Hey')
-        .val()
-    ).toBe('Hey')
+  it('append text', () => {
+    const wrapper = el('p')
+      .append('Hello')
+      .append('World')
+      .append()
+    expect(wrapper.element.innerHTML).toBe('HelloWorld')
   })
 
-  it('replace children', () => {
-    const p = el('p').val('Hey')
+  it('append text and element', () => {
     expect(
-      owner.append(p).replace(el('h1').val('You'), p).element.innerHTML
-    ).toBe('<h1>You</h1>')
+      el('p')
+        .append('ab')
+        .append(el('b').val('c'))
+        .append('d').element.outerHTML
+    ).toBe('<p>ab<b>c</b>d</p>')
+  })
+
+  it('append array of query objects', () => {
+    expect(
+      el('ul').append([el('li').val('1'), el('li').val('2')]).element.innerHTML
+    ).toBe('<li>1</li><li>2</li>')
   })
 
   it('insert single item after', () => {
@@ -77,7 +77,9 @@ describe('manipulations', () => {
       .shift(el('h1').val('New'))
     expect(parent.element.innerHTML).toBe('<h1>New</h1><p>Original</p>')
   })
+})
 
+describe('removing children', () => {
   it('remove single item', () => {
     const h2 = el('h2')
     expect(
@@ -118,6 +120,55 @@ describe('manipulations', () => {
     expect(parent.element.innerHTML).toBe('')
   })
 
+  it('remove range of items', () => {
+    const parent = el('ul')
+      .append(el('li').val('1'))
+      .append(el('li').val('2'))
+      .append(el('li').val('3'))
+      .append(el('li').val('4'))
+
+    const rest = parent.removeFrom(parent.firstChild().next())
+
+    expect(parent.element.childNodes.length).toBe(1)
+    expect(rest.length).toBe(3)
+    expect(rest[0].val()).toBe('2')
+    expect(rest[1].val()).toBe('3')
+    expect(rest[2].val()).toBe('4')
+  })
+
+  it('move children to other element', () => {
+    const parent = el('div')
+    const firstList = el('ul')
+      .append(el('li').val('1'))
+      .appendTo(parent)
+    const secondList = el('ul')
+      .append(el('li').val('2'))
+      .append(el('li').val('3'))
+      .appendTo(parent)
+    secondList.moveChildrenTo(firstList)
+    expect(parent.element.innerHTML).toBe(
+      '<ul><li>1</li><li>2</li><li>3</li></ul><ul></ul>'
+    )
+  })
+})
+
+describe('static content', () => {
+  it('null val empties the content', () => {
+    expect(
+      el('p')
+        .val('HelloWorld')
+        .val(null).element.innerHTML
+    ).toBe('')
+  })
+
+  it('return textContent when val hos no argument', () => {
+    expect(
+      el('p')
+        .val('Hey')
+        .val()
+    ).toBe('Hey')
+  })
+
   it('set classs name', () => {
     expect(owner.className('owner-style').element.outerHTML).toBe(
       '<div class="owner-style"></div>'
@@ -142,29 +193,6 @@ describe('manipulations', () => {
     expect(el('p').isEditable().element.contentEditable).toBe(true)
   })
 
-  it('append text', () => {
-    const wrapper = el('p')
-      .append('Hello')
-      .append('World')
-      .append()
-    expect(wrapper.element.innerHTML).toBe('HelloWorld')
-  })
-
-  it('append text and element', () => {
-    expect(
-      el('p')
-        .append('ab')
-        .append(el('b').val('c'))
-        .append('d').element.outerHTML
-    ).toBe('<p>ab<b>c</b>d</p>')
-  })
-
-  it('append array of query objects', () => {
-    expect(
-      el('ul').append([el('li').val('1'), el('li').val('2')]).element.innerHTML
-    ).toBe('<li>1</li><li>2</li>')
-  })
-
   it('convert element type', () => {
     const parent = el('div')
     const li = el('li')
@@ -172,37 +200,6 @@ describe('manipulations', () => {
       .appendTo(parent)
       .to('p')
     expect(li.element.outerHTML).toBe('<p>some text</p>')
-  })
-
-  it('move children to other element', () => {
-    const parent = el('div')
-    const firstList = el('ul')
-      .append(el('li').val('1'))
-      .appendTo(parent)
-    const secondList = el('ul')
-      .append(el('li').val('2'))
-      .append(el('li').val('3'))
-      .appendTo(parent)
-    secondList.moveChildrenTo(firstList)
-    expect(parent.element.innerHTML).toBe(
-      '<ul><li>1</li><li>2</li><li>3</li></ul><ul></ul>'
-    )
-  })
-
-  it('split children from parent and return them', () => {
-    const parent = el('ul')
-      .append(el('li').val('1'))
-      .append(el('li').val('2'))
-      .append(el('li').val('3'))
-      .append(el('li').val('4'))
-
-    const rest = parent.splitFrom(parent.firstChild().next())
-
-    expect(parent.element.childNodes.length).toBe(1)
-    expect(rest.length).toBe(3)
-    expect(rest[0].val()).toBe('2')
-    expect(rest[1].val()).toBe('3')
-    expect(rest[2].val()).toBe('4')
   })
 })
 

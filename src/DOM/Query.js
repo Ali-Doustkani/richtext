@@ -68,11 +68,6 @@ class QueryElement {
     return this
   }
 
-  replace(newChild, oldChild) {
-    this.element.replaceChild(newChild.element, oldChild.element)
-    return this
-  }
-
   insertBefore(base, newChild) {
     if (Array.isArray(newChild)) {
       newChild.forEach(child =>
@@ -117,7 +112,7 @@ class QueryElement {
     return this
   }
 
-  splitFrom(child) {
+  removeFrom(child) {
     const result = []
     const fromIndex = [...this.element.childNodes].indexOf(child.element)
     while (this.element.childNodes.length > fromIndex) {

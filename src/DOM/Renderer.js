@@ -79,7 +79,7 @@ function changeToSingle(richtext, editors, element) {
   } else if (listItem.is(list.lastChild())) {
     richtext.insertAfter(list, element)
   } else {
-    const rest = list.splitFrom(listItem).splice(1)
+    const rest = list.removeFrom(listItem).splice(1)
     richtext.insertAfter(list, el('ul').append(rest))
     richtext.insertAfter(list, element)
   }
@@ -110,7 +110,7 @@ function changeToMultiple(richtext, listItem, elements) {
       richtext.insertAfter(list, elements[1])
     }
   } else {
-    const rest = list.splitFrom(listItem).slice(1)
+    const rest = list.removeFrom(listItem).slice(1)
     list.append(elements[0])
     richtext.insertAfter(list, el('ul').append(rest))
     richtext.insertAfter(list, elements[1])
