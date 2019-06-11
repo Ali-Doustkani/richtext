@@ -5,175 +5,291 @@ let richtext
 let editor
 
 beforeEach(() => {
-  editor = el('p').val('Initial Value')
-  richtext = el('div').append(editor)
+  richtext = el('div')
 })
 
-it('render a lists', () => {
-  const list = [el('p').val('Hey'), el('pre').val('Code')]
-  const renderModel = {
-    list,
-    active: list[1]
-  }
-  const active = render(richtext, editor, renderModel)
-  expect(active).toBe(renderModel.active)
-  expect(richtext.element.innerHTML).toBe('<p>Hey</p><pre>Code</pre>')
-})
+describe('non lists', () => {
+  it('render simple elements', () => {
+    editor = el('p').appendTo(richtext)
+    render(richtext, editor, [el('p'), el('strong')])
+    expect(richtext.element.innerHTML).toBe('<p></p><strong></strong>')
+  })
 
-it('render an array of editors', () => {
-  const list = [el('strong').val('deleted')]
-  const renderModel = { list, active: list[0] }
-  const editors = [el('p').val('first'), el('p').val('second')]
-  richtext.append(editors[0]).append(editors[1])
-  const active = render(richtext, editors, renderModel)
-  expect(active).toBe(list[0])
-  expect(richtext.element.innerHTML).toBe(
-    '<p>Initial Value</p><strong>deleted</strong>'
-  )
-})
+  it('throw error on empty list', () => {
+    expect(() => render(richtext, editor)).toThrow()
+    expect(() => render(richtext, editor, [])).toThrow()
+  })
 
-it('throw error on empty list', () => {
-  expect(() => render(richtext, editor)).toThrow()
-  expect(() => render(richtext, editor, { list: [] })).toThrow()
-})
-
-it('render an array of model', () => {
-  render(richtext, editor, [{ list: [el('p')] }, { list: [el('p')] }])
-  expect(richtext.element.innerHTML).toBe('<p></p><p></p>')
-})
-
-it('wrap li items in ul', () => {
-  render(richtext, editor, {
-    list: [
-      el('p'),
-      el('li').val('First'),
-      el('li').val('Second'),
-      el('p'),
-      el('li').val('First')
+  it('render an array of editors', () => {
+    editor = [
+      el('p')
+        .val('first')
+        .appendTo(richtext),
+      el('p')
+        .val('second')
+        .appendTo(richtext)
     ]
+
+    render(richtext, editor, [el('strong').val('deleted')])
+
+    expect(richtext.element.innerHTML).toBe('<strong>deleted</strong>')
   })
-  expect(richtext.element.innerHTML).toBe(
-    '<p></p><ul><li>First</li><li>Second</li></ul><p></p><ul><li>First</li></ul>'
-  )
 })
 
-it('render when editor is inside an UL', () => {
-  editor = el('li').val('1')
-  richtext = el('article').append(el('ul').append(editor))
-  render(richtext, editor, {
-    list: [el('li').val('Hello'), el('li').val('World')]
-  })
+describe('lists', () => {
+  describe('when modifying lists', () => {
+    it('modify a list item', () => {
+      el('ul')
+        .append(el('li').val('Hello'))
+        .appendTo(richtext)
+      editor = richtext.firstChild().firstChild()
 
-  expect(richtext.element.innerHTML).toBe(
-    '<ul><li>Hello</li><li>World</li></ul>'
-  )
-})
+      render(richtext, editor, [el('li').append(el('b').val('Hello'))])
 
-it('merge with prev list', () => {
-  richtext = el('article')
-    .append(el('ul').val(el('li').val('First')))
-    .append(el('p').val('Second'))
-  editor = richtext.firstChild().next()
-
-  render(richtext, editor, { list: [el('li').val('Second')] })
-
-  expect(richtext.element.innerHTML).toBe(
-    '<ul><li>First</li><li>Second</li></ul>'
-  )
-})
-
-it('merge with next list', () => {
-  richtext = el('article')
-    .append(el('p').val('First'))
-    .append(el('ul').val(el('li').val('Second')))
-  editor = richtext.firstChild()
-
-  render(richtext, editor, { list: [el('li').val('First')] })
-
-  expect(richtext.element.innerHTML).toBe(
-    '<ul><li>First</li><li>Second</li></ul>'
-  )
-})
-
-it('merge with prev & next lists', () => {
-  richtext = el('article')
-    .append(el('ul').val(el('li').val('First')))
-    .append(el('p').val('Second'))
-    .append(el('ul').val(el('li').val('Third')))
-  editor = richtext.firstChild().next()
-
-  render(richtext, editor, { list: [el('li').val('Second')] })
-
-  expect(richtext.element.innerHTML).toBe(
-    '<ul><li>First</li><li>Second</li><li>Third</li></ul>'
-  )
-})
-
-it('surround lis', () => {
-  render(richtext, editor, {
-    list: [
-      el('p'),
-      el('li').val('First'),
-      el('li').val('Second'),
-      el('p'),
-      el('li').val('First')
-    ]
+      expect(richtext.element.innerHTML).toBe('<ul><li><b>Hello</b></li></ul>')
+    })
   })
 
-  expect(richtext.element.innerHTML).toBe(
-    '<p></p><ul><li>First</li><li>Second</li></ul><p></p><ul><li>First</li></ul>'
-  )
-})
+  describe('when creating list', () => {
+    it('create new list with an item', () => {
+      editor = el('p')
+        .val('item')
+        .appendTo(richtext)
 
-it('surround beginning lis', () => {
-  render(richtext, editor, {
-    list: [el('li').val('Hello'), el('li').val('World'), el('p')]
+      render(richtext, editor, [el('li').val('item')])
+
+      expect(richtext.element.innerHTML).toBe('<ul><li>item</li></ul>')
+    })
+
+    it('append item to previous sibling list', () => {
+      el('ul')
+        .append(el('li').val('1'))
+        .appendTo(richtext)
+      editor = el('p')
+        .val('2')
+        .appendTo(richtext)
+
+      render(richtext, editor, [el('li').val('2')])
+
+      expect(richtext.element.innerHTML).toBe('<ul><li>1</li><li>2</li></ul>')
+    })
+
+    it('append item to next sibling list', () => {
+      editor = el('p')
+        .val('1')
+        .appendTo(richtext)
+      el('ul')
+        .append(el('li').val('2'))
+        .appendTo(richtext)
+
+      render(richtext, editor, [el('li').val('1')])
+
+      expect(richtext.element.innerHTML).toBe('<ul><li>1</li><li>2</li></ul>')
+    })
+
+    it('merge lists when appending items in between', () => {
+      el('ul')
+        .append(el('li').val('1'))
+        .appendTo(richtext)
+      editor = el('p')
+        .val('2')
+        .appendTo(richtext)
+      el('ul')
+        .append(el('li').val('3'))
+        .appendTo(richtext)
+
+      render(richtext, editor, [el('li').val('2')])
+
+      expect(richtext.element.innerHTML).toBe(
+        '<ul><li>1</li><li>2</li><li>3</li></ul>'
+      )
+    })
   })
 
-  expect(richtext.element.innerHTML).toBe(
-    '<ul><li>Hello</li><li>World</li></ul><p></p>'
-  )
-})
+  describe('when appending and deleting list item', () => {
+    it('delete an item to another item', () => {
+      el('ul')
+        .append(el('li').val('1'))
+        .append(el('li').val('2'))
+        .appendTo(richtext)
 
-it('surround ending lis', () => {
-  render(richtext, editor, {
-    list: [el('p'), el('li').val('Hello'), el('li').val('World')]
+      editor = [
+        richtext.firstChild().firstChild(),
+        richtext
+          .firstChild()
+          .firstChild()
+          .next()
+      ] // <li>1</li> <li>2</li>
+
+      render(richtext, editor, [el('li').val('12')])
+
+      expect(richtext.element.innerHTML).toBe('<ul><li>12</li></ul>')
+    })
+
+    it('append a paragraph to an item', () => {
+      el('ul')
+        .append(el('li').val('1'))
+        .appendTo(richtext)
+      el('p')
+        .val('2')
+        .appendTo(richtext)
+      editor = [
+        richtext.firstChild().firstChild(),
+        richtext.firstChild().next()
+      ]
+
+      render(richtext, editor, [el('li').val('12')])
+
+      expect(richtext.element.innerHTML).toBe('<ul><li>12</li></ul>')
+    })
+
+    it('delete an item', () => {
+      el('ul')
+        .append(el('li').val('1'))
+        .append(el('li'))
+        .appendTo(richtext)
+
+      editor = [
+        richtext.firstChild().firstChild(),
+        richtext
+          .firstChild()
+          .firstChild()
+          .next()
+      ]
+
+      render(richtext, editor, [el('li').val('2')])
+
+      expect(richtext.element.innerHTML).toBe('<ul><li>2</li></ul>')
+    })
   })
 
-  expect(richtext.element.innerHTML).toBe(
-    '<p></p><ul><li>Hello</li><li>World</li></ul>'
-  )
-})
+  describe('when changing list item to a single element', () => {
+    it('first item', () => {
+      el('ul')
+        .append(el('li').val('1'))
+        .append(el('li').val('2'))
+        .appendTo(richtext)
 
-it('does not surround when there is no li', () => {
-  render(richtext, editor, { list: [el('p'), el('strong')] })
+      editor = richtext.firstChild().firstChild() // <li>1</li>
 
-  expect(richtext.element.innerHTML).toBe('<p></p><strong></strong>')
-})
+      render(richtext, editor, [el('p').val('1')])
 
-it('render p after li', () => {
-  richtext = el('article')
-    .append(el('ul').append(el('li').val('First')))
-    .append(el('p').val('Third'))
-  editor = richtext.firstChild().firstChild()
+      expect(richtext.element.innerHTML).toBe('<p>1</p><ul><li>2</li></ul>')
+    })
 
-  render(richtext, editor, [
-    { list: [el('li').val('First')] },
-    { list: [el('p').val('Second')] }
-  ])
+    it('middle item', () => {
+      el('ul')
+        .append(el('li').val('1'))
+        .append(el('li').val('2'))
+        .append(el('li').val('3'))
+        .appendTo(richtext)
+      editor = richtext
+        .firstChild()
+        .firstChild()
+        .next() // <li>2</li>
 
-  expect(richtext.element.innerHTML).toBe(
-    '<ul><li>First</li></ul><p>Second</p><p>Third</p>'
-  )
-})
+      render(richtext, editor, [el('p').val('2')])
 
-it('append a paragraph to a list', () => {
-  richtext = el('article')
-    .append(el('ul').append(el('li').val('1')))
-    .append(el('p').val('2'))
-  const editors = [richtext.firstChild(), richtext.firstChild().next()]
+      expect(richtext.element.innerHTML).toBe(
+        '<ul><li>1</li></ul><p>2</p><ul><li>3</li></ul>'
+      )
+    })
 
-  render(richtext, editors, { list: [el('li').val('12')] })
+    it('last item', () => {
+      el('ul')
+        .append(el('li').val('1'))
+        .append(el('li').val('2'))
+        .appendTo(richtext)
+      editor = richtext
+        .firstChild()
+        .firstChild()
+        .next() // <li>2</li>
 
-  expect(richtext.element.innerHTML).toBe('<ul><li>12</li></ul>')
+      render(richtext, editor, [el('p').val('2')])
+
+      expect(richtext.element.innerHTML).toBe('<ul><li>1</li></ul><p>2</p>')
+    })
+
+    it('change list to element completely', () => {
+      el('p')
+        .val('1')
+        .appendTo(richtext)
+      el('ul')
+        .append(el('li').val('2'))
+        .appendTo(richtext)
+      editor = [
+        richtext.firstChild(),
+        richtext
+          .firstChild()
+          .next()
+          .firstChild()
+      ]
+
+      render(richtext, editor, [el('p').val('12')])
+
+      expect(richtext.element.innerHTML).toBe('<p>12</p>')
+    })
+  })
+
+  describe('when changing list item to multiple item', () => {
+    it('single item', () => {
+      el('ul')
+        .append(el('li').val('12'))
+        .appendTo(richtext)
+      editor = richtext.firstChild().firstChild() // <li>12</li>
+
+      render(richtext, editor, [el('li').val('1'), el('li').val('2')])
+
+      expect(richtext.element.innerHTML).toBe('<ul><li>1</li><li>2</li></ul>')
+    })
+
+    it('first item', () => {
+      el('ul')
+        .append(el('li').val('12'))
+        .append(el('li').val('3'))
+        .appendTo(richtext)
+      editor = richtext.firstChild().firstChild() // <li>12</li>
+
+      render(richtext, editor, [el('li').val('1'), el('p').val('2')])
+
+      expect(richtext.element.innerHTML).toBe(
+        '<ul><li>1</li></ul><p>2</p><ul><li>3</li></ul>'
+      )
+    })
+
+    it('middle item', () => {
+      el('ul')
+        .append(el('li').val('1'))
+        .append(el('li').val('23'))
+        .append(el('li').val('4'))
+        .appendTo(richtext)
+      editor = richtext
+        .firstChild()
+        .firstChild()
+        .next()
+
+      render(richtext, editor, [el('li').val('2'), el('p').val('3')])
+
+      expect(richtext.element.innerHTML).toBe(
+        '<ul><li>1</li><li>2</li></ul><p>3</p><ul><li>4</li></ul>'
+      )
+    })
+
+    it('last item', () => {
+      el('ul')
+        .append(el('li').val('1'))
+        .append(el('li').val('23'))
+        .appendTo(richtext)
+      editor = richtext
+        .firstChild()
+        .firstChild()
+        .next()
+
+      render(richtext, editor, [el('li').val('2'), el('p').val('3')])
+
+      expect(richtext.element.innerHTML).toBe(
+        '<ul><li>1</li><li>2</li></ul><p>3</p>'
+      )
+    })
+  })
 })

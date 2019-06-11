@@ -54,6 +54,23 @@ describe('manipulations', () => {
     )
   })
 
+  it('insert single item before', () => {
+    const h3 = el('h3')
+    expect(
+      owner
+        .append(el('h1'))
+        .append(h3)
+        .insertBefore(h3, el('h2')).element.innerHTML
+    ).toBe('<h1></h1><h2></h2><h3></h3>')
+  })
+
+  it('insert array before', () => {
+    const h3 = el('h3')
+    expect(
+      owner.append(h3).insertBefore(h3, [el('h1'), el('h2')]).element.innerHTML
+    ).toBe('<h1></h1><h2></h2><h3></h3>')
+  })
+
   it('shift single item to the beginning of parent', () => {
     const parent = el('div')
       .append(el('p').val('Original'))
@@ -88,6 +105,15 @@ describe('manipulations', () => {
     el('p')
       .val('Hey')
       .appendTo(parent)
+      .remove()
+    expect(parent.element.innerHTML).toBe('')
+  })
+
+  it('do nothing with already removed self', () => {
+    const parent = el('div')
+    el('p')
+      .appendTo(parent)
+      .remove()
       .remove()
     expect(parent.element.innerHTML).toBe('')
   })
@@ -133,6 +159,12 @@ describe('manipulations', () => {
     ).toBe('<p>ab<b>c</b>d</p>')
   })
 
+  it('append array of query objects', () => {
+    expect(
+      el('ul').append([el('li').val('1'), el('li').val('2')]).element.innerHTML
+    ).toBe('<li>1</li><li>2</li>')
+  })
+
   it('convert element type', () => {
     const parent = el('div')
     const li = el('li')
@@ -155,6 +187,22 @@ describe('manipulations', () => {
     expect(parent.element.innerHTML).toBe(
       '<ul><li>1</li><li>2</li><li>3</li></ul><ul></ul>'
     )
+  })
+
+  it('split children from parent and return them', () => {
+    const parent = el('ul')
+      .append(el('li').val('1'))
+      .append(el('li').val('2'))
+      .append(el('li').val('3'))
+      .append(el('li').val('4'))
+
+    const rest = parent.splitFrom(parent.firstChild().next())
+
+    expect(parent.element.childNodes.length).toBe(1)
+    expect(rest.length).toBe(3)
+    expect(rest[0].val()).toBe('2')
+    expect(rest[1].val()).toBe('3')
+    expect(rest[2].val()).toBe('4')
   })
 })
 
@@ -205,6 +253,16 @@ describe('checkings', () => {
         .val('text')
         .hasChildren()
     ).toBe(true)
+  })
+
+  it('count number of children', () => {
+    expect(el('p').count()).toBe(0)
+    expect(
+      el('ul')
+        .append(el('li'))
+        .append(el('li'))
+        .count()
+    ).toBe(2)
   })
 })
 

@@ -2,26 +2,26 @@ import { absoluteRange, relativeRange } from './DOM'
 
 function canBackspace(editor) {
   const { start, end } = relRange(editor)
-  return start === 0 && end === 0 && isNotFirst(editor)
+  return start === 0 && end === 0 && previousEditor(editor) !== null
 }
 
 function canDelete(editor) {
   const { start, end } = relRange(editor)
   const len = editor.val().length
-  return start === len && end === len && isNotLast(editor)
+  return start === len && end === len && nextEditor(editor) !== null
 }
 
 function focusPrev(editor) {
-  if (isNotFirst(editor)) {
-    const prev = editor.previous()
+  const prev = previousEditor(editor)
+  if (prev) {
     prev.element.focus()
     setCursor(prev, prev.val().length)
   }
 }
 
 function focusNext(editor) {
-  if (isNotLast(editor)) {
-    const next = editor.next()
+  const next = nextEditor(editor)
+  if (next) {
     next.element.focus()
     setCursor(next, 0)
   }
@@ -42,14 +42,6 @@ function relRange(editor) {
   return relativeRange(editor, window.getSelection().getRangeAt(0))
 }
 
-function isNotFirst(editor) {
-  return editor.previous() !== null
-}
-
-function isNotLast(editor) {
-  return editor.next() !== null
-}
-
 function handlePreEnter(editor) {
   const { startOffset, endOffset } = window.getSelection().getRangeAt(0)
   const content = editor.firstChild().val()
@@ -62,11 +54,35 @@ function handlePreEnter(editor) {
   }
 }
 
+function previousEditor(editor) {
+  if (editor.is('li') && editor.is(editor.parent().firstChild())) {
+    return editor.parent().previous()
+  }
+  const prev = editor.previous()
+  if (prev && prev.is('ul')) {
+    return prev.lastChild()
+  }
+  return prev
+}
+
+function nextEditor(editor) {
+  if (editor.is('li') && editor.is(editor.parent().lastChild())) {
+    return editor.parent().next()
+  }
+  const next = editor.next()
+  if (next && next.is('ul')) {
+    return next.firstChild()
+  }
+  return next
+}
+
 export {
   canBackspace,
   canDelete,
   focusPrev,
   focusNext,
   setCursor,
-  handlePreEnter
+  handlePreEnter,
+  previousEditor,
+  nextEditor
 }

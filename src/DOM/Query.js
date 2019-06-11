@@ -31,6 +31,8 @@ class QueryElement {
       } else {
         this.element.appendChild(document.createTextNode(child))
       }
+    } else if (Array.isArray(child)) {
+      child.forEach(c => this.element.appendChild(c.element))
     } else {
       this.element.appendChild(child.element)
     }
@@ -71,6 +73,17 @@ class QueryElement {
     return this
   }
 
+  insertBefore(base, newChild) {
+    if (Array.isArray(newChild)) {
+      newChild.forEach(child =>
+        this.element.insertBefore(child.element, base.element)
+      )
+    } else {
+      this.element.insertBefore(newChild.element, base.element)
+    }
+    return this
+  }
+
   insertAfter(base, newChild) {
     if (Array.isArray(newChild)) {
       newChild
@@ -86,7 +99,9 @@ class QueryElement {
 
   remove(child) {
     if (child === undefined) {
-      this.element.parentNode.removeChild(this.element)
+      if (this.element.parentNode) {
+        this.element.parentNode.removeChild(this.element)
+      }
     } else if (Array.isArray(child)) {
       child.forEach(item => this.element.removeChild(item.element))
     } else {
@@ -100,6 +115,16 @@ class QueryElement {
       targetParent.element.append(this.element.firstChild)
     }
     return this
+  }
+
+  splitFrom(child) {
+    const result = []
+    const fromIndex = [...this.element.childNodes].indexOf(child.element)
+    while (this.element.childNodes.length > fromIndex) {
+      result.push(el(this.element.childNodes[fromIndex]))
+      this.element.removeChild(this.element.childNodes[fromIndex])
+    }
+    return result
   }
 
   to(target) {
@@ -157,6 +182,10 @@ class QueryElement {
     return this
   }
 
+  count() {
+    return this.element.childNodes.length
+  }
+
   parent() {
     return el(this.element.parentNode)
   }
@@ -181,14 +210,14 @@ class QueryElement {
     return el(this.element.previousSibling)
   }
 
-  nextIs(target){
+  nextIs(target) {
     return this.next() && this.next().is(target)
   }
 
-  previousIs(target){
+  previousIs(target) {
     return this.previous() && this.previous().is(target)
   }
-  
+
   hasChildren() {
     return Boolean(this.element.childNodes.length)
   }

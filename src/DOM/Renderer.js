@@ -1,126 +1,134 @@
 import { el } from './Query'
 
-function render(richtext, editors, renderModels) {
-  editors = array(editors)
-  if (shouldMoveToList(editors)) {
-    moveToList(editors, renderModels)
-  } else if (shouldAppendToList(editors)) {
-    appendToList(editors, renderModels)
-  } else if (shouldMergeList(editors)) {
-    merge(richtext, editors, renderModels)
+function render(richtext, editors, elements) {
+  editors = Array.isArray(editors) ? editors : [editors]
+  if (shouldCreateList(editors, elements)) {
+    createList(richtext, editors[0], elements[0])
+  } else if (shouldAppendOrDeleteListItem(editors, elements)) {
+    appendOrDeleteListItem(editors, elements[0])
+  } else if (shouldChangeToSingle(editors, elements)) {
+    changeToSingle(richtext, editors, elements[0])
+  } else if (shouldChangeToMultiple(editors, elements)) {
+    changeToMultiple(richtext, editors[0], elements)
+  } else if (shouldModifyListItem(editors, elements)) {
+    modifyListItem(editors[0], elements[0])
   } else {
-    surroundItemsAndInsert(richtext, editors, renderModels)
+    richtext.insertAfter(editors[0], elements).remove(editors)
   }
-  return active(renderModels)
 }
 
-function shouldMoveToList(editors) {
-  return editors.length === 2 && editors[0].is('ul') && editors[1].isNot('li')
-}
-
-function moveToList([list, other], renderModel) {
-  list.remove(list.lastChild())
-  other.remove()
-  list.append(renderModel.list[0])
-}
-
-function shouldAppendToList(editors) {
-  return editors.length === 1 && editors[0].parent().is('ul')
-}
-
-function appendToList(editors, renderModels) {
-  const allModels = flattenModels(renderModels)
-  const listItem = editors[0]
-  const list = listItem.parent()
-  list.insertAfter(listItem, allModels.filter(x => x.is('li')))
-  allModels
-    .filter(x => x.isNot('li'))
-    .forEach(item => list.parent().insertAfter(list, item))
-  list.remove(listItem)
-}
-
-function shouldMergeList(editors) {
+function shouldCreateList(editors, elements) {
   return (
     editors.length === 1 &&
-    (editors[0].previousIs('ul') || editors[0].nextIs('ul'))
+    editors[0].isNot('li') &&
+    elements.length === 1 &&
+    elements[0].is('li')
   )
 }
 
-function merge(richtext, editors, renderModels) {
-  const cur = editors[0]
-  if (cur.previousIs('ul')) {
-    const prevList = cur.previous().append(renderModels.list[0])
-    if (cur.nextIs('ul')) {
-      cur
+function createList(richtext, editor, element) {
+  if (editor.previousIs('ul')) {
+    const prevList = editor.previous()
+    prevList.append(element)
+    if (editor.nextIs('ul')) {
+      editor
         .next()
         .moveChildrenTo(prevList)
         .remove()
     }
-  } else if (cur.nextIs('ul')) {
-    cur.next().shift(renderModels.list[0])
+    editor.remove()
+  } else if (editor.nextIs('ul')) {
+    editor.next().shift(element)
+    editor.remove()
+  } else {
+    richtext.insertAfter(editor, el('ul').append(element)).remove(editor)
   }
-  richtext.remove(editors)
 }
 
-function active(renderModels) {
-  if (renderModels.length) {
-    return renderModels[renderModels.length - 1].active
+function shouldAppendOrDeleteListItem(editors, elements) {
+  return (
+    editors.length === 2 &&
+    editors.some(x => x.is('li')) &&
+    elements.length === 1 &&
+    elements[0].is('li')
+  )
+}
+
+function appendOrDeleteListItem([editor1, editor2], element) {
+  if (editor1.is('li')) {
+    const list = editor1.parent()
+    list.insertAfter(editor1, element)
+    editor1.remove()
+    editor2.remove()
   }
-  return renderModels.active
 }
 
-function array(value) {
-  if (Array.isArray(value)) {
-    return value
+function shouldChangeToSingle(editors, elements) {
+  return (
+    editors.some(x => x.is('li')) &&
+    elements.length === 1 &&
+    elements[0].isNot('li')
+  )
+}
+
+function changeToSingle(richtext, editors, element) {
+  const listItem = editors.filter(x => x.is('li'))[0]
+  const list = listItem.parent()
+  if (listItem.is(list.firstChild())) {
+    richtext.insertBefore(list, element)
+  } else if (listItem.is(list.lastChild())) {
+    richtext.insertAfter(list, element)
+  } else {
+    const rest = list.splitFrom(listItem).splice(1)
+    richtext.insertAfter(list, el('ul').append(rest))
+    richtext.insertAfter(list, element)
   }
-  return [value]
+
+  editors.forEach(x => x.remove())
+  if (list.count() === 0) {
+    list.remove()
+  }
 }
 
-function surroundItemsAndInsert(richtext, editors, renderModels) {
-  const list = flattenModels(renderModels)
-  surroundListItems(list)
-  richtext.insertAfter(editors[0], list).remove(editors)
+function shouldChangeToMultiple(editors, elements) {
+  return (
+    editors.length === 1 &&
+    editors[0].is('li') &&
+    elements.length === 2 &&
+    elements.some(x => x.is('li'))
+  )
 }
 
-function surroundListItems(list) {
-  let ul
-  for (let i = 0; i < list.length; i++) {
-    if (list[i].is('li')) {
-      if (!ul) {
-        ul = el('ul')
-      }
-      ul.append(list[i])
-      list.splice(i, 1)
-      i--
+function changeToMultiple(richtext, listItem, elements) {
+  const list = listItem.parent()
+  if (listItem.is(list.lastChild())) {
+    listItem.remove()
+    list.append(elements[0])
+    if (elements[1].is('li')) {
+      list.append(elements[1])
     } else {
-      if (ul) {
-        list.splice(i, 0, ul)
-        i++
-        ul = null
-      }
+      richtext.insertAfter(list, elements[1])
     }
-  }
-  if (ul) {
-    list.push(ul)
+  } else {
+    const rest = list.splitFrom(listItem).slice(1)
+    list.append(elements[0])
+    richtext.insertAfter(list, el('ul').append(rest))
+    richtext.insertAfter(list, elements[1])
   }
 }
 
-function flattenModels(renderModels) {
-  const a = array(renderModels)
-  let list = []
-  a.forEach(item => {
-    check(item)
-    list = list.concat(item.list)
-  })
-  return list
+function shouldModifyListItem(editors, elements) {
+  return (
+    editors.length === 1 &&
+    editors[0].is('li') &&
+    elements.length === 1 &&
+    elements[0].is('li')
+  )
 }
 
-function check(renderModel) {
-  if (!renderModel || !renderModel.list || !renderModel.list.length) {
-    throw new Error(
-      "'renderModel' object be valid and contain a non-empty list"
-    )
-  }
+function modifyListItem(listItem, element) {
+  listItem.parent().insertAfter(listItem, element)
+  listItem.remove()
 }
 
 export { render }

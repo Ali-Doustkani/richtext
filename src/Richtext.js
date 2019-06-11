@@ -37,22 +37,20 @@ function create(effects) {
       staySelected: value => (staySelected = value),
 
       apply: (start, end, styleName) => {
-        const active = render(
-          richtext,
-          el.active(),
-          style(effects, start, end, styleName)
-        )
+        const elements = style(effects, start, end, styleName)
+        render(richtext, el.active(), elements.list)
         if (styleName === 'header') {
           start = 0
-          end = active.val().length
+          end = elements.active.val().length
         }
-        Editor.setCursor(active, staySelected ? start : end, end)
+        Editor.setCursor(elements.active, staySelected ? start : end, end)
       },
 
       make: styleName => {
         const editor = el.active()
-        const active = render(richtext, editor, style(effects, 0, editor.length, styleName))
-        Editor.setCursor(active, editor.length, editor.length)
+        const elements = style(effects, 0, editor.length, styleName)
+        render(richtext, editor, elements.list)
+        Editor.setCursor(elements.active, editor.length, editor.length)
       }
     }
   }
@@ -66,16 +64,15 @@ function handleEnterKey(event, effects, richtextQuery) {
     return
   }
   if (editor.is('li') && event.ctrlKey) {
-    const [m1, m2] = breakAt(read(effects, editor), relativeRange(editor))
-    m2.list[0].to('p').isEditable()
-    render(richtextQuery, editor, [m1, m2]).element.focus()
+    const elements = breakAt(read(effects, editor), relativeRange(editor))
+    elements.list[1].to('p').isEditable()
+    render(richtextQuery, editor, elements.list)
+    elements.active.element.focus()
     return
   }
-  render(
-    richtextQuery,
-    editor,
-    breakAt(read(effects, editor), relativeRange(editor))
-  ).element.focus()
+  const elements = breakAt(read(effects, editor), relativeRange(editor))
+  render(richtextQuery, editor, elements.list)
+  elements.active.element.focus()
 }
 
 function handleBackspaceKey(event, effects, richtextQuery) {
@@ -84,17 +81,11 @@ function handleBackspaceKey(event, effects, richtextQuery) {
     return
   }
   event.preventDefault()
-  const len = editor.previous().val().length
-  let prevEditor = editor.previous()
-  if (prevEditor.is('ul')) {
-    prevEditor = prevEditor.lastChild()
-  }
-  const active = render(
-    richtextQuery,
-    [editor.previous(), editor],
-    glue(read(effects, prevEditor), read(effects, editor))
-  )
-  Editor.setCursor(active, len)
+  const prevEditor = Editor.previousEditor(editor)
+  const len = prevEditor.length
+  const elements = glue(read(effects, prevEditor), read(effects, editor))
+  render(richtextQuery, [prevEditor, editor], elements.list)
+  Editor.setCursor(elements.active, len)
 }
 
 function handleDeleteKey(event, effects, richtextQuery) {
@@ -102,15 +93,13 @@ function handleDeleteKey(event, effects, richtextQuery) {
   if (!Editor.canDelete(editor)) {
     return
   }
-  const len = editor.length
   event.preventDefault()
-
-  const active = render(
-    richtextQuery,
-    [editor, editor.next()],
-    glue(read(effects, editor), read(effects, editor.next()))
-  )
-  Editor.setCursor(active, len)
+  
+  const len = editor.length
+  const nextEditor = Editor.nextEditor(editor)
+  const elements = glue(read(effects, editor), read(effects, nextEditor))
+  render(richtextQuery, [editor, nextEditor], elements.list)
+  Editor.setCursor(elements.active, len)
 }
 
 function handleArrowUp(event) {
