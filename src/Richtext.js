@@ -52,8 +52,8 @@ function create(effects) {
       }
       Editor.setCursor(elements.active, staySelected ? start : end, end)
     }
-
     const styleSelectedOrAll = (styleName, listTag) => {
+
       const editor = el.active()
       if (Editor.isNotEditor(richtext, editor)) {
         return
