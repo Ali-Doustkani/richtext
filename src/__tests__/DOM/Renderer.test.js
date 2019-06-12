@@ -2,14 +2,14 @@ import { el } from './../../DOM/Query'
 import { render as _render } from './../../DOM/Renderer'
 
 let richtext
-let editor
+let editors
 
 beforeEach(() => {
   richtext = el('div')
 })
 
 function render(elements) {
-  _render(richtext, editor, elements)
+  _render({ richtext, editors, elements, listTag: 'ul' })
 }
 
 function expectHtml(html) {
@@ -18,7 +18,7 @@ function expectHtml(html) {
 
 describe('non lists', () => {
   it('render simple elements', () => {
-    editor = el('p').appendTo(richtext)
+    editors = el('p').appendTo(richtext)
     render([el('p'), el('strong')])
     expectHtml('<p></p><strong></strong>')
   })
@@ -29,7 +29,7 @@ describe('non lists', () => {
   })
 
   it('render an array of editors', () => {
-    editor = [
+    editors = [
       el('p')
         .val('first')
         .appendTo(richtext),
@@ -50,7 +50,7 @@ describe('lists', () => {
       el('ul')
         .append(el('li').val('Hello'))
         .appendTo(richtext)
-      editor = richtext.firstChild().firstChild()
+      editors = richtext.firstChild().firstChild()
 
       render([el('li').append(el('b').val('Hello'))])
 
@@ -60,7 +60,7 @@ describe('lists', () => {
 
   describe('when creating list', () => {
     it('create new list with an item', () => {
-      editor = el('p')
+      editors = el('p')
         .val('item')
         .appendTo(richtext)
 
@@ -73,7 +73,7 @@ describe('lists', () => {
       el('ul')
         .append(el('li').val('1'))
         .appendTo(richtext)
-      editor = el('p')
+      editors = el('p')
         .val('2')
         .appendTo(richtext)
 
@@ -83,7 +83,7 @@ describe('lists', () => {
     })
 
     it('append item to next sibling list', () => {
-      editor = el('p')
+      editors = el('p')
         .val('1')
         .appendTo(richtext)
       el('ul')
@@ -99,7 +99,7 @@ describe('lists', () => {
       el('ul')
         .append(el('li').val('1'))
         .appendTo(richtext)
-      editor = el('p')
+      editors = el('p')
         .val('2')
         .appendTo(richtext)
       el('ul')
@@ -119,7 +119,7 @@ describe('lists', () => {
         .append(el('li').val('2'))
         .appendTo(richtext)
 
-      editor = [
+      editors = [
         richtext.firstChild().firstChild(),
         richtext
           .firstChild()
@@ -139,7 +139,7 @@ describe('lists', () => {
       el('p')
         .val('2')
         .appendTo(richtext)
-      editor = [
+      editors = [
         richtext.firstChild().firstChild(),
         richtext.firstChild().next()
       ]
@@ -155,7 +155,7 @@ describe('lists', () => {
         .append(el('li'))
         .appendTo(richtext)
 
-      editor = [
+      editors = [
         richtext.firstChild().firstChild(),
         richtext
           .firstChild()
@@ -176,7 +176,7 @@ describe('lists', () => {
         .append(el('li').val('2'))
         .appendTo(richtext)
 
-      editor = richtext.firstChild().firstChild() // <li>1</li>
+      editors = richtext.firstChild().firstChild() // <li>1</li>
 
       render([el('p').val('1')])
 
@@ -189,7 +189,7 @@ describe('lists', () => {
         .append(el('li').val('2'))
         .append(el('li').val('3'))
         .appendTo(richtext)
-      editor = richtext
+      editors = richtext
         .firstChild()
         .firstChild()
         .next() // <li>2</li>
@@ -204,7 +204,7 @@ describe('lists', () => {
         .append(el('li').val('1'))
         .append(el('li').val('2'))
         .appendTo(richtext)
-      editor = richtext
+      editors = richtext
         .firstChild()
         .firstChild()
         .next() // <li>2</li>
@@ -221,7 +221,7 @@ describe('lists', () => {
       el('ul')
         .append(el('li').val('2'))
         .appendTo(richtext)
-      editor = [
+      editors = [
         richtext.firstChild(),
         richtext
           .firstChild()
@@ -240,7 +240,7 @@ describe('lists', () => {
       el('ul')
         .append(el('li').val('12'))
         .appendTo(richtext)
-      editor = richtext.firstChild().firstChild() // <li>12</li>
+      editors = richtext.firstChild().firstChild() // <li>12</li>
 
       render([el('li').val('1'), el('li').val('2')])
 
@@ -252,7 +252,7 @@ describe('lists', () => {
         .append(el('li').val('12'))
         .append(el('li').val('3'))
         .appendTo(richtext)
-      editor = richtext.firstChild().firstChild() // <li>12</li>
+      editors = richtext.firstChild().firstChild() // <li>12</li>
 
       render([el('li').val('1'), el('p').val('2')])
 
@@ -265,7 +265,7 @@ describe('lists', () => {
         .append(el('li').val('23'))
         .append(el('li').val('4'))
         .appendTo(richtext)
-      editor = richtext
+      editors = richtext
         .firstChild()
         .firstChild()
         .next()
@@ -280,7 +280,7 @@ describe('lists', () => {
         .append(el('li').val('1'))
         .append(el('li').val('23'))
         .appendTo(richtext)
-      editor = richtext
+      editors = richtext
         .firstChild()
         .firstChild()
         .next()

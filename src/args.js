@@ -59,7 +59,7 @@ function checkEditor(richtext) {
 }
 
 function addDefaultEffects(effects) {
-  effects.unorderedList = {
+  effects.list = {
     parent: true,
     tag: 'li'
   }

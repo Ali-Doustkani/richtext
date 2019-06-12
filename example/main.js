@@ -47,5 +47,5 @@ wire('header', sel => {
 })
 
 wire('codebox', () => richtext.applyCodebox())
-
 wire('list', () => richtext.applyUnorderedList())
+wire('orderedList', () => richtext.applyOrderedList())

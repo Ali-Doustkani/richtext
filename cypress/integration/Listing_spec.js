@@ -28,6 +28,22 @@ describe('styling', () => {
     </ul>`)
   })
 
+  it('create ordered lists', () => {
+    cy.visit('/')
+    cy.get('#editor>p').type('One')
+    cy.contains('Ordered List').click()
+    cy.get('#editor li').type('{enter}')
+    cy.get('#editor li')
+      .eq(1)
+      .type('Two')
+
+    cy.get('#editor').shouldHaveHtml(`
+    <ol>
+      <li contenteditable="true">One</li>
+      <li contenteditable="true">Two</li>
+    </ol>`)
+  })
+
   it('put <p> in the list', () => {
     cy.visit('/')
     cy.get('#editor>p').type('Hello{enter}')

@@ -38,38 +38,36 @@ function create(effects) {
       true
     )
 
-    const setStyle = (start, end, styleName) => {
-      const elements = style(effects, start, end, styleName)
-      render(richtext, el.active(), elements.list)
-      if (styleName === 'header') {
-        start = 0
-        end = elements.active.val().length
-      }
-      Editor.setCursor(elements.active, staySelected ? start : end, end)
-    }
-
-    const make = styleName => {
-      const editor = el.active()
-      const elements = style(effects, 0, editor.length, styleName)
-      render(richtext, editor, elements.list)
-      Editor.setCursor(elements.active, editor.length, editor.length)
-    }
-
-    const setStyleOrMake = styleName => {
+    const setStyleOrMake = (styleName, listTag) => {
       const sel = relativeRange(el.active())
-      if (sel.start === sel.end) {
-        make(styleName)
-      } else {
-        setStyle(sel.start, sel.end, styleName)
-      }
+      const editor = el.active()
+      const [start, end] =
+        sel.start === sel.end ? [0, editor.length] : [sel.start, sel.end]
+      const elements = style(effects, start, end, styleName)
+      render({ richtext, editors: editor, elements: elements.list, listTag })
+      Editor.setCursor(elements.active, staySelected ? start : end, end)
     }
 
     return {
       staySelected: value => (staySelected = value),
-      setStyle,
-      make,
-      applyUnorderedList: () => setStyleOrMake('unorderedList'),
-      applyCodebox: () => setStyleOrMake('codebox')
+      setStyle: (start, end, styleName) => {
+        const elements = style(effects, start, end, styleName)
+        render({ richtext, editors: el.active(), elements: elements.list })
+        if (styleName === 'header') {
+          start = 0
+          end = elements.active.val().length
+        }
+        Editor.setCursor(elements.active, staySelected ? start : end, end)
+      },
+      make: styleName => {
+        const editor = el.active()
+        const elements = style(effects, 0, editor.length, styleName)
+        render({ richtext, editors: editor, elements: elements.list })
+        Editor.setCursor(elements.active, editor.length, editor.length)
+      },
+      applyUnorderedList: () => setStyleOrMake('list', 'ul'),
+      applyCodebox: () => setStyleOrMake('codebox'),
+      applyOrderedList: () => setStyleOrMake('list', 'ol')
     }
   }
 }

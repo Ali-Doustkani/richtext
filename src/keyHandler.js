@@ -10,15 +10,15 @@ function enterKey(event, effects, richtext) {
     return
   }
   if (editor.is('li') && event.ctrlKey) {
-    const elements = breakAt(read(effects, editor), relativeRange(editor))
-    elements.list[1].to('p').isEditable()
-    render(richtext, editor, elements.list)
-    elements.active.element.focus()
+    const renderModel = breakAt(read(effects, editor), relativeRange(editor))
+    renderModel.list[1].to('p').isEditable()
+    render({ richtext, editors: editor, elements: renderModel.list })
+    renderModel.active.element.focus()
     return
   }
-  const elements = breakAt(read(effects, editor), relativeRange(editor))
-  render(richtext, editor, elements.list)
-  elements.active.element.focus()
+  const renderModel = breakAt(read(effects, editor), relativeRange(editor))
+  render({ richtext, editors: editor, elements: renderModel.list })
+  renderModel.active.element.focus()
 }
 
 function backspaceKey(event, effects, richtext) {
@@ -29,12 +29,16 @@ function backspaceKey(event, effects, richtext) {
   event.preventDefault()
   const prevEditor = Editor.previousEditor(editor)
   const len = prevEditor.length
-  const elements = glue(read(effects, prevEditor), read(effects, editor))
-  render(richtext, [prevEditor, editor], elements.list)
-  Editor.setCursor(elements.active, len)
+  const renderModels = glue(read(effects, prevEditor), read(effects, editor))
+  render({
+    richtext,
+    editors: [prevEditor, editor],
+    elements: renderModels.list
+  })
+  Editor.setCursor(renderModels.active, len)
 }
 
-function deleteKey(event, effects, richtextQuery) {
+function deleteKey(event, effects, richtext) {
   const editor = el.active()
   if (!Editor.canDelete(editor)) {
     return
@@ -43,9 +47,13 @@ function deleteKey(event, effects, richtextQuery) {
 
   const len = editor.length
   const nextEditor = Editor.nextEditor(editor)
-  const elements = glue(read(effects, editor), read(effects, nextEditor))
-  render(richtextQuery, [editor, nextEditor], elements.list)
-  Editor.setCursor(elements.active, len)
+  const renderModel = glue(read(effects, editor), read(effects, nextEditor))
+  render({
+    richtext,
+    editors: [editor, nextEditor],
+    elements: renderModel.list
+  })
+  Editor.setCursor(renderModel.active, len)
 }
 
 function arrowUp(event) {
