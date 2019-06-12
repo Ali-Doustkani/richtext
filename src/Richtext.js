@@ -54,6 +54,14 @@ function create(effects) {
     }
 
     const styleSelectedOrAll = (styleName, listTag) => {
+      if (
+        el
+          .active()
+          .parent()
+          .isNot(richtext)
+      ) {
+        return
+      }
       let { start, end } = relativeRange(el.active())
       if (start === end) {
         start = 0
@@ -65,6 +73,14 @@ function create(effects) {
     return {
       staySelected: value => (staySelected = value),
       style: styleName => {
+        if (
+          el
+            .active()
+            .parent()
+            .isNot(richtext)
+        ) {
+          return
+        }
         const { start, end } = relativeRange(el.active())
         setStyle(start, end, styleName)
       },
