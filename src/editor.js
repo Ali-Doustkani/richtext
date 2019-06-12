@@ -76,6 +76,16 @@ function nextEditor(editor) {
   return next
 }
 
+function isNotEditor(richtext, editor) {
+  if (editor.is('li')) {
+    return editor
+      .parent()
+      .parent()
+      .isNot(richtext)
+  }
+  return editor.parent().isNot(richtext)
+}
+
 export {
   canBackspace,
   canDelete,
@@ -84,5 +94,6 @@ export {
   setCursor,
   handlePreEnter,
   previousEditor,
-  nextEditor
+  nextEditor,
+  isNotEditor
 }

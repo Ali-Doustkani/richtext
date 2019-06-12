@@ -54,7 +54,11 @@ function create(effects) {
     }
 
     const styleSelectedOrAll = (styleName, listTag) => {
-      let { start, end } = relativeRange(el.active())
+      const editor = el.active()
+      if (Editor.isNotEditor(richtext, editor)) {
+        return
+      }
+      let { start, end } = relativeRange(editor)
       if (start === end) {
         start = 0
         end = el.active().length
@@ -65,7 +69,11 @@ function create(effects) {
     return {
       staySelected: value => (staySelected = value),
       style: styleName => {
-        const { start, end } = relativeRange(el.active())
+        const editor = el.active()
+        if (Editor.isNotEditor(richtext, editor)) {
+          return
+        }
+        const { start, end } = relativeRange(editor)
         setStyle(start, end, styleName)
       },
       apply: styleName => styleSelectedOrAll(styleName),
