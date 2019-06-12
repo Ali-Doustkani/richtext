@@ -38,36 +38,40 @@ function create(effects) {
       true
     )
 
-    const setStyleOrMake = (styleName, listTag) => {
-      const sel = relativeRange(el.active())
-      const editor = el.active()
-      const [start, end] =
-        sel.start === sel.end ? [0, editor.length] : [sel.start, sel.end]
+    const setStyle = (start, end, styleName, listTag) => {
       const elements = style(effects, start, end, styleName)
-      render({ richtext, editors: editor, elements: elements.list, listTag })
+      render({
+        richtext,
+        editors: el.active(),
+        elements: elements.list,
+        listTag
+      })
+      if (effects[styleName].parent) {
+        end -= start
+        start = 0
+      }
       Editor.setCursor(elements.active, staySelected ? start : end, end)
+    }
+
+    const styleSelectedOrAll = (styleName, listTag) => {
+      let { start, end } = relativeRange(el.active())
+      if (start === end) {
+        start = 0
+        end = el.active().length
+      }
+      setStyle(start, end, styleName, listTag)
     }
 
     return {
       staySelected: value => (staySelected = value),
-      setStyle: (start, end, styleName) => {
-        const elements = style(effects, start, end, styleName)
-        render({ richtext, editors: el.active(), elements: elements.list })
-        if (styleName === 'header') {
-          start = 0
-          end = elements.active.val().length
-        }
-        Editor.setCursor(elements.active, staySelected ? start : end, end)
+      style: styleName => {
+        const { start, end } = relativeRange(el.active())
+        setStyle(start, end, styleName)
       },
-      make: styleName => {
-        const editor = el.active()
-        const elements = style(effects, 0, editor.length, styleName)
-        render({ richtext, editors: editor, elements: elements.list })
-        Editor.setCursor(elements.active, editor.length, editor.length)
-      },
-      applyUnorderedList: () => setStyleOrMake('list', 'ul'),
-      applyCodebox: () => setStyleOrMake('codebox'),
-      applyOrderedList: () => setStyleOrMake('list', 'ol')
+      apply: styleName => styleSelectedOrAll(styleName),
+      applyUnorderedList: () => styleSelectedOrAll('list', 'ul'),
+      applyCodebox: () => styleSelectedOrAll('codebox'),
+      applyOrderedList: () => styleSelectedOrAll('list', 'ol')
     }
   }
 }
