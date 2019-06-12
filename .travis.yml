@@ -4,6 +4,6 @@ node_js:
 jobs:
   include:
     - stage: test
-    script: npm run lint
-    script: npm test
-    script: npm run test:integration
+      script: npm run lint
+      script: npm test
+      script: npm run test:integration
