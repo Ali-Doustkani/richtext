@@ -1,3 +1,8 @@
+/**
+ * It reads the editor and returns an array of style models.
+ * @param {Array} effects Effect rules.
+ * @param {HTMLElement} editor Current editor.
+ */
 function read(effects, editor) {
   const ret = []
   const parentEffects = getParentEffects(editor)
