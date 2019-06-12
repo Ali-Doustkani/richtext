@@ -1,13 +1,14 @@
 import { el } from './Query'
 
-function render(richtext, editors, elements) {
+function render(params) {
+  let { richtext, editors, elements, listTag } = params
   editors = Array.isArray(editors) ? editors : [editors]
   if (shouldCreateList(editors, elements)) {
-    createList(richtext, editors[0], elements[0])
+    createList(richtext, editors[0], elements[0], listTag)
   } else if (shouldAppendOrDeleteListItem(editors, elements)) {
     appendOrDeleteListItem(editors, elements[0])
   } else if (shouldChangeToSingle(editors, elements)) {
-    changeToSingle(richtext, editors, elements[0])
+    changeToSingle(richtext, editors, elements[0], listTag)
   } else if (shouldChangeToMultiple(editors, elements)) {
     changeToMultiple(richtext, editors[0], elements)
   } else if (shouldModifyListItem(editors, elements)) {
@@ -26,22 +27,22 @@ function shouldCreateList(editors, elements) {
   )
 }
 
-function createList(richtext, editor, element) {
-  if (editor.previousIs('ul')) {
+function createList(richtext, editor, element, listTag) {
+  if (editor.previousIs(listTag)) {
     const prevList = editor.previous()
     prevList.append(element)
-    if (editor.nextIs('ul')) {
+    if (editor.nextIs(listTag)) {
       editor
         .next()
         .moveChildrenTo(prevList)
         .remove()
     }
     editor.remove()
-  } else if (editor.nextIs('ul')) {
+  } else if (editor.nextIs(listTag)) {
     editor.next().shift(element)
     editor.remove()
   } else {
-    richtext.insertAfter(editor, el('ul').append(element)).remove(editor)
+    richtext.insertAfter(editor, el(listTag).append(element)).remove(editor)
   }
 }
 
@@ -71,7 +72,7 @@ function shouldChangeToSingle(editors, elements) {
   )
 }
 
-function changeToSingle(richtext, editors, element) {
+function changeToSingle(richtext, editors, element, listTag) {
   const listItem = editors.filter(x => x.is('li'))[0]
   const list = listItem.parent()
   if (listItem.is(list.firstChild())) {
@@ -80,7 +81,7 @@ function changeToSingle(richtext, editors, element) {
     richtext.insertAfter(list, element)
   } else {
     const rest = list.removeFrom(listItem).splice(1)
-    richtext.insertAfter(list, el('ul').append(rest))
+    richtext.insertAfter(list, el(listTag).append(rest))
     richtext.insertAfter(list, element)
   }
 
@@ -112,7 +113,7 @@ function changeToMultiple(richtext, listItem, elements) {
   } else {
     const rest = list.removeFrom(listItem).slice(1)
     list.append(elements[0])
-    richtext.insertAfter(list, el('ul').append(rest))
+    richtext.insertAfter(list, el.withTag(list).append(rest))
     richtext.insertAfter(list, elements[1])
   }
 }

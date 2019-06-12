@@ -58,4 +58,15 @@ function checkEditor(richtext) {
   }
 }
 
-export { checkEffects, checkEditor }
+function addDefaultEffects(effects) {
+  effects.list = {
+    parent: true,
+    tag: 'li'
+  }
+  effects.codebox = {
+    parent: true,
+    tag: 'pre'
+  }
+}
+
+export { checkEffects, checkEditor, addDefaultEffects }

@@ -37,7 +37,7 @@ describe('styling', () => {
     cy.get('#editor>p').highlight(0, 5)
     cy.contains('Bold').click()
 
-    cy.get('#editor>p>b').shouldHavePosition( 5)
+    cy.get('#editor>p>b').shouldHavePosition(5)
 
     cy.get('[type="checkbox"]').check()
     cy.get('#editor>p').highlightAll()
@@ -48,6 +48,19 @@ describe('styling', () => {
       startOffset: 0,
       endContainer: el => el.firstChild.firstChild,
       endOffset: 10
+    })
+
+    cy.get('#editor>p').type('{enter}')
+    cy.get('#editor>p')
+      .eq(1)
+      .type('HelloWorld')
+      .highlight(5, 6)
+    cy.contains('Header').click()
+    cy.get('#editor>h1').shouldHaveRange({
+      startContainer: el => el.firstChild,
+      startOffset: 0,
+      endContainer: el => el.firstChild,
+      endOffset: 1
     })
   })
 
@@ -232,7 +245,7 @@ describe('key handling', () => {
         `)
     cy.get('#editor>p')
       .eq(0)
-      .shouldHavePosition( 3)
+      .shouldHavePosition(3)
   })
 
   it('handle del key at the beginning of a paragraph', () => {
@@ -258,7 +271,7 @@ describe('key handling', () => {
 
     cy.get('#editor>p')
       .eq(0)
-      .shouldHavePosition( 3)
+      .shouldHavePosition(3)
   })
 
   it('handle arrow keys between paragraphs', () => {
@@ -276,7 +289,7 @@ describe('key handling', () => {
     cy.get('#editor>p')
       .eq(0)
       .should('have.focus')
-      .shouldHavePosition( 90)
+      .shouldHavePosition(90)
       .type('{uparrow}')
       .type('{uparrow}')
       .should('have.focus')
@@ -298,13 +311,13 @@ describe('key handling', () => {
     cy.get('#editor>p')
       .eq(0)
       .should('have.focus')
-      .shouldHavePosition( 90)
+      .shouldHavePosition(90)
       // Arrow Right
       .type('{rightarrow}')
       .should('not.have.focus')
     cy.get('#editor>p')
       .eq(1)
       .should('have.focus')
-      .shouldHavePosition( 0)
+      .shouldHavePosition(0)
   })
 })

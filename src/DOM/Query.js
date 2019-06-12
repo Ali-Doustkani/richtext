@@ -15,6 +15,10 @@ el.active = function() {
   return el(document.activeElement)
 }
 
+el.withTag = function(queryElement){
+  return el(queryElement.element.tagName)
+}
+
 class QueryElement {
   constructor(element) {
     this.element = element
