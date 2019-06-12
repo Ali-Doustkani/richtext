@@ -1,3 +1,9 @@
 language: node_js
 node_js:
   - "10.15"
+jobs:
+  include:
+    - stage: test
+    script: npm run lint
+    script: npm test
+    script: npm run test:integration
