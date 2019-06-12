@@ -10,7 +10,10 @@ import * as Editor from './editor'
  */
 function create(effects) {
   let staySelected = false
-  effects = checkEffects(effects)
+  
+  if (process.env.NODE_ENV === 'development') {
+    effects = checkEffects(effects)
+  }
 
   return function(richtextElement) {
     checkEditor(richtextElement)
@@ -94,7 +97,7 @@ function handleDeleteKey(event, effects, richtextQuery) {
     return
   }
   event.preventDefault()
-  
+
   const len = editor.length
   const nextEditor = Editor.nextEditor(editor)
   const elements = glue(read(effects, editor), read(effects, nextEditor))
