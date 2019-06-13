@@ -13,7 +13,7 @@ function glue(model1, model2) {
   pushAll(model1)
 
   const parentEffect = model1.length
-    ? model1[0].effects.filter(x => x.parent)[0]
+    ? model1[0].effects.find(x => x.parent)
     : null
 
   model2.forEach(item => {

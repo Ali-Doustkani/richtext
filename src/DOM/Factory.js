@@ -21,7 +21,7 @@ function generateRenderModel(styleModel) {
   const setActive = (editor, item) => (active = item.active ? editor : active)
 
   const parentOf = effects => {
-    const result = effects ? effects.filter(x => x.parent)[0] : undefined
+    const result = effects ? effects.find(x => x.parent) : undefined
     return result || { tag: 'p' }
   }
 
