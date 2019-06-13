@@ -4,7 +4,7 @@ function render(params) {
   let { richtext, editors, elements, listTag } = params
   editors = Array.isArray(editors) ? editors : [editors]
   if (shouldCreateList(editors, elements)) {
-    createList(richtext, editors[0], elements[0], listTag)
+    createList(richtext, editors[0], elements, listTag)
   } else if (shouldAppendOrDeleteListItem(editors, elements)) {
     appendOrDeleteListItem(editors, elements[0])
   } else if (shouldChangeToSingle(editors, elements)) {
@@ -22,15 +22,20 @@ function shouldCreateList(editors, elements) {
   return (
     editors.length === 1 &&
     editors[0].isNot('li') &&
-    elements.length === 1 &&
-    elements[0].is('li')
+    elements.length <= 3 &&
+    elements.some(x => x.is('li'))
   )
 }
 
-function createList(richtext, editor, element, listTag) {
-  if (editor.previousIs(listTag)) {
+function createList(richtext, editor, elements, listTag) {
+  const element = elements.find(x => x.is('li'))
+  if (elements[0].is('li') && editor.previousIs(listTag)) {
     const prevList = editor.previous()
     prevList.append(element)
+
+    if (elements[1]) {
+      richtext.insertAfter(editor, elements[1])
+    }
     if (editor.nextIs(listTag)) {
       editor
         .next()
@@ -38,11 +43,15 @@ function createList(richtext, editor, element, listTag) {
         .remove()
     }
     editor.remove()
-  } else if (editor.nextIs(listTag)) {
+  } else if (elements[elements.length - 1].is('li') && editor.nextIs(listTag)) {
     editor.next().shift(element)
+    if (elements[0].isNot('li')) {
+      richtext.insertAfter(editor, elements[0])
+    }
     editor.remove()
   } else {
-    richtext.insertAfter(editor, el(listTag).append(element)).remove(editor)
+    elements = elements.map(x => (x.is('li') ? el(listTag).append(x) : x))
+    richtext.insertAfter(editor, elements).remove(editor)
   }
 }
 
@@ -73,7 +82,7 @@ function shouldChangeToSingle(editors, elements) {
 }
 
 function changeToSingle(richtext, editors, element, listTag) {
-  const listItem = editors.filter(x => x.is('li'))[0]
+  const listItem = editors.find(x => x.is('li'))
   const list = listItem.parent()
   if (listItem.is(list.firstChild())) {
     richtext.insertBefore(list, element)

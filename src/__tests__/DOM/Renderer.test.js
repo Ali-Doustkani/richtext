@@ -69,7 +69,37 @@ describe('lists', () => {
       expectHtml('<ul><li>item</li></ul>')
     })
 
-    it('append item to previous sibling list', () => {
+    it('create <p><li>', () => {
+      editors = el('p')
+        .val('HelloWorld')
+        .appendTo(richtext)
+
+      render([el('p').val('Hello'), el('li').val('World')])
+
+      expectHtml('<p>Hello</p><ul><li>World</li></ul>')
+    })
+
+    it('create <li><p>', () => {
+      editors = el('p')
+        .val('HelloWorld')
+        .appendTo(richtext)
+
+      render([el('li').val('Hello'), el('p').val('World')])
+
+      expectHtml('<ul><li>Hello</li></ul><p>World</p>')
+    })
+
+    it('create <p><li><p>', () => {
+      editors = el('p')
+        .val('123')
+        .appendTo(richtext)
+
+      render([el('p').val('1'), el('li').val('2'), el('p').val('3')])
+
+      expectHtml('<p>1</p><ul><li>2</li></ul><p>3</p>')
+    })
+
+    it('append <li> to previous sibling list', () => {
       el('ul')
         .append(el('li').val('1'))
         .appendTo(richtext)
@@ -82,7 +112,36 @@ describe('lists', () => {
       expectHtml('<ul><li>1</li><li>2</li></ul>')
     })
 
-    it('append item to next sibling list', () => {
+    it('append <li><p> to previous sibling list', () => {
+      el('ul')
+        .append(el('li').val('1'))
+        .appendTo(richtext)
+      editors = el('p')
+        .val('23')
+        .appendTo(richtext)
+      el('ul')
+        .append(el('li').val('4'))
+        .appendTo(richtext)
+
+      render([el('li').val('2'), el('p').val('3')])
+
+      expectHtml('<ul><li>1</li><li>2</li></ul><p>3</p><ul><li>4</li></ul>')
+    })
+
+    it('append <p><li> to previous sibling list', () => {
+      el('ul')
+        .append(el('li').val('1'))
+        .appendTo(richtext)
+      editors = el('p')
+        .val('23')
+        .appendTo(richtext)
+
+      render([el('p').val('2'), el('li').val('3')])
+
+      expectHtml('<ul><li>1</li></ul><p>2</p><ul><li>3</li></ul>')
+    })
+
+    it('append <li> to next sibling list', () => {
       editors = el('p')
         .val('1')
         .appendTo(richtext)
@@ -95,7 +154,33 @@ describe('lists', () => {
       expectHtml('<ul><li>1</li><li>2</li></ul>')
     })
 
-    it('merge lists when appending items in between', () => {
+    it('append <p><li> to next sibling list', () => {
+      editors = el('p')
+        .val('12')
+        .appendTo(richtext)
+      el('ul')
+        .append(el('li').val('3'))
+        .appendTo(richtext)
+
+      render([el('p').val('1'), el('li').val('2')])
+
+      expectHtml('<p>1</p><ul><li>2</li><li>3</li></ul>')
+    })
+
+    it('append <li><p> to next sibling list', () => {
+      editors = el('p')
+        .val('12')
+        .appendTo(richtext)
+      el('ul')
+        .append(el('li').val('3'))
+        .appendTo(richtext)
+
+      render([el('li').val('1'), el('p').val('2')])
+
+      expectHtml('<ul><li>1</li></ul><p>2</p><ul><li>3</li></ul>')
+    })
+
+    it('merge <li> when between two <ul>', () => {
       el('ul')
         .append(el('li').val('1'))
         .appendTo(richtext)
