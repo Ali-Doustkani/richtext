@@ -31,10 +31,27 @@ function read(effects, editor) {
     for (let prop in effects) {
       const e = effects[prop]
       if (e.tag && el.is(e.tag) && el.hasClassFrom(e)) {
-        return effects[prop]
+        const specials = dynamicAttribs(e)
+        return specials.length ? makeEffect(e, specials, el) : e
       }
     }
     throw new Error('Unsupported node: ' + el.element.tagName)
+  }
+
+  // values of dynamic attributes are read from DOM instead of effects array
+  function dynamicAttribs(effects) {
+    return Object.keys(effects).filter(
+      x => x !== 'tag' && x !== 'className' && x !== 'parent'
+    )
+  }
+
+  function makeEffect(effect, specials, element) {
+    const ret = { tag: effect.tag }
+    if (effect.className) {
+      ret.className = effect.className
+    }
+    specials.forEach(item => (ret[item] = element.getAttribute(item)))
+    return ret
   }
 
   function getParentEffects(editor) {

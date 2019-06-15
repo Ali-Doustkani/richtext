@@ -143,6 +143,15 @@ class QueryElement {
     return this
   }
 
+  getAttribute(name) {
+    return this.element.getAttribute(name)
+  }
+
+  setAttribute(name, value) {
+    this.element.setAttribute(name, value)
+    return this
+  }
+
   setAttributeFrom(obj) {
     if (obj) {
       const attributes = Object.keys(obj).filter(x => x !== 'tag')

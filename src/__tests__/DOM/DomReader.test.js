@@ -16,6 +16,10 @@ const effects = {
   smallHeader: {
     tag: 'h2',
     className: 'header-style'
+  },
+  anchor: {
+    tag: 'a',
+    href: '' // dynamic attribute
   }
 }
 
@@ -67,4 +71,17 @@ it('read empty parent effect', () => {
   expect(read(effects, el('h1'))).toEqual([
     { text: '', effects: [effects.bigHeader] }
   ])
+})
+
+it('read anchor href', () => {
+  expect(
+    read(
+      effects,
+      el('p').append(
+        el('a')
+          .setAttribute('href', 'link')
+          .val('Hey')
+      )
+    )
+  ).toEqual([{ text: 'Hey', effects: [{ tag: 'a', href: 'link' }] }])
 })

@@ -169,13 +169,24 @@ describe('static content', () => {
     ).toBe('Hey')
   })
 
+  it('convert element type', () => {
+    const parent = el('div')
+    const li = el('li')
+      .val('some text')
+      .appendTo(parent)
+      .to('p')
+    expect(li.element.outerHTML).toBe('<p>some text</p>')
+  })
+})
+
+describe('attributes', () => {
   it('set classs name', () => {
     expect(owner.className('owner-style').element.outerHTML).toBe(
       '<div class="owner-style"></div>'
     )
   })
 
-  it('set class from an object', () => {
+  it('set attributes from an object', () => {
     expect(
       owner.append(el('p').setAttributeFrom(undefined)).element.innerHTML
     ).toBe('<p></p>')
@@ -193,13 +204,20 @@ describe('static content', () => {
     expect(el('p').isEditable().element.contentEditable).toBe(true)
   })
 
-  it('convert element type', () => {
-    const parent = el('div')
-    const li = el('li')
-      .val('some text')
-      .appendTo(parent)
-      .to('p')
-    expect(li.element.outerHTML).toBe('<p>some text</p>')
+  it('set attributes value', () => {
+    expect(
+      el('p')
+        .setAttribute('data-id', '123')
+        .val('Hey').element.outerHTML
+    ).toBe('<p data-id="123">Hey</p>')
+  })
+
+  it('get attributes value', () => {
+    expect(
+      el('p')
+        .setAttribute('data-id', '123')
+        .getAttribute('data-id')
+    ).toBe('123')
   })
 })
 
