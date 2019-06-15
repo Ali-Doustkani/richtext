@@ -1,6 +1,6 @@
 import { style } from './../../Stylist/Stylist'
 
-const rules = {
+const effects = {
   bold: { tag: 'strong' },
   italic: { tag: 'i' }
 }
@@ -9,13 +9,13 @@ describe('when input is plain text', () => {
   it('italic a section', () => {
     expect(
       style({
-        type: rules.italic,
+        type: effects.italic,
         input: 'hello world',
         from: 0,
         to: 5
       })
     ).toEqual([
-      { text: 'hello', effects: [rules.italic], active: true },
+      { text: 'hello', effects: [effects.italic], active: true },
       { text: ' world', effects: [], active: false }
     ])
   })
@@ -23,13 +23,13 @@ describe('when input is plain text', () => {
   it('bold beginning', () => {
     expect(
       style({
-        type: rules.bold,
+        type: effects.bold,
         input: 'one two three',
         from: 0,
         to: 3
       })
     ).toEqual([
-      { text: 'one', effects: [rules.bold], active: true },
+      { text: 'one', effects: [effects.bold], active: true },
       { text: ' two three', effects: [], active: false }
     ])
   })
@@ -37,28 +37,28 @@ describe('when input is plain text', () => {
   it('bold ending', () => {
     expect(
       style({
-        type: rules.bold,
+        type: effects.bold,
         input: 'ali',
         from: 1,
         to: 3
       })
     ).toEqual([
       { text: 'a', effects: [], active: false },
-      { text: 'li', effects: [rules.bold], active: true }
+      { text: 'li', effects: [effects.bold], active: true }
     ])
   })
 
   it('bold middle', () => {
     expect(
       style({
-        type: rules.bold,
+        type: effects.bold,
         input: 'one two three',
         from: 4,
         to: 7
       })
     ).toEqual([
       { text: 'one ', effects: [], active: false },
-      { text: 'two', effects: [rules.bold], active: true },
+      { text: 'two', effects: [effects.bold], active: true },
       { text: ' three', effects: [], active: false }
     ])
   })
@@ -66,7 +66,7 @@ describe('when input is plain text', () => {
   it('bold middle with some elements not touched', () => {
     expect(
       style({
-        type: rules.bold,
+        type: effects.bold,
         input: [
           { text: 'one' },
           { text: ' two' },
@@ -78,7 +78,7 @@ describe('when input is plain text', () => {
       })
     ).toEqual([
       { text: 'one t', effects: [], active: false },
-      { text: 'wo th', effects: [rules.bold], active: true },
+      { text: 'wo th', effects: [effects.bold], active: true },
       { text: 'ree four', effects: [], active: false }
     ])
   })
@@ -86,18 +86,18 @@ describe('when input is plain text', () => {
   it('bold completely', () => {
     expect(
       style({
-        type: rules.bold,
+        type: effects.bold,
         input: 'ali',
         from: 0,
         to: 3
       })
-    ).toEqual([{ text: 'ali', effects: [rules.bold], active: true }])
+    ).toEqual([{ text: 'ali', effects: [effects.bold], active: true }])
   })
 
   it('bold multiple elements completely', () => {
     expect(
       style({
-        type: rules.bold,
+        type: effects.bold,
         input: [
           { text: 'one' },
           { text: 'two' },
@@ -109,8 +109,23 @@ describe('when input is plain text', () => {
       })
     ).toEqual([
       { text: 'on', effects: [], active: false },
-      { text: 'etwothreef', effects: [rules.bold], active: true },
+      { text: 'etwothreef', effects: [effects.bold], active: true },
       { text: 'our', effects: [], active: false }
+    ])
+  })
+
+  it('anchor', () => {
+    expect(
+      style({
+        type: { tag: 'a', href: 'link' },
+        input: 'HelloWorld',
+        from: 0,
+        to: 5,
+        href: 'link'
+      })
+    ).toEqual([
+      { text: 'Hello', effects: [{ tag: 'a', href: 'link' }], active: true },
+      { text: 'World', effects: [], active: false }
     ])
   })
 })
@@ -119,27 +134,33 @@ describe('when some parts of input are styled', () => {
   it('bold before a bolded text', () => {
     expect(
       style({
-        type: rules.bold,
-        input: [{ text: 'hello' }, { text: ' world!', effects: [rules.bold] }],
+        type: effects.bold,
+        input: [
+          { text: 'hello' },
+          { text: ' world!', effects: [effects.bold] }
+        ],
         from: 3,
         to: 8
       })
     ).toEqual([
       { text: 'hel', effects: [], active: false },
-      { text: 'lo world!', effects: [rules.bold], active: true }
+      { text: 'lo world!', effects: [effects.bold], active: true }
     ])
   })
 
   it('bold after a bolded text', () => {
     expect(
       style({
-        type: rules.bold,
-        input: [{ text: 'hello', effects: [rules.bold] }, { text: ' world!' }],
+        type: effects.bold,
+        input: [
+          { text: 'hello', effects: [effects.bold] },
+          { text: ' world!' }
+        ],
         from: 0,
         to: 7
       })
     ).toEqual([
-      { text: 'hello w', effects: [rules.bold], active: true },
+      { text: 'hello w', effects: [effects.bold], active: true },
       { text: 'orld!', effects: [], active: false }
     ])
   })
@@ -147,10 +168,10 @@ describe('when some parts of input are styled', () => {
   it('expand bold', () => {
     expect(
       style({
-        type: rules.bold,
+        type: effects.bold,
         input: [
           { text: 'first' },
-          { text: 'second', effects: [rules.bold] },
+          { text: 'second', effects: [effects.bold] },
           { text: 'third' }
         ],
         from: 6,
@@ -158,7 +179,7 @@ describe('when some parts of input are styled', () => {
       })
     ).toEqual([
       { text: 'first', effects: [], active: false },
-      { text: 'secondth', effects: [rules.bold], active: true },
+      { text: 'secondth', effects: [effects.bold], active: true },
       { text: 'ird', effects: [], active: false }
     ])
   })
@@ -168,8 +189,11 @@ describe('when unstyling', () => {
   it('unbold the bolded text', () => {
     expect(
       style({
-        type: rules.bold,
-        input: [{ text: 'first', effects: [rules.bold] }, { text: ' second' }],
+        type: effects.bold,
+        input: [
+          { text: 'first', effects: [effects.bold] },
+          { text: ' second' }
+        ],
         from: 0,
         to: 5
       })
@@ -179,13 +203,13 @@ describe('when unstyling', () => {
   it('unbold an ending section', () => {
     expect(
       style({
-        type: rules.bold,
-        input: { text: 'first second', effects: [rules.bold] },
+        type: effects.bold,
+        input: { text: 'first second', effects: [effects.bold] },
         from: 6,
         to: 12
       })
     ).toEqual([
-      { text: 'first ', effects: [rules.bold], active: false },
+      { text: 'first ', effects: [effects.bold], active: false },
       { text: 'second', effects: [], active: true }
     ])
   })
@@ -193,10 +217,10 @@ describe('when unstyling', () => {
   it('unbold a middle section', () => {
     expect(
       style({
-        type: rules.bold,
+        type: effects.bold,
         input: [
           { text: '123' },
-          { text: '4', effects: [rules.bold] },
+          { text: '4', effects: [effects.bold] },
           { text: '5' }
         ],
         from: 3,
@@ -208,15 +232,15 @@ describe('when unstyling', () => {
   it('unbold an italic and bold text', () => {
     expect(
       style({
-        type: rules.bold,
-        input: { text: 'hello world', effects: [rules.bold, rules.italic] },
+        type: effects.bold,
+        input: { text: 'hello world', effects: [effects.bold, effects.italic] },
         from: 2,
         to: 5
       })
     ).toEqual([
-      { text: 'he', effects: [rules.bold, rules.italic], active: false },
-      { text: 'llo', effects: [rules.italic], active: true },
-      { text: ' world', effects: [rules.bold, rules.italic], active: false }
+      { text: 'he', effects: [effects.bold, effects.italic], active: false },
+      { text: 'llo', effects: [effects.italic], active: true },
+      { text: ' world', effects: [effects.bold, effects.italic], active: false }
     ])
   })
 })
@@ -225,32 +249,32 @@ describe('when applying multiple styles', () => {
   it('italic a bold section', () => {
     expect(
       style({
-        type: rules.italic,
-        input: [{ text: 'hello' }, { text: 'world', effects: [rules.bold] }],
+        type: effects.italic,
+        input: [{ text: 'hello' }, { text: 'world', effects: [effects.bold] }],
         from: 5,
         to: 10
       })
     ).toEqual([
       { text: 'hello', effects: [], active: false },
-      { text: 'world', effects: [rules.bold, rules.italic], active: true }
+      { text: 'world', effects: [effects.bold, effects.italic], active: true }
     ])
   })
 
   it('style before styled content', () => {
     expect(
       style({
-        type: rules.italic,
+        type: effects.italic,
         input: [
           { text: 'first ' },
-          { text: 'second ', effects: [rules.bold] },
+          { text: 'second ', effects: [effects.bold] },
           { text: 'third' }
         ],
         from: 0,
         to: 6
       })
     ).toEqual([
-      { text: 'first ', effects: [rules.italic], active: true },
-      { text: 'second ', effects: [rules.bold], active: false },
+      { text: 'first ', effects: [effects.italic], active: true },
+      { text: 'second ', effects: [effects.bold], active: false },
       { text: 'third', effects: [], active: false }
     ])
   })
@@ -258,24 +282,24 @@ describe('when applying multiple styles', () => {
   it('style already styled content', () => {
     expect(
       style({
-        type: rules.bold,
-        input: { text: 'hello world', effects: [rules.italic] },
+        type: effects.bold,
+        input: { text: 'hello world', effects: [effects.italic] },
         from: 6,
         to: 11
       })
     ).toEqual([
-      { text: 'hello ', effects: [rules.italic], active: false },
-      { text: 'world', effects: [rules.italic, rules.bold], active: true }
+      { text: 'hello ', effects: [effects.italic], active: false },
+      { text: 'world', effects: [effects.italic, effects.bold], active: true }
     ])
   })
 
   it('style after styled content', () => {
     expect(
       style({
-        type: rules.italic,
+        type: effects.italic,
         input: [
           { text: 'first ' },
-          { text: 'second ', effects: [rules.bold] },
+          { text: 'second ', effects: [effects.bold] },
           { text: 'third' }
         ],
         from: 13,
@@ -283,19 +307,19 @@ describe('when applying multiple styles', () => {
       })
     ).toEqual([
       { text: 'first ', effects: [], active: false },
-      { text: 'second ', effects: [rules.bold], active: false },
-      { text: 'third', effects: [rules.italic], active: true }
+      { text: 'second ', effects: [effects.bold], active: false },
+      { text: 'third', effects: [effects.italic], active: true }
     ])
   })
 
   it('style multiple styled contents', () => {
     expect(
       style({
-        type: rules.bold,
+        type: effects.bold,
         input: [
           { text: 'one' },
-          { text: 'two', effects: [rules.italic] },
-          { text: 'three', effects: [rules.bold] },
+          { text: 'two', effects: [effects.italic] },
+          { text: 'three', effects: [effects.bold] },
           { text: 'four' }
         ],
         from: 1,
@@ -303,9 +327,9 @@ describe('when applying multiple styles', () => {
       })
     ).toEqual([
       { text: 'o', effects: [], active: false },
-      { text: 'ne', effects: [rules.bold], active: false },
-      { text: 'two', effects: [rules.italic, rules.bold], active: false },
-      { text: 'threefou', effects: [rules.bold], active: true },
+      { text: 'ne', effects: [effects.bold], active: false },
+      { text: 'two', effects: [effects.italic, effects.bold], active: false },
+      { text: 'threefou', effects: [effects.bold], active: true },
       { text: 'r', effects: [], active: false }
     ])
   })
@@ -315,19 +339,19 @@ describe('when input is empty', () => {
   it('style', () => {
     expect(
       style({
-        type: rules.bold,
+        type: effects.bold,
         input: [{ text: '' }],
         from: 0,
         to: 0
       })
-    ).toEqual([{ text: '', effects: [rules.bold], active: true }])
+    ).toEqual([{ text: '', effects: [effects.bold], active: true }])
   })
 
   it('unstyle', () => {
     expect(
       style({
-        type: rules.bold,
-        input: [{ text: '', effects: [rules.bold] }],
+        type: effects.bold,
+        input: [{ text: '', effects: [effects.bold] }],
         from: 0,
         to: 0
       })

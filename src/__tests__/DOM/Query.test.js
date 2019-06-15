@@ -177,13 +177,13 @@ describe('static content', () => {
 
   it('set class from an object', () => {
     expect(
-      owner.append(el('p').setClassFrom(undefined)).element.innerHTML
+      owner.append(el('p').setAttributeFrom(undefined)).element.innerHTML
     ).toBe('<p></p>')
-    expect(owner.append(el('p').setClassFrom({})).element.innerHTML).toBe(
+    expect(owner.append(el('p').setAttributeFrom({})).element.innerHTML).toBe(
       '<p></p><p></p>'
     )
     expect(
-      owner.append(el('p').setClassFrom({ className: 'style' })).element
+      owner.append(el('p').setAttributeFrom({ className: 'style' })).element
         .innerHTML
     ).toBe('<p></p><p></p><p class="style"></p>')
   })
@@ -298,5 +298,37 @@ describe('navigationals', () => {
     const p = el('p').appendTo(owner)
     const pre = el('pre').appendTo(owner)
     expect(pre.previousIs(p)).toBe(true)
+  })
+})
+
+describe('eventing', () => {
+  it('add event listener', () => {
+    const clickEvent = new Event('click')
+    const fn = jest.fn()
+    const btn = el('button').addListener('click', fn)
+
+    btn.element.dispatchEvent(clickEvent)
+
+    expect(fn).toBeCalled()
+  })
+
+  it('remove event listener', () => {
+    const clickEvent = new Event('click')
+    const fn = jest.fn()
+    const btn = el('button')
+      .addListener('click', fn)
+      .removeListener('click', fn)
+
+    btn.element.dispatchEvent(clickEvent)
+
+    expect(fn).not.toBeCalled()
+  })
+})
+
+describe('styling', () => {
+  it('set top', () => {
+    const div = el('div').style({ top: 12, left: 13 }).element
+    expect(div.style.top).toBe('12px')
+    expect(div.style.left).toBe('13px')
   })
 })

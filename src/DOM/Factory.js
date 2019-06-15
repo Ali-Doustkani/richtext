@@ -2,7 +2,7 @@ import { el } from './Query'
 
 function createNewEditor(effect) {
   return el(effect && effect.parent ? effect.tag : 'p')
-    .setClassFrom(effect)
+    .setAttributeFrom(effect)
     .isEditable()
 }
 
@@ -50,7 +50,7 @@ function generateRenderModel(styleModel) {
       nonParentEffects.forEach(
         effect =>
           (children = el(effect.tag)
-            .setClassFrom(effect)
+            .setAttributeFrom(effect)
             .val(children))
       )
     }

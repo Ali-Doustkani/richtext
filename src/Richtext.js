@@ -1,6 +1,7 @@
 import { checkEffects, checkEditor, addDefaultEffects } from './args'
 import { el, render, relativeRange } from './DOM'
 import { style } from './Stylist'
+import { showDialog } from './Dialogue'
 import * as Handle from './keyHandler'
 import * as Editor from './editor'
 
@@ -46,14 +47,14 @@ function create(effects) {
         elements: elements.list,
         listTag
       })
-      if (effects[styleName].parent) {
+      if (typeof styleName === 'string' && effects[styleName].parent) {
         end -= start
         start = 0
       }
       Editor.setCursor(elements.active, staySelected ? start : end, end)
     }
-    const styleSelectedOrAll = (styleName, listTag) => {
 
+    const styleSelectedOrAll = (styleName, listTag) => {
       const editor = el.active()
       if (Editor.isNotEditor(richtext, editor)) {
         return
@@ -75,6 +76,18 @@ function create(effects) {
         }
         const { start, end } = relativeRange(editor)
         setStyle(start, end, styleName)
+      },
+      styleLink: () => {
+        const editor = el.active()
+        if (Editor.isNotEditor(richtext, editor)) {
+          return
+        }
+        const { start, end } = relativeRange(editor)
+
+        showDialog(richtext).succeeded(link => {
+          editor.element.focus()
+          setStyle(start, end, { tag: 'a', href: link })
+        })
       },
       apply: styleName => styleSelectedOrAll(styleName),
       applyUnorderedList: () => styleSelectedOrAll('list', 'ul'),

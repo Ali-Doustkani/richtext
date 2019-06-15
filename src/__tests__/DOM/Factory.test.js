@@ -87,7 +87,9 @@ it('model parent effect ending with paragraph', () => {
   ])
   expect(model.list.length).toBe(2)
   expect(model.list[0].element.outerHTML).toBe('<p>Content</p>')
-  expect(model.list[1].element.outerHTML).toBe('<h2 class="header-style">Title</h2>')
+  expect(model.list[1].element.outerHTML).toBe(
+    '<h2 class="header-style">Title</h2>'
+  )
   expect(model.active).toBe(model.list[0])
 })
 
@@ -113,4 +115,14 @@ it('model empty effects', () => {
   expect(model.list.length).toBe(1)
   expect(model.list[0].element.outerHTML).toBe('<p>HelloWorld</p>')
   expect(model.active).toBe(model.list[0])
+})
+
+it('model anchors', () => {
+  const model = generateRenderModel([
+    { text: 'Hello', effects: [{ tag: 'a', href: 'link' }] },
+    { text: 'World' }
+  ])
+  expect(model.list[0].element.outerHTML).toBe(
+    '<p><a href="link">Hello</a>World</p>'
+  )
 })

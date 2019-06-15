@@ -3,9 +3,10 @@ import { glue as _glue, breakAt as _breakAt } from './Break'
 import { generateRenderModel, el, read } from './../DOM'
 
 function style(effects, start, end, styleName) {
+  const ef = typeof styleName === 'string' ? effects[styleName] : styleName
   return generateRenderModel(
     _style({
-      type: effects[styleName],
+      type: ef,
       input: read(effects, el(document.activeElement)),
       from: start,
       to: end

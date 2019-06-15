@@ -143,9 +143,12 @@ class QueryElement {
     return this
   }
 
-  setClassFrom(obj) {
-    if (obj && obj.className) {
-      this.element.className = obj.className
+  setAttributeFrom(obj) {
+    if (obj) {
+      const attributes = Object.keys(obj).filter(x => x !== 'tag')
+      attributes.forEach(attrib => {
+        this.element[attrib] = obj[attrib]
+      })
     }
     return this
   }
@@ -223,6 +226,22 @@ class QueryElement {
 
   hasNoChildren() {
     return !this.hasChildren()
+  }
+
+  addListener(event, listener) {
+    this.element.addEventListener(event, listener)
+    return this
+  }
+
+  removeListener(event, listener) {
+    this.element.removeEventListener(event, listener)
+    return this
+  }
+
+  style(styles) {
+    this.element.style.top = styles.top + 'px'
+    this.element.style.left = styles.left + 'px'
+    return this
   }
 
   get length() {

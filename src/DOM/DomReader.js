@@ -34,7 +34,7 @@ function read(effects, editor) {
         return effects[prop]
       }
     }
-    throw new Error('Unsupported node')
+    throw new Error('Unsupported node: ' + el.element.tagName)
   }
 
   function getParentEffects(editor) {
