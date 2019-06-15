@@ -67,26 +67,29 @@ function create(effects) {
       setStyle(start, end, styleName, listTag)
     }
 
+    const ifReady = func => {
+      const editor = el.active()
+      if (Editor.isNotEditor(richtext, editor)) {
+        return
+      }
+      const { start, end } = relativeRange(editor)
+      if (start === end) {
+        return
+      }
+      func(start, end, editor)
+    }
+
     return {
       staySelected: value => (staySelected = value),
       style: styleName => {
-        const editor = el.active()
-        if (Editor.isNotEditor(richtext, editor)) {
-          return
-        }
-        const { start, end } = relativeRange(editor)
-        setStyle(start, end, styleName)
+        ifReady((start, end) => setStyle(start, end, styleName))
       },
       styleLink: () => {
-        const editor = el.active()
-        if (Editor.isNotEditor(richtext, editor)) {
-          return
-        }
-        const { start, end } = relativeRange(editor)
-
-        showDialog(richtext).succeeded(link => {
-          editor.element.focus()
-          setStyle(start, end, { tag: 'a', href: link })
+        ifReady((start, end, editor) => {
+          showDialog(richtext).succeeded(link => {
+            editor.element.focus()
+            setStyle(start, end, { tag: 'a', href: link })
+          })
         })
       },
       apply: styleName => styleSelectedOrAll(styleName),
