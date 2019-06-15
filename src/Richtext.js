@@ -39,22 +39,23 @@ function create(effects) {
       true
     )
 
-    const setStyle = (start, end, styleName, listTag) => {
-      const elements = style(effects, start, end, styleName)
+    const setStyle = options => {
+      let { start, end, type, listTag, editor } = options
+      const elements = style(effects, start, end, type, editor)
       render({
         richtext,
-        editors: el.active(),
+        editors: editor,
         elements: elements.list,
         listTag
       })
-      if (typeof styleName === 'string' && effects[styleName].parent) {
+      if (typeof type === 'string' && effects[type].parent) {
         end -= start
         start = 0
       }
       Editor.setCursor(elements.active, staySelected ? start : end, end)
     }
 
-    const styleSelectedOrAll = (styleName, listTag) => {
+    const styleSelectedOrAll = (type, listTag) => {
       const editor = el.active()
       if (Editor.isNotEditor(richtext, editor)) {
         return
@@ -64,7 +65,7 @@ function create(effects) {
         start = 0
         end = el.active().length
       }
-      setStyle(start, end, styleName, listTag)
+      setStyle({ start, end, type, listTag, editor })
     }
 
     const ifReady = func => {
@@ -81,18 +82,22 @@ function create(effects) {
 
     return {
       staySelected: value => (staySelected = value),
-      style: styleName => {
-        ifReady((start, end) => setStyle(start, end, styleName))
+      style: type => {
+        ifReady((start, end, editor) => setStyle({ start, end, type, editor }))
       },
       styleLink: () => {
         ifReady((start, end, editor) => {
           showDialog(richtext).succeeded(link => {
-            editor.element.focus()
-            setStyle(start, end, { tag: 'a', href: link })
+            setStyle({
+              start,
+              end,
+              type: { tag: 'a', href: link },
+              editor
+            })
           })
         })
       },
-      apply: styleName => styleSelectedOrAll(styleName),
+      apply: type => styleSelectedOrAll(type),
       applyUnorderedList: () => styleSelectedOrAll('list', 'ul'),
       applyCodebox: () => styleSelectedOrAll('codebox'),
       applyOrderedList: () => styleSelectedOrAll('list', 'ol')

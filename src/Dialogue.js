@@ -33,6 +33,7 @@ function showDialog(richtext) {
   cancelButton.addListener('click', canceled)
 
   open()
+  input.element.focus()
 
   return {
     succeeded: function(callback) {
