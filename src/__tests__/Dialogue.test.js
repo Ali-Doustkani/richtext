@@ -1,11 +1,19 @@
 import 'jest-dom/extend-expect'
-import { getByText, getByTestId, queryByTestId } from '@testing-library/dom'
+import {
+  getByText,
+  getByTestId,
+  queryByTestId,
+  fireEvent
+} from '@testing-library/dom'
 import { showDialog } from './../Dialogue'
 import { el } from './../DOM'
 
 let parent
 beforeEach(() => {
   parent = el('div')
+  while (document.body.firstChild) {
+    document.body.removeChild(document.body.firstChild)
+  }
   document.body.appendChild(parent.element)
 })
 
@@ -42,19 +50,41 @@ describe('Saving', () => {
     getByText(document, 'Save').click()
     expect(queryByTestId(document, 'dialogue')).not.toBeInTheDocument()
   })
+
+  it('work with enter key', () => {
+    const fn = jest.fn()
+    showDialog(parent).succeeded(fn)
+    getByTestId(document, 'dialogue-input').value = 'Hello'
+    fireEvent.keyUp(getByTestId(document, 'dialogue-input'), { key: 'Enter' })
+    expect(queryByTestId(document, 'dialogue')).not.toBeInTheDocument()
+    expect(fn).toBeCalledWith('Hello')
+  })
 })
 
 describe('Canceling', () => {
   it('callback', () => {
-    const fn = jest.fn()
-    showDialog(parent).canceled(fn)
+    const succeeded = jest.fn()
+    const canceled = jest.fn()
+    showDialog(parent)
+      .succeeded(succeeded)
+      .canceled(canceled)
     getByText(document, 'Cancel').click()
-    expect(fn).toBeCalled()
+    expect(canceled).toBeCalled()
   })
 
   it('close dialogue', () => {
     showDialog(parent)
     getByText(document, 'Cancel').click()
     expect(queryByTestId(document, 'dialogue')).not.toBeInTheDocument()
+  })
+
+  it('work with escape key', () => {
+    const fn = jest.fn()
+    showDialog(parent).canceled(fn)
+    fireEvent.keyUp(getByTestId(document, 'dialogue-input'), {
+      key: 'Escape'
+    })
+    expect(queryByTestId(document, 'dialogue')).not.toBeInTheDocument()
+    expect(fn).toBeCalled()
   })
 })

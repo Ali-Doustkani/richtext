@@ -2,40 +2,48 @@ import { el } from './DOM'
 
 function showDialog(richtext) {
   const border = createBorder()
+  const input = border.firstChild()
+  const saveButton = input.next()
+  const cancelButton = saveButton.next()
   let succeededFunc, canceledFunc
-  // handle save button
-  border
-    .firstChild()
-    .next()
-    .addListener('click', () => {
-      richtext.remove(border)
-      if (succeededFunc) {
-        succeededFunc(border.firstChild().element.value)
-      }
-    })
-  // handle cancel button
-  border
-    .firstChild()
-    .next()
-    .next()
-    .addListener('click', () => {
-      richtext.remove(border)
-      if (canceledFunc) {
-        canceledFunc()
-      }
-    })
-  richtext.shift(border)
-  const result = {
-    succeeded: callback => {
-      succeededFunc = callback
-      return result
-    },
-    canceled: callback => {
-      canceledFunc = callback
-      return result
+
+  const close = () => richtext.parent().remove(border)
+  const open = () => richtext.parent().insertAfter(richtext, border)
+  const succeeded = () => {
+    close()
+    if (succeededFunc) {
+      succeededFunc(border.firstChild().element.value)
     }
   }
-  return result
+  const canceled = () => {
+    close()
+    if (canceledFunc) {
+      canceledFunc()
+    }
+  }
+
+  input.addListener('keyup', e => {
+    if (e.key === 'Enter') {
+      succeeded()
+    } else if (e.key === 'Escape') {
+      canceled()
+    }
+  })
+  saveButton.addListener('click', succeeded)
+  cancelButton.addListener('click', canceled)
+
+  open()
+
+  return {
+    succeeded: function(callback) {
+      succeededFunc = callback
+      return this
+    },
+    canceled: function(callback) {
+      canceledFunc = callback
+      return this
+    }
+  }
 }
 
 function createBorder() {
