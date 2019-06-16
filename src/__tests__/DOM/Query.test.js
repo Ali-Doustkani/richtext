@@ -317,6 +317,19 @@ describe('navigationals', () => {
     const pre = el('pre').appendTo(owner)
     expect(pre.previousIs(p)).toBe(true)
   })
+
+  it('loops through children', () => {
+    const hello = el('b').val('Hello')
+    const world = el('i').val('World')
+    const p = el('p')
+      .append(hello)
+      .append(world)
+    const result = []
+    p.forChildren(child => result.push(child))
+    expect(result.length).toBe(2)
+    expect(result[0].element).toBe(hello.element)
+    expect(result[1].element).toBe(world.element)
+  })
 })
 
 describe('eventing', () => {
@@ -327,7 +340,7 @@ describe('eventing', () => {
 
     btn.element.dispatchEvent(clickEvent)
 
-    expect(fn).toBeCalled()
+    expect(fn).toHaveBeenCalled()
   })
 
   it('remove event listener', () => {
@@ -339,7 +352,7 @@ describe('eventing', () => {
 
     btn.element.dispatchEvent(clickEvent)
 
-    expect(fn).not.toBeCalled()
+    expect(fn).not.toHaveBeenCalled()
   })
 })
 

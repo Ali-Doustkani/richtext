@@ -213,6 +213,12 @@ class QueryElement {
     return el(this.element.lastChild)
   }
 
+  forChildren(callback) {
+    for (let i = 0; i < this.element.childNodes.length; i++) {
+      callback(el(this.element.childNodes[i]))
+    }
+  }
+
   next() {
     return el(this.element.nextSibling)
   }

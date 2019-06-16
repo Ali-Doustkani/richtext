@@ -42,7 +42,7 @@ describe('Saving', () => {
     showDialog(parent).succeeded(fn)
     getByTestId(document, 'dialogue-input').value = 'some link'
     getByText(document, 'Save').click()
-    expect(fn).toBeCalledWith('some link')
+    expect(fn).toHaveBeenCalledWith('some link')
   })
 
   it('close dialogue', () => {
@@ -57,7 +57,7 @@ describe('Saving', () => {
     getByTestId(document, 'dialogue-input').value = 'Hello'
     fireEvent.keyUp(getByTestId(document, 'dialogue-input'), { key: 'Enter' })
     expect(queryByTestId(document, 'dialogue')).not.toBeInTheDocument()
-    expect(fn).toBeCalledWith('Hello')
+    expect(fn).toHaveBeenCalledWith('Hello')
   })
 })
 
@@ -69,7 +69,7 @@ describe('Canceling', () => {
       .succeeded(succeeded)
       .canceled(canceled)
     getByText(document, 'Cancel').click()
-    expect(canceled).toBeCalled()
+    expect(canceled).toHaveBeenCalled()
   })
 
   it('close dialogue', () => {
@@ -85,6 +85,6 @@ describe('Canceling', () => {
       key: 'Escape'
     })
     expect(queryByTestId(document, 'dialogue')).not.toBeInTheDocument()
-    expect(fn).toBeCalled()
+    expect(fn).toHaveBeenCalled()
   })
 })

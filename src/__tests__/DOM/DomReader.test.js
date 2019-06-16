@@ -1,18 +1,13 @@
 import { read } from './../../DOM/DomReader'
 import { el } from './../../DOM/Query'
 
+let richtext
+beforeEach(() => (richtext = el('div')))
+
 const effects = {
   bold: { tag: 'b' },
   styledBold: { tag: 'b', className: 'bold-style' },
   italic: { tag: 'i' },
-  highlight: {
-    tag: 'div',
-    className: 'text-highlight'
-  },
-  bigHeader: {
-    parent: true,
-    tag: 'h1'
-  },
   smallHeader: {
     tag: 'h2',
     className: 'header-style'
@@ -20,68 +15,90 @@ const effects = {
   anchor: {
     tag: 'a',
     href: '' // dynamic attribute
-  }
+  },
+  list: { tag: 'i' }
 }
 
 it('read from paragraph editors', () => {
-  const editor = el('p')
-    .append(el('b').val(el('i').val('hello')))
-    .append(' ')
-    .append(el('i').val('world'))
+  richtext.append(
+    el('p')
+      .append(el('b').val(el('i').val('hello')))
+      .append(' ')
+      .append(el('i').val('world'))
+  )
 
-  expect(read(effects, editor)).toEqual([
+  expect(read(effects, richtext.firstChild())).toEqual([
     { text: 'hello', effects: [effects.italic, effects.bold] },
     { text: ' ', effects: [] },
     { text: 'world', effects: [effects.italic] }
   ])
 })
 
-it('read from non paragraph editors', () => {
-  const editor = el('h1').val('Title')
-  expect(read(effects, editor)).toEqual([
-    { text: 'Title', effects: [effects.bigHeader] }
-  ])
-})
-
-it('take classNames into account for effect detection', () => {
-  const editor = el('h2')
-    .className('header-style')
-    .append(
-      el('b')
-        .val('Title')
-        .className('bold-style')
+it('find effects based on classNames', () => {
+  richtext.append(
+    el('p').append(
+      el('h2')
+        .className('header-style')
+        .append(
+          el('b')
+            .val('Title')
+            .className('bold-style')
+        )
     )
-  expect(read(effects, editor)).toEqual([
+  )
+  expect(read(effects, richtext.firstChild())).toEqual([
     { text: 'Title', effects: [effects.styledBold, effects.smallHeader] }
   ])
 })
 
-it('read empty', () => {
-  const editor = el('p')
-  expect(read(effects, editor)).toEqual([{ text: '', effects: [] }])
+it('read empty editor', () => {
+  richtext.append(el('p'))
+  expect(read(effects, richtext.firstChild())).toEqual([
+    { text: '', effects: [] }
+  ])
 })
 
-it('read paragraph with empty effects', () => {
-  expect(
-    read(effects, el('p').val(el('h2').className('header-style')))
-  ).toEqual([{ text: '', effects: [effects.smallHeader] }])
-})
-
-it('read empty parent effect', () => {
-  expect(read(effects, el('h1'))).toEqual([
-    { text: '', effects: [effects.bigHeader] }
+it('read editor with empty effects', () => {
+  richtext.append(el('p').val(el('h2').className('header-style')))
+  expect(read(effects, richtext.firstChild())).toEqual([
+    { text: '', effects: [effects.smallHeader] }
   ])
 })
 
 it('read anchor href', () => {
-  expect(
-    read(
-      effects,
-      el('p').append(
-        el('a')
-          .setAttribute('href', 'link')
-          .val('Hey')
-      )
+  richtext.append(
+    el('p').append(
+      el('a')
+        .setAttribute('href', 'link')
+        .val('Hey')
     )
-  ).toEqual([{ text: 'Hey', effects: [{ tag: 'a', href: 'link' }] }])
+  )
+  expect(read(effects, richtext.firstChild())).toEqual([
+    { text: 'Hey', effects: [{ tag: 'a', href: 'link' }] }
+  ])
+})
+
+it('read bolded anchor', () => {
+  richtext.append(
+    el('p').append(
+      el('b')
+        .append(
+          el('a')
+            .setAttribute('href', 'link')
+            .val('abc')
+        )
+        .append('def')
+    )
+  )
+  expect(read(effects, richtext.firstChild())).toEqual([
+    { text: 'abc', effects: [{ tag: 'a', href: 'link' }, effects.bold] },
+    { text: 'def', effects: [effects.bold] }
+  ])
+})
+
+it('read editor tag as effect', () => {
+  richtext.append(el('i').val('HelloWorld'))
+  expect(read(effects, richtext.firstChild())).toEqual([
+    { text: 'HelloWorld', effects: [effects.list] }
+  ])
 })
