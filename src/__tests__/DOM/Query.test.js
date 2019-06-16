@@ -152,7 +152,7 @@ describe('removing children', () => {
   })
 })
 
-describe('static content', () => {
+describe('val', () => {
   it('null val empties the content', () => {
     expect(
       el('p')
@@ -161,7 +161,7 @@ describe('static content', () => {
     ).toBe('')
   })
 
-  it('return textContent when val hos no argument', () => {
+  it('return textContent when hos no argument', () => {
     expect(
       el('p')
         .val('Hey')
@@ -169,13 +169,14 @@ describe('static content', () => {
     ).toBe('Hey')
   })
 
-  it('convert element type', () => {
-    const parent = el('div')
-    const li = el('li')
-      .val('some text')
-      .appendTo(parent)
-      .to('p')
-    expect(li.element.outerHTML).toBe('<p>some text</p>')
+  it('set value if element is input', () => {
+    expect(el('input').val('Hello').element.value).toBe('Hello')
+  })
+
+  it('return value if element is input', () => {
+    const input = document.createElement('input')
+    input.value = 'Hey'
+    expect(el(input).val()).toBe('Hey')
   })
 })
 
@@ -362,4 +363,13 @@ describe('styling', () => {
     expect(div.style.top).toBe('12px')
     expect(div.style.left).toBe('13px')
   })
+})
+
+it('convert element type', () => {
+  const parent = el('div')
+  const li = el('li')
+    .val('some text')
+    .appendTo(parent)
+    .to('p')
+  expect(li.element.outerHTML).toBe('<p>some text</p>')
 })

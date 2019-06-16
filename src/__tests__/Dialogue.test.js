@@ -88,3 +88,8 @@ describe('Canceling', () => {
     expect(fn).toHaveBeenCalled()
   })
 })
+
+it('show default value', () => {
+  showDialog(parent, { defaultValue: 'https://' })
+  expect(getByTestId(document, 'dialogue-input').value).toBe('https://')
+})

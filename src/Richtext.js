@@ -11,7 +11,10 @@ import * as Editor from './editor'
  * @returns {Function} The function that configures the given <div> or <article> element as the editor.
  */
 function create(effects) {
-  let staySelected = false
+  const richtextOptions = {
+    staySelected: false,
+    defaultLink: ''
+  }
 
   addDefaultEffects(effects)
   if (process.env.NODE_ENV === 'development') {
@@ -52,7 +55,11 @@ function create(effects) {
         end -= start
         start = 0
       }
-      Editor.setCursor(elements.active, staySelected ? start : end, end)
+      Editor.setCursor(
+        elements.active,
+        richtextOptions.staySelected ? start : end,
+        end
+      )
     }
 
     const styleSelectedOrAll = (type, listTag) => {
@@ -81,13 +88,22 @@ function create(effects) {
     }
 
     return {
-      staySelected: value => (staySelected = value),
+      setOptions: value => {
+        if (value.staySelected !== undefined) {
+          richtextOptions.staySelected = value.staySelected
+        }
+        if (value.defaultLink !== undefined) {
+          richtextOptions.defaultLink = value.defaultLink
+        }
+      },
       style: type => {
         ifReady((start, end, editor) => setStyle({ start, end, type, editor }))
       },
       styleLink: () => {
         ifReady((start, end, editor) => {
-          showDialog(richtext).succeeded(link => {
+          showDialog(richtext, {
+            defaultValue: richtextOptions.defaultLink
+          }).succeeded(link => {
             setStyle({
               start,
               end,

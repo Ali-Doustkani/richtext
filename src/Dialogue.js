@@ -1,6 +1,6 @@
 import { el } from './DOM'
 
-function showDialog(richtext) {
+function showDialog(richtext, options) {
   const border = createBorder()
   const input = border.firstChild()
   const saveButton = input.next()
@@ -12,7 +12,7 @@ function showDialog(richtext) {
   const succeeded = () => {
     close()
     if (succeededFunc) {
-      succeededFunc(border.firstChild().element.value)
+      succeededFunc(input.val())
     }
   }
   const canceled = () => {
@@ -29,6 +29,11 @@ function showDialog(richtext) {
       canceled()
     }
   })
+
+  if (options) {
+    input.val(options.defaultValue)
+  }
+
   saveButton.addListener('click', succeeded)
   cancelButton.addListener('click', canceled)
 

@@ -14,6 +14,7 @@ const richtext = createRichtext({
     className: 'header-style'
   }
 })(div)
+richtext.setOptions({ defaultLink: 'https://' })
 div.firstChild.focus()
 
 function wire(id, func) {
@@ -22,7 +23,7 @@ function wire(id, func) {
 }
 
 document.getElementById('staySelected').onchange = e => {
-  richtext.staySelected(e.target.checked)
+  richtext.setOptions({ staySelected: e.target.checked })
 }
 
 wire('bold', () => richtext.style('bold'))

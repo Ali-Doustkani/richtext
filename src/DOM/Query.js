@@ -56,14 +56,22 @@ class QueryElement {
 
   val(value) {
     if (value === undefined) {
-      return this.element.textContent
+      if (this.element instanceof HTMLInputElement) {
+        return this.element.value
+      } else {
+        return this.element.textContent
+      }
     }
     this.element.innerHTML = ''
     if (!value) {
       return this
     }
     if (typeof value === 'string') {
-      this.element.appendChild(document.createTextNode(value))
+      if (this.element instanceof HTMLInputElement) {
+        this.element.value = value
+      } else {
+        this.element.appendChild(document.createTextNode(value))
+      }
     } else if (value instanceof QueryElement) {
       this.append(value)
     } else {
