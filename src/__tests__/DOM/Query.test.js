@@ -373,3 +373,13 @@ it('convert element type', () => {
     .to('p')
   expect(li.element.outerHTML).toBe('<p>some text</p>')
 })
+
+it('take off the last outer most element', () => {
+  const parent = el('article')
+  const target = el('div')
+    .append(el('b').val('Hello'))
+    .append('World')
+    .appendTo(parent)
+  target.takeOff()
+  expect(parent.element.innerHTML).toBe('<b>Hello</b>World')
+})

@@ -34,10 +34,22 @@ describe('Showing', () => {
     showDialog(parent)
     expect(getByTestId(document, 'dialogue')).toBeVisible()
   })
+
+  it('show delete button in edit mode', () => {
+    showDialog(parent, { mode: 'edit' })
+    expect(getByText(document, 'Save')).toBeVisible()
+    expect(getByText(document, 'Delete')).toBeVisible()
+    expect(getByText(document, 'Cancel')).toBeVisible()
+  })
+
+  it('show default value', () => {
+    showDialog(parent, { defaultValue: 'https://' })
+    expect(getByTestId(document, 'dialogue-input').value).toBe('https://')
+  })
 })
 
 describe('Saving', () => {
-  it('callback', () => {
+  it('call callback', () => {
     const fn = jest.fn()
     showDialog(parent).succeeded(fn)
     getByTestId(document, 'dialogue-input').value = 'some link'
@@ -59,10 +71,26 @@ describe('Saving', () => {
     expect(queryByTestId(document, 'dialogue')).not.toBeInTheDocument()
     expect(fn).toHaveBeenCalledWith('Hello')
   })
+
+  it('save on edit mode', () => {
+    const fn = jest.fn()
+    showDialog(parent, { mode: 'edit', defaultValue: 'OldValue' }).succeeded(fn)
+    expect(getByTestId(document, 'dialogue-input').value).toBe('OldValue')
+    getByTestId(document, 'dialogue-input').value = 'NewValue'
+    getByText(document, 'Save').click()
+    expect(fn).toHaveBeenCalledWith('NewValue')
+  })
+
+  it('delete on edit mode', () => {
+    const fn = jest.fn()
+    showDialog(parent, { mode: 'edit' }).deleted(fn)
+    getByText(document, 'Delete').click()
+    expect(fn).toHaveBeenCalled()
+  })
 })
 
 describe('Canceling', () => {
-  it('callback', () => {
+  it('call callback', () => {
     const succeeded = jest.fn()
     const canceled = jest.fn()
     showDialog(parent)
@@ -87,9 +115,11 @@ describe('Canceling', () => {
     expect(queryByTestId(document, 'dialogue')).not.toBeInTheDocument()
     expect(fn).toHaveBeenCalled()
   })
-})
 
-it('show default value', () => {
-  showDialog(parent, { defaultValue: 'https://' })
-  expect(getByTestId(document, 'dialogue-input').value).toBe('https://')
+  it('cancel on edit mode', () => {
+    const fn = jest.fn()
+    showDialog(parent, { mode: 'edit' }).canceled(fn)
+    getByText(document, 'Cancel').click()
+    expect(fn).toHaveBeenCalled()
+  })
 })

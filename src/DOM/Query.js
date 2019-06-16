@@ -146,6 +146,14 @@ class QueryElement {
     return this
   }
 
+  takeOff() {
+    const parent = this.element.parentNode
+    while (this.element.childNodes.length) {
+      parent.insertBefore(this.element.firstChild, this.element)
+    }
+    parent.removeChild(this.element)
+  }
+
   className(classname) {
     this.element.className = classname
     return this

@@ -42,6 +42,22 @@ function create(effects) {
       true
     )
 
+    richtextElement.addEventListener('click', e => {
+      const target = el(e.target)
+      if (target.is('a')) {
+        showDialog(richtext, {
+          defaultValue: richtextOptions.defaultLink,
+          mode: 'edit'
+        })
+          .succeeded(link => {
+            target.setAttribute('href', link)
+          })
+          .deleted(() => {
+            target.takeOff()
+          })
+      }
+    })
+
     const setStyle = options => {
       let { start, end, type, listTag, editor } = options
       const elements = style(effects, start, end, type, editor)
@@ -99,7 +115,7 @@ function create(effects) {
       style: type => {
         ifReady((start, end, editor) => setStyle({ start, end, type, editor }))
       },
-      styleLink: () => {
+      styleLink: () =>
         ifReady((start, end, editor) => {
           showDialog(richtext, {
             defaultValue: richtextOptions.defaultLink
@@ -111,8 +127,7 @@ function create(effects) {
               editor
             })
           })
-        })
-      },
+        }),
       apply: type => styleSelectedOrAll(type),
       applyUnorderedList: () => styleSelectedOrAll('list', 'ul'),
       applyCodebox: () => styleSelectedOrAll('codebox'),

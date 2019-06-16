@@ -1,64 +1,64 @@
 import { el } from './DOM'
 
 function showDialog(richtext, options) {
-  const border = create()
-  const input = border.firstChild().firstChild()
-  const saveButton = input.next()
-  const cancelButton = saveButton.next()
-  let succeededFunc, canceledFunc
-
-  const close = () => richtext.parent().remove(border)
-  const open = () => richtext.parent().insertAfter(richtext, border)
-  const succeeded = () => {
-    close()
-    if (succeededFunc) {
-      succeededFunc(input.val())
-    }
-  }
-  const canceled = () => {
-    close()
-    if (canceledFunc) {
-      canceledFunc()
-    }
-  }
+  options = options || { mode: 'add', defaultValue: '' }
+  let succeedCallback, cancelCallback, deletCallback
+  const { dialogue, input, saveButton, deleteButton, cancelButton } = create(
+    options
+  )
 
   input.addListener('keyup', e => {
     if (e.key === 'Enter') {
       succeeded()
     } else if (e.key === 'Escape') {
-      canceled()
+      run(cancelCallback)
     }
   })
 
-  if (options) {
-    input.val(options.defaultValue)
-  }
-
-  border.element.addEventListener('click', e => {
-    if (border.is(e.target)) {
-      canceled()
+  dialogue.addListener('click', e => {
+    if (dialogue.is(e.target)) {
+      run(cancelCallback)
     }
   })
   saveButton.addListener('click', succeeded)
-  cancelButton.addListener('click', canceled)
+  cancelButton.addListener('click', () => run(cancelCallback))
+  if (options.mode === 'edit') {
+    deleteButton.addListener('click', () => run(deletCallback))
+  }
 
-  open()
+  richtext.parent().insertAfter(richtext, dialogue)
   input.element.focus()
+
+  function run(func, arg) {
+    richtext.parent().remove(dialogue)
+    if (func) {
+      func(arg)
+    }
+  }
+
+  function succeeded() {
+    run(succeedCallback, input.val())
+  }
 
   return {
     succeeded: function(callback) {
-      succeededFunc = callback
+      succeedCallback = callback
       return this
     },
     canceled: function(callback) {
-      canceledFunc = callback
+      cancelCallback = callback
+      return this
+    },
+    deleted: function(callback) {
+      deletCallback = callback
       return this
     }
   }
 }
 
-function create() {
+function create(options) {
   const input = el('input')
+  input.val(options.defaultValue)
   input.element.autofocus = true
   input.element.dataset.testid = 'dialogue-input'
 
@@ -67,7 +67,12 @@ function create() {
     .getRangeAt(0)
     .getBoundingClientRect()
 
-  const border = el('div')
+  const saveButton = el('button').val('Save')
+  const deleteButton =
+    options.mode === 'edit' ? el('button').val('Delete') : null
+  const cancelButton = el('button').val('Cancel')
+
+  const dialogue = el('div')
     .style({
       width: '100%',
       height: '100%',
@@ -81,16 +86,18 @@ function create() {
       el('div')
         .className('dialogue')
         .append(input)
-        .append(el('button').val('Save'))
-        .append(el('button').val('Cancel'))
+        .append(saveButton)
+        .append(deleteButton)
+        .append(cancelButton)
         .style({
           top: rect.top + rect.height + 3 + 'px',
           left: rect.left + 'px'
         })
     )
-  border.element.dataset.testid = 'dialogue'
 
-  return border
+  dialogue.element.dataset.testid = 'dialogue'
+
+  return { dialogue, input, saveButton, deleteButton, cancelButton }
 }
 
 export { showDialog }
