@@ -1,8 +1,8 @@
 import { el } from './DOM'
 
 function showDialog(richtext, options) {
-  const border = createBorder()
-  const input = border.firstChild()
+  const border = create()
+  const input = border.firstChild().firstChild()
   const saveButton = input.next()
   const cancelButton = saveButton.next()
   let succeededFunc, canceledFunc
@@ -34,6 +34,11 @@ function showDialog(richtext, options) {
     input.val(options.defaultValue)
   }
 
+  border.element.addEventListener('click', e => {
+    if (border.is(e.target)) {
+      canceled()
+    }
+  })
   saveButton.addListener('click', succeeded)
   cancelButton.addListener('click', canceled)
 
@@ -52,7 +57,7 @@ function showDialog(richtext, options) {
   }
 }
 
-function createBorder() {
+function create() {
   const input = el('input')
   input.element.autofocus = true
   input.element.dataset.testid = 'dialogue-input'
@@ -63,14 +68,26 @@ function createBorder() {
     .getBoundingClientRect()
 
   const border = el('div')
-    .className('dialogue')
-    .append(input)
-    .append(el('button').val('Save'))
-    .append(el('button').val('Cancel'))
     .style({
-      top: rect.top + rect.height + 3,
-      left: rect.left
+      width: '100%',
+      height: '100%',
+      background: 'rgba(0, 0, 0, 0.5)',
+      position: 'absolute',
+      top: '0',
+      left: '0',
+      'z-index': 1000
     })
+    .append(
+      el('div')
+        .className('dialogue')
+        .append(input)
+        .append(el('button').val('Save'))
+        .append(el('button').val('Cancel'))
+        .style({
+          top: rect.top + rect.height + 3 + 'px',
+          left: rect.left + 'px'
+        })
+    )
   border.element.dataset.testid = 'dialogue'
 
   return border

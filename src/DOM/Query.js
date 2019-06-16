@@ -262,8 +262,9 @@ class QueryElement {
   }
 
   style(styles) {
-    this.element.style.top = styles.top + 'px'
-    this.element.style.left = styles.left + 'px'
+    for (let prop in styles) {
+      this.element.style[prop] = styles[prop]
+    }
     return this
   }
 

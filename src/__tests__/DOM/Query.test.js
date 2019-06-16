@@ -359,7 +359,7 @@ describe('eventing', () => {
 
 describe('styling', () => {
   it('set top', () => {
-    const div = el('div').style({ top: 12, left: 13 }).element
+    const div = el('div').style({ top: '12px', left: '13px' }).element
     expect(div.style.top).toBe('12px')
     expect(div.style.left).toBe('13px')
   })
