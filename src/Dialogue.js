@@ -15,11 +15,14 @@ function showDialog(richtext, options) {
     }
   })
 
-  dialogue.addListener('click', e => {
-    if (dialogue.is(e.target)) {
+  let targetOnMouseDown
+  dialogue.addListener('mousedown', e => (targetOnMouseDown = e.target))
+  dialogue.addListener('mouseup', e => {
+    if (dialogue.is(e.target) && dialogue.is(targetOnMouseDown)) {
       run(cancelCallback)
     }
   })
+
   saveButton.addListener('click', succeeded)
   cancelButton.addListener('click', () => run(cancelCallback))
   if (options.mode === 'edit') {
