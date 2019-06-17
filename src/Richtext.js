@@ -86,7 +86,7 @@ function create(effects) {
       let { start, end } = relativeRange(editor)
       if (start === end) {
         start = 0
-        end = el.active().length
+        end = el.active().textLength
       }
       setStyle({ start, end, type, listTag, editor })
     }

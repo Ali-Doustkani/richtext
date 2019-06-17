@@ -295,7 +295,7 @@ class QueryElement {
     return this
   }
 
-  get length() {
+  get textLength() {
     return this.element.textContent.length
   }
 }

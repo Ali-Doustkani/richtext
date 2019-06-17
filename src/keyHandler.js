@@ -28,7 +28,7 @@ function backspaceKey(event, effects, richtext) {
   }
   event.preventDefault()
   const prevEditor = Editor.previousEditor(editor)
-  const len = prevEditor.length
+  const len = prevEditor.textLength
   const renderModels = glue(read(effects, prevEditor), read(effects, editor))
   render({
     richtext,
@@ -45,7 +45,7 @@ function deleteKey(event, effects, richtext) {
   }
   event.preventDefault()
 
-  const len = editor.length
+  const len = editor.textLength
   const nextEditor = Editor.nextEditor(editor)
   const renderModel = glue(read(effects, editor), read(effects, nextEditor))
   render({
@@ -68,7 +68,7 @@ function arrowUp(event) {
 function arrowDown(event) {
   const editor = el.active()
   const relRange = relativeRange(editor)
-  const len = editor.length
+  const len = editor.textLength
   if (relRange.start === len && relRange.end === len) {
     event.preventDefault()
     Editor.focusNext(editor)
