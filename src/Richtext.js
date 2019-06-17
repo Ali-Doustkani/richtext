@@ -4,6 +4,7 @@ import { style } from './Stylist'
 import { showDialog } from './Dialogue'
 import * as Handle from './keyHandler'
 import * as Editor from './editor'
+import { importImage } from './image'
 
 /**
  * It creates a configurator function based on the effects.
@@ -131,7 +132,8 @@ function create(effects) {
       apply: type => styleSelectedOrAll(type),
       applyUnorderedList: () => styleSelectedOrAll('list', 'ul'),
       applyCodebox: () => styleSelectedOrAll('codebox'),
-      applyOrderedList: () => styleSelectedOrAll('list', 'ol')
+      applyOrderedList: () => styleSelectedOrAll('list', 'ol'),
+      selectImage: () => importImage(richtext)
     }
   }
 }
