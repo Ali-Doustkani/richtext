@@ -1,4 +1,4 @@
-import { areEqual, remove, merge } from './utils'
+import { areEqual } from './utils'
 
 function create(result, head) {
   return Object.freeze({
@@ -103,6 +103,26 @@ function createContext(from, to) {
   }
 
   return ret
+}
+
+// remove the element from array
+function remove(array, element) {
+  return array.filter(item => item !== element)
+}
+
+// add the element to array if it's not already there
+function merge(array, element) {
+  if (!array) {
+    return [element]
+  }
+  return [...array.filter(item => !effectsEqual(item, element)), element]
+}
+
+function effectsEqual(effect1, effect2) {
+  if (effect1 === effect2) {
+    return true
+  }
+  return effect1.tag === effect2.tag && effect1.className === effect2.className
 }
 
 export default createContext

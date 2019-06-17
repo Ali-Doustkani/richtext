@@ -333,6 +333,26 @@ describe('when applying multiple styles', () => {
       { text: 'r', effects: [], active: false }
     ])
   })
+
+  it('ignore hrefs when re-applying anchors', () => {
+    expect(
+      style({
+        type: { tag: 'a', href: 'link2' },
+        input: [
+          { text: 'Hello', effects: [{ tag: 'a', href: 'link1' }] },
+          { text: 'World', effects: [] }
+        ],
+        from: 0,
+        to: 10
+      })
+    ).toEqual([
+      {
+        text: 'HelloWorld',
+        effects: [{ tag: 'a', href: 'link2' }],
+        active: true
+      }
+    ])
+  })
 })
 
 describe('when input is empty', () => {

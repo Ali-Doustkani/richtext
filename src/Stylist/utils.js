@@ -29,19 +29,6 @@ function when(condition) {
   return thenObj
 }
 
-// remove the element from array
-function remove(array, element) {
-  return array.filter(item => item !== element)
-}
-
-// add the element to array if it's not already there
-function merge(array, element) {
-  if (!array) {
-    return [element]
-  }
-  return [...array.filter(item => item !== element), element]
-}
-
 /**
  * Checks the equality of two different effect arrays.
  * @param {Array} first   First effects array.
@@ -63,4 +50,4 @@ function areEqual(first, second) {
   return first.every(item => second.includes(item))
 }
 
-export { remove, merge, areEqual, when }
+export { when, areEqual }
