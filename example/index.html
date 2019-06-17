@@ -6,15 +6,16 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Richtext</title>
     <style>
-      pre{
+      pre {
         background-color: rgb(50, 50, 50);
         color: white;
       }
       #editor {
-        background-color: rgba(255, 255, 255, 0.89);
         border: 1px solid black;
         margin: 0 10px;
         padding: 5px;
+        height: 500px;
+        overflow: scroll;
       }
       #editor > p {
         cursor: text;
@@ -25,6 +26,11 @@
       }
       .header-style {
         background-color: salmon;
+      }
+      .dialogue {
+        position: absolute;
+        padding: 10px;
+        background: orangered;
       }
     </style>
   </head>
@@ -37,6 +43,7 @@
     <button id="codebox">Code Box</button>
     <button id="list">List</button>
     <button id="orderedList">Ordered List</button>
+    <button id="hyperlink">Hyperlink</button>
     <label>
       Stay Selected
       <input type="checkbox" id="staySelected" />

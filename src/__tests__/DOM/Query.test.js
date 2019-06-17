@@ -152,7 +152,7 @@ describe('removing children', () => {
   })
 })
 
-describe('static content', () => {
+describe('val', () => {
   it('null val empties the content', () => {
     expect(
       el('p')
@@ -161,7 +161,7 @@ describe('static content', () => {
     ).toBe('')
   })
 
-  it('return textContent when val hos no argument', () => {
+  it('return textContent when hos no argument', () => {
     expect(
       el('p')
         .val('Hey')
@@ -169,21 +169,33 @@ describe('static content', () => {
     ).toBe('Hey')
   })
 
+  it('set value if element is input', () => {
+    expect(el('input').val('Hello').element.value).toBe('Hello')
+  })
+
+  it('return value if element is input', () => {
+    const input = document.createElement('input')
+    input.value = 'Hey'
+    expect(el(input).val()).toBe('Hey')
+  })
+})
+
+describe('attributes', () => {
   it('set classs name', () => {
     expect(owner.className('owner-style').element.outerHTML).toBe(
       '<div class="owner-style"></div>'
     )
   })
 
-  it('set class from an object', () => {
+  it('set attributes from an object', () => {
     expect(
-      owner.append(el('p').setClassFrom(undefined)).element.innerHTML
+      owner.append(el('p').setAttributeFrom(undefined)).element.innerHTML
     ).toBe('<p></p>')
-    expect(owner.append(el('p').setClassFrom({})).element.innerHTML).toBe(
+    expect(owner.append(el('p').setAttributeFrom({})).element.innerHTML).toBe(
       '<p></p><p></p>'
     )
     expect(
-      owner.append(el('p').setClassFrom({ className: 'style' })).element
+      owner.append(el('p').setAttributeFrom({ className: 'style' })).element
         .innerHTML
     ).toBe('<p></p><p></p><p class="style"></p>')
   })
@@ -193,13 +205,20 @@ describe('static content', () => {
     expect(el('p').isEditable().element.contentEditable).toBe(true)
   })
 
-  it('convert element type', () => {
-    const parent = el('div')
-    const li = el('li')
-      .val('some text')
-      .appendTo(parent)
-      .to('p')
-    expect(li.element.outerHTML).toBe('<p>some text</p>')
+  it('set attributes value', () => {
+    expect(
+      el('p')
+        .setAttribute('data-id', '123')
+        .val('Hey').element.outerHTML
+    ).toBe('<p data-id="123">Hey</p>')
+  })
+
+  it('get attributes value', () => {
+    expect(
+      el('p')
+        .setAttribute('data-id', '123')
+        .getAttribute('data-id')
+    ).toBe('123')
   })
 })
 
@@ -298,5 +317,106 @@ describe('navigationals', () => {
     const p = el('p').appendTo(owner)
     const pre = el('pre').appendTo(owner)
     expect(pre.previousIs(p)).toBe(true)
+  })
+
+  it('loops through children', () => {
+    const hello = el('b').val('Hello')
+    const world = el('i').val('World')
+    const p = el('p')
+      .append(hello)
+      .append(world)
+    const result = []
+    p.forChildren(child => result.push(child))
+    expect(result.length).toBe(2)
+    expect(result[0].element).toBe(hello.element)
+    expect(result[1].element).toBe(world.element)
+  })
+})
+
+describe('eventing', () => {
+  it('add event listener', () => {
+    const clickEvent = new Event('click')
+    const fn = jest.fn()
+    const btn = el('button').addListener('click', fn)
+
+    btn.element.dispatchEvent(clickEvent)
+
+    expect(fn).toHaveBeenCalled()
+  })
+
+  it('remove event listener', () => {
+    const clickEvent = new Event('click')
+    const fn = jest.fn()
+    const btn = el('button')
+      .addListener('click', fn)
+      .removeListener('click', fn)
+
+    btn.element.dispatchEvent(clickEvent)
+
+    expect(fn).not.toHaveBeenCalled()
+  })
+})
+
+describe('styling', () => {
+  it('set top', () => {
+    const div = el('div').style({ top: '12px', left: '13px' }).element
+    expect(div.style.top).toBe('12px')
+    expect(div.style.left).toBe('13px')
+  })
+})
+
+it('convert element type', () => {
+  const parent = el('div')
+  const li = el('li')
+    .val('some text')
+    .appendTo(parent)
+    .to('p')
+  expect(li.element.outerHTML).toBe('<p>some text</p>')
+})
+
+it('take off the last outer most element', () => {
+  const parent = el('article')
+  const target = el('div')
+    .append(el('b').val('Hello'))
+    .append('World')
+    .appendTo(parent)
+  target.takeOff()
+  expect(parent.element.innerHTML).toBe('<b>Hello</b>World')
+})
+
+describe('hasTheSameTag', () => {
+  it('return false when one arg is null', () => {
+    expect(el.hasTheSameTag(null, el('p'))).toBe(false)
+    expect(el.hasTheSameTag(el('p'), null)).toBe(false)
+  })
+
+  it('return false when one arg is text', () => {
+    const text = el(document.createTextNode('Hey'))
+    expect(el.hasTheSameTag(text, el('p'))).toBe(false)
+    expect(el.hasTheSameTag(el('p'), text)).toBe(false)
+  })
+
+  it('compare tags', () => {
+    expect(el.hasTheSameTag(el('p'), el('p'))).toBe(true)
+    expect(el.hasTheSameTag(el('p'), el('b'))).toBe(false)
+  })
+})
+
+describe('parentOf', () => {
+  it('return parent when exists', () => {
+    const target = el('a')
+    el('div').append(
+      el('p')
+        .setAttribute('data-test', 'set')
+        .append('b')
+        .append(target)
+    )
+    expect(el.parentOf(target, 'p').getAttribute('data-test')).toBe('set')
+  })
+
+  it('return null when does not exist', () => {
+    const target = el('a')
+    el('div').append(target)
+    expect(el.parentOf(target, 'p')).toBe(null)
   })
 })

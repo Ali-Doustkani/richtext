@@ -1,12 +1,13 @@
 import { style as _style } from './Stylist'
 import { glue as _glue, breakAt as _breakAt } from './Break'
-import { generateRenderModel, el, read } from './../DOM'
+import { generateRenderModel, read } from './../DOM'
 
-function style(effects, start, end, styleName) {
+function style(effects, start, end, styleName, editor) {
+  const ef = typeof styleName === 'string' ? effects[styleName] : styleName
   return generateRenderModel(
     _style({
-      type: effects[styleName],
-      input: read(effects, el(document.activeElement)),
+      type: ef,
+      input: read(effects, editor),
       from: start,
       to: end
     })

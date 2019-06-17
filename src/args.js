@@ -67,6 +67,10 @@ function addDefaultEffects(effects) {
     parent: true,
     tag: 'pre'
   }
+  effects.anchor = {
+    tag: 'a',
+    href: ''
+  }
 }
 
 export { checkEffects, checkEditor, addDefaultEffects }

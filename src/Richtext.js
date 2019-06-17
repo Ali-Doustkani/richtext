@@ -1,6 +1,7 @@
 import { checkEffects, checkEditor, addDefaultEffects } from './args'
 import { el, render, relativeRange } from './DOM'
 import { style } from './Stylist'
+import { showDialog } from './Dialogue'
 import * as Handle from './keyHandler'
 import * as Editor from './editor'
 
@@ -10,7 +11,10 @@ import * as Editor from './editor'
  * @returns {Function} The function that configures the given <div> or <article> element as the editor.
  */
 function create(effects) {
-  let staySelected = false
+  const richtextOptions = {
+    staySelected: false,
+    defaultLink: ''
+  }
 
   addDefaultEffects(effects)
   if (process.env.NODE_ENV === 'development') {
@@ -38,22 +42,43 @@ function create(effects) {
       true
     )
 
-    const setStyle = (start, end, styleName, listTag) => {
-      const elements = style(effects, start, end, styleName)
+    richtextElement.addEventListener('click', e => {
+      const anchor = el.parentOf(el(e.target), 'a')
+      if (anchor) {
+        showDialog(richtext, {
+          defaultValue: anchor.getAttribute('href'),
+          mode: 'edit'
+        })
+          .succeeded(link => {
+            anchor.setAttribute('href', link)
+          })
+          .deleted(() => {
+            anchor.takeOff()
+          })
+      }
+    })
+
+    const setStyle = options => {
+      let { start, end, type, listTag, editor } = options
+      const elements = style(effects, start, end, type, editor)
       render({
         richtext,
-        editors: el.active(),
+        editors: editor,
         elements: elements.list,
         listTag
       })
-      if (effects[styleName].parent) {
+      if (typeof type === 'string' && effects[type].parent) {
         end -= start
         start = 0
       }
-      Editor.setCursor(elements.active, staySelected ? start : end, end)
+      Editor.setCursor(
+        elements.active,
+        richtextOptions.staySelected ? start : end,
+        end
+      )
     }
-    const styleSelectedOrAll = (styleName, listTag) => {
 
+    const styleSelectedOrAll = (type, listTag) => {
       const editor = el.active()
       if (Editor.isNotEditor(richtext, editor)) {
         return
@@ -61,22 +86,49 @@ function create(effects) {
       let { start, end } = relativeRange(editor)
       if (start === end) {
         start = 0
-        end = el.active().length
+        end = el.active().textLength
       }
-      setStyle(start, end, styleName, listTag)
+      setStyle({ start, end, type, listTag, editor })
+    }
+
+    const ifReady = func => {
+      const editor = el.active()
+      if (Editor.isNotEditor(richtext, editor)) {
+        return
+      }
+      const { start, end } = relativeRange(editor)
+      if (start === end) {
+        return
+      }
+      func(start, end, editor)
     }
 
     return {
-      staySelected: value => (staySelected = value),
-      style: styleName => {
-        const editor = el.active()
-        if (Editor.isNotEditor(richtext, editor)) {
-          return
+      setOptions: value => {
+        if (value.staySelected !== undefined) {
+          richtextOptions.staySelected = value.staySelected
         }
-        const { start, end } = relativeRange(editor)
-        setStyle(start, end, styleName)
+        if (value.defaultLink !== undefined) {
+          richtextOptions.defaultLink = value.defaultLink
+        }
       },
-      apply: styleName => styleSelectedOrAll(styleName),
+      style: type => {
+        ifReady((start, end, editor) => setStyle({ start, end, type, editor }))
+      },
+      styleLink: () =>
+        ifReady((start, end, editor) => {
+          showDialog(richtext, {
+            defaultValue: richtextOptions.defaultLink
+          }).succeeded(link => {
+            setStyle({
+              start,
+              end,
+              type: { tag: 'a', href: link },
+              editor
+            })
+          })
+        }),
+      apply: type => styleSelectedOrAll(type),
       applyUnorderedList: () => styleSelectedOrAll('list', 'ul'),
       applyCodebox: () => styleSelectedOrAll('codebox'),
       applyOrderedList: () => styleSelectedOrAll('list', 'ol')

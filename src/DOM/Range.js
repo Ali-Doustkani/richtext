@@ -20,13 +20,13 @@ function relativeRange(rootEl, docRange) {
     enoughReadingForStart = false,
     endOffset = 0
 
-  const incrementEndOffset = node => (endOffset += node.val().length)
+  const incrementEndOffset = node => (endOffset += node.textLength)
   const incrementStartOffset = node => {
     if (node.is(docRange.startContainer)) {
       enoughReadingForStart = true
     }
     if (!enoughReadingForStart) {
-      startOffset += node.val().length
+      startOffset += node.textLength
     }
   }
 
@@ -74,8 +74,8 @@ function absoluteRange(rootEl, selection) {
     startOffset,
     endOffset
   while (!startContainer || !endContainer) {
-    read += node.val().length
-    const r = read - node.val().length
+    read += node.textLength
+    const r = read - node.textLength
     if (!startContainer && read >= selection.start) {
       startContainer = node.element
       startOffset = selection.start - r

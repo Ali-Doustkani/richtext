@@ -19,6 +19,25 @@ el.withTag = function(queryElement) {
   return el(queryElement.element.tagName)
 }
 
+el.hasTheSameTag = function(queryElement1, queryElement2) {
+  if (
+    queryElement1 &&
+    queryElement1.element &&
+    queryElement2 &&
+    queryElement2.element
+  ) {
+    return queryElement1.element.tagName === queryElement2.element.tagName
+  }
+  return false
+}
+
+el.parentOf = function(queryElement, tagName) {
+  while (queryElement && queryElement.isNot(tagName)) {
+    queryElement = queryElement.parent()
+  }
+  return queryElement
+}
+
 class QueryElement {
   constructor(element) {
     this.element = element
@@ -56,14 +75,22 @@ class QueryElement {
 
   val(value) {
     if (value === undefined) {
-      return this.element.textContent
+      if (this.element instanceof HTMLInputElement) {
+        return this.element.value
+      } else {
+        return this.element.textContent
+      }
     }
     this.element.innerHTML = ''
     if (!value) {
       return this
     }
     if (typeof value === 'string') {
-      this.element.appendChild(document.createTextNode(value))
+      if (this.element instanceof HTMLInputElement) {
+        this.element.value = value
+      } else {
+        this.element.appendChild(document.createTextNode(value))
+      }
     } else if (value instanceof QueryElement) {
       this.append(value)
     } else {
@@ -138,14 +165,34 @@ class QueryElement {
     return this
   }
 
+  takeOff() {
+    const parent = this.element.parentNode
+    while (this.element.childNodes.length) {
+      parent.insertBefore(this.element.firstChild, this.element)
+    }
+    parent.removeChild(this.element)
+  }
+
   className(classname) {
     this.element.className = classname
     return this
   }
 
-  setClassFrom(obj) {
-    if (obj && obj.className) {
-      this.element.className = obj.className
+  getAttribute(name) {
+    return this.element.getAttribute(name)
+  }
+
+  setAttribute(name, value) {
+    this.element.setAttribute(name, value)
+    return this
+  }
+
+  setAttributeFrom(obj) {
+    if (obj) {
+      const attributes = Object.keys(obj).filter(x => x !== 'tag')
+      attributes.forEach(attrib => {
+        this.element[attrib] = obj[attrib]
+      })
     }
     return this
   }
@@ -201,6 +248,12 @@ class QueryElement {
     return el(this.element.lastChild)
   }
 
+  forChildren(callback) {
+    for (let i = 0; i < this.element.childNodes.length; i++) {
+      callback(el(this.element.childNodes[i]))
+    }
+  }
+
   next() {
     return el(this.element.nextSibling)
   }
@@ -225,7 +278,24 @@ class QueryElement {
     return !this.hasChildren()
   }
 
-  get length() {
+  addListener(event, listener) {
+    this.element.addEventListener(event, listener)
+    return this
+  }
+
+  removeListener(event, listener) {
+    this.element.removeEventListener(event, listener)
+    return this
+  }
+
+  style(styles) {
+    for (let prop in styles) {
+      this.element.style[prop] = styles[prop]
+    }
+    return this
+  }
+
+  get textLength() {
     return this.element.textContent.length
   }
 }
