@@ -46,7 +46,7 @@ function create(effects) {
       const anchor = el.parentOf(el(e.target), 'a')
       if (anchor) {
         showDialog(richtext, {
-          defaultValue: richtextOptions.defaultLink,
+          defaultValue: anchor.getAttribute('href'),
           mode: 'edit'
         })
           .succeeded(link => {
