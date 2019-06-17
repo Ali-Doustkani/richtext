@@ -4,6 +4,9 @@ const effects = {
   bold: {
     tag: 'b'
   },
+  italic: {
+    tag: 'i'
+  },
   highlight: {
     tag: 'span',
     className: 'text-highlight'
@@ -19,15 +22,15 @@ const effects = {
   }
 }
 
-it('model empty style model', () => {
+it('model empty', () => {
   const model = generateRenderModel([])
   expect(model.list.length).toBe(1)
   expect(model.active).toBe(model.list[0])
   expect(model.list[0].element.outerHTML).toBe('<p></p>')
 })
 
-it('model empty paragraphs with null child', () => {
-  let model = generateRenderModel([{ text: '' }])
+it('model empty paragraphs', () => {
+  let model = generateRenderModel([{ text: '', effects: [] }])
   expect(model.list.length).toBe(1)
 
   model = generateRenderModel([{ text: '', effects: [effects.bold] }])
@@ -35,7 +38,9 @@ it('model empty paragraphs with null child', () => {
 })
 
 it('model simple text', () => {
-  const model = generateRenderModel([{ text: 'hello world', active: true }])
+  const model = generateRenderModel([
+    { text: 'hello world', effects: [], active: true }
+  ])
   expect(model.list.length).toBe(1)
   expect(model.active).toBe(model.list[0])
   expect(model.list[0].element.outerHTML).toBe('<p>hello world</p>')
@@ -52,7 +57,7 @@ it('model two items with different effects', () => {
   )
 })
 
-it('model two items with some effects intersection', () => {
+it('model two items with some effects in common', () => {
   const model = generateRenderModel([
     {
       text: 'Hello',
@@ -71,7 +76,7 @@ it('model two items with some effects intersection', () => {
 it('model parent effect beginning with paragraph', () => {
   const model = generateRenderModel([
     { text: 'Title', effects: [effects.bigHeader, effects.bold], active: true },
-    { text: 'Content', active: false }
+    { text: 'Content', effects: [], active: false }
   ])
   expect(model.list.length).toBe(2)
   expect(model.active).toBe(model.list[0])
@@ -82,7 +87,7 @@ it('model parent effect beginning with paragraph', () => {
 
 it('model parent effect ending with paragraph', () => {
   const model = generateRenderModel([
-    { text: 'Content', active: true },
+    { text: 'Content', effects: [], active: true },
     { text: 'Title', effects: [effects.smallHeader], active: false }
   ])
   expect(model.list.length).toBe(2)
@@ -95,9 +100,9 @@ it('model parent effect ending with paragraph', () => {
 
 it('model parent effect surrounded by paragraphs', () => {
   const model = generateRenderModel([
-    { text: 'Content1', active: false },
+    { text: 'Content1', effects: [], active: false },
     { text: 'Title', effects: [effects.bigHeader], active: false },
-    { text: 'Content2', active: true }
+    { text: 'Content2', effects: [], active: true }
   ])
   expect(model.list.length).toBe(3)
   expect(model.list[0].element.outerHTML).toBe('<p>Content1</p>')
@@ -108,8 +113,8 @@ it('model parent effect surrounded by paragraphs', () => {
 
 it('model empty effects', () => {
   const model = generateRenderModel([
-    { text: 'Hello', active: true },
-    { text: 'World', active: false }
+    { text: 'Hello', effects: [], active: true },
+    { text: 'World', effects: [], active: false }
   ])
 
   expect(model.list.length).toBe(1)
@@ -120,9 +125,42 @@ it('model empty effects', () => {
 it('model anchors', () => {
   const model = generateRenderModel([
     { text: 'Hello', effects: [{ tag: 'a', href: 'link' }] },
-    { text: 'World' }
+    { text: 'World', effects: [] }
   ])
   expect(model.list[0].element.outerHTML).toBe(
     '<p><a href="link">Hello</a>World</p>'
+  )
+})
+
+it('merge anchors in a single node', () => {
+  const model = generateRenderModel([
+    { text: 'Hello', effects: [effects.bold, { tag: 'a', href: 'link' }] },
+    { text: 'World', effects: [{ tag: 'a', href: 'link' }] }
+  ])
+  expect(model.list[0].element.innerHTML).toBe(
+    '<a href="link"><b>Hello</b>World</a>'
+  )
+})
+
+it('do not merge anchors with different hrefs', () => {
+  const model = generateRenderModel([
+    { text: 'Hello', effects: [effects.bold, { tag: 'a', href: 'link1' }] },
+    { text: 'World', effects: [{ tag: 'a', href: 'link2' }] }
+  ])
+  expect(model.list[0].element.innerHTML).toBe(
+    '<a href="link1"><b>Hello</b></a><a href="link2">World</a>'
+  )
+})
+
+it('put the anchor the last wrapper', () => {
+  const model = generateRenderModel([
+    {
+      text: 'Hello',
+      effects: [effects.bold, { tag: 'a', href: 'link' }, effects.italic]
+    },
+    { text: 'World', effects: [{ tag: 'a', href: 'link' }, effects.highlight] }
+  ])
+  expect(model.list[0].element.innerHTML).toBe(
+    '<a href="link"><i><b>Hello</b></i><span class="text-highlight">World</span></a>'
   )
 })

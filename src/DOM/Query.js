@@ -19,6 +19,25 @@ el.withTag = function(queryElement) {
   return el(queryElement.element.tagName)
 }
 
+el.hasTheSameTag = function(queryElement1, queryElement2) {
+  if (
+    queryElement1 &&
+    queryElement1.element &&
+    queryElement2 &&
+    queryElement2.element
+  ) {
+    return queryElement1.element.tagName === queryElement2.element.tagName
+  }
+  return false
+}
+
+el.parentOf = function(queryElement, tagName) {
+  while (queryElement && queryElement.isNot(tagName)) {
+    queryElement = queryElement.parent()
+  }
+  return queryElement
+}
+
 class QueryElement {
   constructor(element) {
     this.element = element

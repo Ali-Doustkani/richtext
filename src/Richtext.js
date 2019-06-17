@@ -43,17 +43,17 @@ function create(effects) {
     )
 
     richtextElement.addEventListener('click', e => {
-      const target = el(e.target)
-      if (target.is('a')) {
+      const anchor = el.parentOf(el(e.target), 'a')
+      if (anchor) {
         showDialog(richtext, {
           defaultValue: richtextOptions.defaultLink,
           mode: 'edit'
         })
           .succeeded(link => {
-            target.setAttribute('href', link)
+            anchor.setAttribute('href', link)
           })
           .deleted(() => {
-            target.takeOff()
+            anchor.takeOff()
           })
       }
     })

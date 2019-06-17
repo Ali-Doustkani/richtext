@@ -25,8 +25,10 @@ describe('styling', () => {
 
     cy.get('#editor').shouldHaveHtml(`
       <p contenteditable="true">
-        <b><i>Hello</i></b>
-        <b>World</b>
+        <b>
+          <i>Hello</i>
+          World
+        </b>
       </p>`)
   })
 

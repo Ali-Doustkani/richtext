@@ -383,3 +383,40 @@ it('take off the last outer most element', () => {
   target.takeOff()
   expect(parent.element.innerHTML).toBe('<b>Hello</b>World')
 })
+
+describe('hasTheSameTag', () => {
+  it('return false when one arg is null', () => {
+    expect(el.hasTheSameTag(null, el('p'))).toBe(false)
+    expect(el.hasTheSameTag(el('p'), null)).toBe(false)
+  })
+
+  it('return false when one arg is text', () => {
+    const text = el(document.createTextNode('Hey'))
+    expect(el.hasTheSameTag(text, el('p'))).toBe(false)
+    expect(el.hasTheSameTag(el('p'), text)).toBe(false)
+  })
+
+  it('compare tags', () => {
+    expect(el.hasTheSameTag(el('p'), el('p'))).toBe(true)
+    expect(el.hasTheSameTag(el('p'), el('b'))).toBe(false)
+  })
+})
+
+describe('parentOf', () => {
+  it('return parent when exists', () => {
+    const target = el('a')
+    el('div').append(
+      el('p')
+        .setAttribute('data-test', 'set')
+        .append('b')
+        .append(target)
+    )
+    expect(el.parentOf(target, 'p').getAttribute('data-test')).toBe('set')
+  })
+
+  it('return null when does not exist', () => {
+    const target = el('a')
+    el('div').append(target)
+    expect(el.parentOf(target, 'p')).toBe(null)
+  })
+})

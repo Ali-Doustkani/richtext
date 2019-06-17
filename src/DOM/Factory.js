@@ -44,17 +44,19 @@ function generateRenderModel(styleModel) {
   }
 
   styleModel.forEach(item => {
-    let children = item.text
-    const nonParentEffects = (item.effects || []).filter(x => !x.parent)
-    if (nonParentEffects.length) {
-      nonParentEffects.forEach(
-        effect =>
-          (children = el(effect.tag)
-            .setAttributeFrom(effect)
-            .val(children))
-      )
+    let child = item.text
+    const setChild = effect =>
+      (child = el(effect.tag)
+        .setAttributeFrom(effect)
+        .val(child))
+    item.effects.filter(x => !x.parent && x.tag !== 'a').forEach(setChild)
+    item.effects.filter(x => !x.parent && x.tag === 'a').forEach(setChild)
+    const editor = editorOf(item)
+    if (mergeable(editor.lastChild(), child)) {
+      child.moveChildrenTo(editor.lastChild())
+    } else {
+      editor.append(child)
     }
-    editorOf(item).append(children)
   })
 
   return { list, active }
@@ -63,6 +65,14 @@ function generateRenderModel(styleModel) {
 function empty() {
   const p = createNewEditor()
   return { list: [p], active: p }
+}
+
+function mergeable(el1, el2) {
+  const theSame = el.hasTheSameTag(el1, el2)
+  if (theSame && el1.is('a')) {
+    return el1.getAttribute('href') === el2.getAttribute('href')
+  }
+  return theSame
 }
 
 export { generateRenderModel, createNewEditor }
