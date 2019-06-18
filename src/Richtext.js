@@ -133,7 +133,7 @@ function create(effects) {
       applyUnorderedList: () => styleSelectedOrAll('list', 'ul'),
       applyCodebox: () => styleSelectedOrAll('codebox'),
       applyOrderedList: () => styleSelectedOrAll('list', 'ol'),
-      selectImage: () => importImage(richtext)
+      selectImage: () => importImage(richtext, effects)
     }
   }
 }

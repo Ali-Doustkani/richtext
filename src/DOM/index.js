@@ -7,6 +7,6 @@ function relativeRange(editor) {
 export { read } from './DomReader'
 export { generateRenderModel, createNewEditor } from './Factory'
 export { el } from './Query'
-export { render } from './Renderer'
+export { render, renderImage } from './Renderer'
 export { absoluteRange } from './Range'
 export { relativeRange }

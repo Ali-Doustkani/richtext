@@ -1,5 +1,28 @@
 import { el } from './Query'
 
+function renderImage(params) {
+  const { richtext, editor, elements } = params
+  if (editor) {
+    if (elements.some(x => x.is('li'))) {
+      const list = editor.parent()
+      const rest = list.removeFrom(editor).splice(1)
+      list.append(elements[0])
+      richtext.insertAfter(list, elements[1])
+      richtext.insertAfter(
+        elements[1],
+        el
+          .withTag(list)
+          .append(elements[2])
+          .append(rest)
+      )
+    } else {
+      richtext.insertBefore(editor, elements).remove(editor)
+    }
+  } else {
+    richtext.append(elements[0])
+  }
+}
+
 function render(params) {
   let { richtext, editors, elements, listTag } = params
   editors = Array.isArray(editors) ? editors : [editors]
@@ -141,4 +164,4 @@ function modifyListItem(listItem, element) {
   listItem.remove()
 }
 
-export { render }
+export { renderImage, render }

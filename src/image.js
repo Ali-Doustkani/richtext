@@ -1,6 +1,7 @@
-import { el } from './DOM'
+import { el, renderImage, read, relativeRange } from './DOM'
+import { breakAt } from './Stylist'
 
-function importImage(richtext) {
+function importImage(richtext, effects) {
   const currentEdit = el.active()
   const input = el('input')
     .setAttribute('type', 'file')
@@ -15,9 +16,19 @@ function importImage(richtext) {
       () => {
         const img = createImage(reader.result)
         if (currentEdit) {
-          richtext.insertAfter(currentEdit, img)
+          const renderModel = breakAt(
+            read(effects, currentEdit),
+            relativeRange(currentEdit)
+          )
+          renderModel.list.splice(1, 0, img)
+          renderImage({
+            richtext,
+            editor: currentEdit,
+            elements: renderModel.list
+          })
+          renderModel.active.element.focus()
         } else {
-          richtext.append(img)
+          renderImage({ richtext, elements: [img] })
         }
       },
       false
