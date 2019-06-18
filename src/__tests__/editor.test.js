@@ -64,108 +64,169 @@ describe('checking editor gluing with delete', () => {
   })
 })
 
-describe('previous editor', () => {
+describe('navigating from <li>s', () => {
   let richtext
-  let editor
-  beforeEach(() => (richtext = el('div')))
+  beforeEach(
+    () =>
+      (richtext = el('div')
+        .append(el('p').val('p1'))
+        .append(
+          el('ul')
+            .append(el('li').val('first'))
+            .append(el('li').val('second'))
+        )
+        .append(el('p').val('p2')))
+  )
 
-  it('return null for first <p>', () => {
-    editor = el('p').appendTo(richtext)
-    expect(Editor.previousEditor(editor)).toBeNull()
-  })
-
-  it('return previous element for a <p>', () => {
-    const prev = el('p').appendTo(richtext)
-    editor = el('p').appendTo(richtext)
-    expect(Editor.previousEditor(editor).is(prev)).toBe(true)
-  })
-
-  it('return last <li> of previous list', () => {
-    el('ul')
-      .append(el('li').val('first'))
-      .append(el('li').val('second'))
-      .appendTo(richtext)
-    editor = el('p').appendTo(richtext)
+  it('goto last <li>', () => {
+    const editor = richtext.lastChild()
     expect(Editor.previousEditor(editor).val()).toBe('second')
   })
 
-  it('return previous <li> in a list', () => {
-    el('ul')
-      .append(el('li').val('first'))
-      .append(el('li').val('second'))
-      .appendTo(richtext)
-    editor = richtext
+  it('goto first <li>', () => {
+    const editor = richtext.firstChild()
+    expect(Editor.nextEditor(editor).val()).toBe('first')
+  })
+
+  it('goto previous <li>', () => {
+    const editor = richtext
       .firstChild()
+      .next()
       .firstChild()
       .next()
     expect(Editor.previousEditor(editor).val()).toBe('first')
   })
 
-  it('return previous element of list when editor is the first <li>', () => {
-    const prev = el('p').appendTo(richtext)
-    editor = el('ul')
-      .append(el('li'))
-      .appendTo(richtext)
+  it('goto next <li>', () => {
+    const editor = richtext
       .firstChild()
-    expect(Editor.previousEditor(editor).is(prev)).toBe(true)
-  })
-
-  it('return null of first <li> of a list with no previous element', () => {
-    editor = el('ul')
-      .append(el('li'))
+      .next()
       .firstChild()
-    expect(Editor.previousEditor(editor)).toBeNull()
-  })
-})
-
-describe('next editor', () => {
-  let richtext
-  let editor
-  beforeEach(() => (richtext = el('div')))
-
-  it('return null for last <p>', () => {
-    editor = el('p').appendTo(richtext)
-    expect(Editor.nextEditor(editor)).toBeNull()
-  })
-
-  it('return next element for a <p>', () => {
-    editor = el('p').appendTo(richtext)
-    const next = el('p').appendTo(richtext)
-    expect(Editor.nextEditor(editor).is(next)).toBe(true)
-  })
-
-  it('return first <li> of next list', () => {
-    editor = el('p').appendTo(richtext)
-    el('ul')
-      .append(el('li').val('first'))
-      .append(el('li').val('second'))
-      .appendTo(richtext)
-    expect(Editor.nextEditor(editor).val()).toBe('first')
-  })
-
-  it('return next <li> in a list', () => {
-    el('ul')
-      .append(el('li').val('first'))
-      .append(el('li').val('second'))
-      .appendTo(richtext)
-    editor = richtext.firstChild().firstChild()
-
     expect(Editor.nextEditor(editor).val()).toBe('second')
   })
 
-  it('return next element of list when editor is the last <li>', () => {
-    editor = el('ul')
-      .append(el('li'))
-      .appendTo(richtext)
+  it('go out from list backward', () => {
+    const editor = richtext
       .firstChild()
-    const next = el('p').appendTo(richtext)
-    expect(Editor.nextEditor(editor).is(next)).toBe(true)
+      .next()
+      .firstChild()
+    expect(Editor.previousEditor(editor).val()).toBe('p1')
   })
 
-  it('return null of last <li> of a list with no next element', () => {
-    editor = el('ul')
-      .append(el('li'))
+  it('go out from list forward', () => {
+    const editor = richtext
       .firstChild()
+      .next()
+      .lastChild()
+    expect(Editor.nextEditor(editor).val()).toBe('p2')
+  })
+
+  it('go out from first list backward', () => {
+    richtext.firstChild().remove()
+    const editor = richtext.firstChild().firstChild()
+    expect(Editor.previousEditor(editor)).toBeNull()
+  })
+
+  it('go out from last list forward', () => {
+    richtext.lastChild().remove()
+    const editor = richtext.firstChild().lastChild()
     expect(Editor.nextEditor(editor)).toBeNull()
+  })
+})
+
+describe('navigating in <p>s', () => {
+  const richtext = el('div')
+    .append(el('p').val('1'))
+    .append(el('p').val('2'))
+
+  it('return previous element for a <p>', () => {
+    const editor = richtext.lastChild()
+    expect(Editor.previousEditor(editor).val()).toBe('1')
+  })
+
+  it('return next element for a <p>', () => {
+    const editor = richtext.firstChild()
+    expect(Editor.nextEditor(editor).val()).toBe('2')
+  })
+
+  it('previous of first is null', () => {
+    const editor = richtext.firstChild()
+    expect(Editor.previousEditor(editor)).toBeNull()
+  })
+
+  it('next of last is null', () => {
+    const editor = richtext.lastChild()
+    expect(Editor.nextEditor(editor)).toBeNull()
+  })
+})
+
+describe('navigating to <figure>s', () => {
+  const richtext = el('div')
+  el('p')
+    .val('1')
+    .appendTo(richtext)
+  const cap = el('figcaption')
+  el('figure')
+    .append(el('img'))
+    .append(cap)
+    .appendTo(richtext)
+  el('p')
+    .val('2')
+    .appendTo(richtext)
+
+  it('previous is <figcaption>', () => {
+    const editor = richtext.lastChild()
+    expect(Editor.previousEditor(editor).is(cap)).toBe(true)
+  })
+
+  it('next is <figcaption>', () => {
+    const editor = richtext.firstChild()
+    expect(Editor.nextEditor(editor).is(cap)).toBe(true)
+  })
+})
+
+describe('navigating from list to <figure>s', () => {
+  const richtext = el('div')
+    .append(
+      el('figure')
+        .append(el('img'))
+        .append(el('figcaption').val('image 1'))
+    )
+    .append(el('ul').append(el('li')))
+    .append(
+      el('figure')
+        .append(el('img'))
+        .append(el('figcaption').val('image 2'))
+    )
+  const editor = richtext.child(1).firstChild()
+
+  it('go to <figure> backward', () => {
+    expect(Editor.previousEditor(editor).is('figcaption')).toBe(true)
+    expect(Editor.previousEditor(editor).val()).toBe('image 1')
+  })
+
+  it('go to <figure> forward', () => {
+    expect(Editor.nextEditor(editor).is('figcaption')).toBe(true)
+    expect(Editor.nextEditor(editor).val()).toBe('image 2')
+  })
+})
+
+describe('navigating from <figure> to <p>', () => {
+  const richtext = el('div')
+    .append(el('p').val('1'))
+    .append(
+      el('figure')
+        .append(el('img'))
+        .append(el('figcaption'))
+    )
+    .append(el('p').val('2'))
+  const cap = richtext.child(1).lastChild()
+
+  it('go backward', () => {
+    expect(Editor.previousEditor(cap).is(richtext.firstChild())).toBe(true)
+  })
+
+  it('go forward', () => {
+    expect(Editor.nextEditor(cap).is(richtext.lastChild())).toBe(true)
   })
 })

@@ -56,24 +56,28 @@ function handlePreEnter(editor) {
   }
 }
 
-function previousEditor(editor) {
-  if (editor.is('li') && editor.is(editor.parent().firstChild())) {
-    return editor.parent().previous()
-  }
-  const prev = editor.previous()
-  if (prev && prev.is('ul')) {
-    return prev.lastChild()
-  }
-  return prev
-}
+const previousEditor = editor =>
+  getNextEditor(editor, n => n.previous(), n => n.lastChild())
 
-function nextEditor(editor) {
-  if (editor.is('li') && editor.is(editor.parent().lastChild())) {
-    return editor.parent().next()
+const nextEditor = editor =>
+  getNextEditor(editor, n => n.next(), n => n.firstChild())
+
+function getNextEditor(editor, nextNode, childOf) {
+  let next = nextNode(editor)
+  if (editor.is('li')) {
+    if (next) {
+      return next
+    }
+    next = nextNode(editor.parent())
+  } else if (editor.is('figcaption')) {
+    next = nextNode(editor.parent())
   }
-  const next = editor.next()
+
   if (next && next.is('ul')) {
-    return next.firstChild()
+    return childOf(next)
+  }
+  if (next && next.is('figure')) {
+    return next.lastChild()
   }
   return next
 }
