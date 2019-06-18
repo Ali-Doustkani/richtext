@@ -1,4 +1,4 @@
-import { el, renderImage, read, relativeRange } from './DOM'
+import { el, renderImage } from './DOM'
 import { breakAt } from './Stylist'
 
 function importImage(richtext, effects) {
@@ -16,10 +16,7 @@ function importImage(richtext, effects) {
       () => {
         const img = createImage(reader.result)
         if (currentEdit) {
-          const renderModel = breakAt(
-            read(effects, currentEdit),
-            relativeRange(currentEdit)
-          )
+          const renderModel = breakAt(effects, currentEdit)
           renderModel.list.splice(1, 0, img)
           renderImage({
             richtext,

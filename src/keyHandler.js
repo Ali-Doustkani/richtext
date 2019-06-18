@@ -1,4 +1,4 @@
-import { el, read, render, relativeRange } from './DOM'
+import { el, render, relativeRange } from './DOM'
 import { breakAt, glue } from './Stylist'
 import * as Editor from './editor'
 
@@ -10,13 +10,13 @@ function enterKey(event, effects, richtext) {
     return
   }
   if (editor.is('li') && event.ctrlKey) {
-    const renderModel = breakAt(read(effects, editor), relativeRange(editor))
+    const renderModel = breakAt(effects, editor)
     renderModel.list[1].to('p').isEditable()
     render({ richtext, editors: editor, elements: renderModel.list })
     renderModel.active.element.focus()
     return
   }
-  const renderModel = breakAt(read(effects, editor), relativeRange(editor))
+  const renderModel = breakAt(effects, editor)
   render({ richtext, editors: editor, elements: renderModel.list })
   renderModel.active.element.focus()
 }
@@ -29,7 +29,7 @@ function backspaceKey(event, effects, richtext) {
   event.preventDefault()
   const prevEditor = Editor.previousEditor(editor)
   const len = prevEditor.textLength
-  const renderModels = glue(read(effects, prevEditor), read(effects, editor))
+  const renderModels = glue(effects, prevEditor, editor)
   render({
     richtext,
     editors: [prevEditor, editor],
@@ -47,7 +47,7 @@ function deleteKey(event, effects, richtext) {
 
   const len = editor.textLength
   const nextEditor = Editor.nextEditor(editor)
-  const renderModel = glue(read(effects, editor), read(effects, nextEditor))
+  const renderModel = glue(effects, editor, nextEditor)
   render({
     richtext,
     editors: [editor, nextEditor],
