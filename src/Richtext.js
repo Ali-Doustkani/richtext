@@ -1,4 +1,9 @@
-import { checkEffects, checkEditor, addDefaultEffects } from './args'
+import {
+  checkEffects,
+  checkEditor,
+  addDefaultEffects,
+  setOptions
+} from './args'
 import { el, render } from './DOM'
 import { relativeRange } from './Ranging'
 import { style } from './Stylist'
@@ -66,12 +71,11 @@ function create(effects) {
         elements: elements.list,
         listTag
       })
-      if (typeof type === 'string' && effects[type].parent) {
-        range = range.shiftToStart()
-      }
-      if (!richtextOptions.staySelected) {
-        range = range.toEnd()
-      }
+      range =
+        typeof type === 'string' && effects[type].parent
+          ? range.shiftToStart()
+          : range
+      range = richtextOptions.staySelected ? range : range.toEnd()
       Editor.setCursor(elements.active, range)
     }
 
@@ -97,17 +101,9 @@ function create(effects) {
     }
 
     return {
-      setOptions: value => {
-        if (value.staySelected !== undefined) {
-          richtextOptions.staySelected = value.staySelected
-        }
-        if (value.defaultLink !== undefined) {
-          richtextOptions.defaultLink = value.defaultLink
-        }
-      },
-      style: type => {
-        ifReady((range, editor) => setStyle({ range, type, editor }))
-      },
+      setOptions: value => setOptions(value, richtextOptions),
+      style: type =>
+        ifReady((range, editor) => setStyle({ range, type, editor })),
       styleLink: () =>
         ifReady((range, editor) => {
           showDialog({
