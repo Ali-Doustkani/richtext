@@ -1,8 +1,8 @@
 import { el } from './DOM'
 
-function showDialog(richtext, options) {
+function showDialog(options) {
+  const richtext = options.richtext
   options = options || { mode: 'add', defaultValue: '' }
-  let succeedCallback, cancelCallback, deletCallback
   const { dialogue, input, saveButton, deleteButton, cancelButton } = create(
     options
   )
@@ -11,7 +11,7 @@ function showDialog(richtext, options) {
     if (e.key === 'Enter') {
       succeeded()
     } else if (e.key === 'Escape') {
-      run(cancelCallback)
+      run(options.canceled)
     }
   })
 
@@ -19,14 +19,14 @@ function showDialog(richtext, options) {
   dialogue.addListener('mousedown', e => (targetOnMouseDown = e.target))
   dialogue.addListener('mouseup', e => {
     if (dialogue.is(e.target) && dialogue.is(targetOnMouseDown)) {
-      run(cancelCallback)
+      run(options.canceled)
     }
   })
 
   saveButton.addListener('click', succeeded)
-  cancelButton.addListener('click', () => run(cancelCallback))
+  cancelButton.addListener('click', () => run(options.canceled))
   if (options.mode === 'edit') {
-    deleteButton.addListener('click', () => run(deletCallback))
+    deleteButton.addListener('click', () => run(options.deleted))
   }
 
   richtext.parent().insertAfter(richtext, dialogue)
@@ -40,22 +40,7 @@ function showDialog(richtext, options) {
   }
 
   function succeeded() {
-    run(succeedCallback, input.val())
-  }
-
-  return {
-    succeeded: function(callback) {
-      succeedCallback = callback
-      return this
-    },
-    canceled: function(callback) {
-      cancelCallback = callback
-      return this
-    },
-    deleted: function(callback) {
-      deletCallback = callback
-      return this
-    }
+    run(options.succeeded, input.val())
   }
 }
 

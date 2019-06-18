@@ -1,4 +1,5 @@
-import { el, render, relativeRange } from './DOM'
+import { el, render } from './DOM'
+import { relativeRange } from './Ranging'
 import { breakAt, glue } from './Stylist'
 import * as Editor from './editor'
 

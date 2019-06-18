@@ -25,19 +25,19 @@ function addToResult(state, text, effects, active) {
   return create(result, state.head + text.length)
 }
 
-function createContext(from, to) {
+function createContext({ start, end }) {
   let state = create()
   let regionHead = 0
   const ret = {}
 
   const mustUndo = (effects, type) => {
     const hasTheEffect = effects.includes(type)
-    const regionFitToPoints = state.head === from && regionHead === to
+    const regionFitToPoints = state.head === start && regionHead === end
     const pointsAreInRegion =
-      from >= state.head &&
-      to > state.head &&
-      from < regionHead &&
-      to <= regionHead
+      start >= state.head &&
+      end > state.head &&
+      start < regionHead &&
+      end <= regionHead
     return hasTheEffect && (regionFitToPoints || pointsAreInRegion)
   }
 
@@ -65,40 +65,40 @@ function createContext(from, to) {
     mustUndo(effects, type) ? remove(effects, type) : merge(effects, type)
 
   ret.regionUntouched = () => {
-    return regionHead <= from || state.head >= to
+    return regionHead <= start || state.head >= end
   }
 
   ret.region0Part = () => {
-    return regionHead <= to && state.head >= from
+    return regionHead <= end && state.head >= start
   }
 
   ret.region3Parts = () => {
     const [head, len] = [state.head, regionHead]
-    const leftHandedTrio = head < from && from < len && to <= len
-    const rightHandedTrio = head <= from && from < len && to < len
+    const leftHandedTrio = head < start && start < len && end <= len
+    const rightHandedTrio = head <= start && start < len && end < len
     return leftHandedTrio || rightHandedTrio
   }
 
   ret.regionFirstEffectiveOf2Parts = () => {
-    const first = state.head <= from && regionHead < to
-    const second = state.head < from && regionHead <= to
+    const first = state.head <= start && regionHead < end
+    const second = state.head < start && regionHead <= end
     return first || second
   }
 
   ret.regionSecondEffectiveOf2Parts = () => {
-    const first = from <= state.head && regionHead > to
-    const second = from < state.head && regionHead >= to
+    const first = start <= state.head && regionHead > end
+    const second = start < state.head && regionHead >= end
     return first || second
   }
 
   ret.threePieces = text => {
-    const a = from - state.head
-    const b = to - state.head
+    const a = start - state.head
+    const b = end - state.head
     return [text.slice(0, a), text.slice(a, b), text.slice(b, text.length)]
   }
 
   ret.twoPieces = text => {
-    const p = state.head <= from && from < regionHead ? from : to
+    const p = state.head <= start && start < regionHead ? start : end
     return [text.slice(0, p - state.head), text.slice(p - state.head)]
   }
 

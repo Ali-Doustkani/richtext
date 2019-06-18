@@ -1,5 +1,6 @@
 import { checkEffects, checkEditor, addDefaultEffects } from './args'
-import { el, render, relativeRange } from './DOM'
+import { el, render } from './DOM'
+import { relativeRange } from './Ranging'
 import { style } from './Stylist'
 import { showDialog } from './Dialogue'
 import * as Handle from './keyHandler'
@@ -46,22 +47,19 @@ function create(effects) {
     richtextElement.addEventListener('click', e => {
       const anchor = el.parentOf(el(e.target), 'a')
       if (anchor) {
-        showDialog(richtext, {
+        showDialog({
+          richtext,
           defaultValue: anchor.getAttribute('href'),
-          mode: 'edit'
+          mode: 'edit',
+          succeeded: link => anchor.setAttribute('href', link),
+          deleted: () => anchor.takeOff()
         })
-          .succeeded(link => {
-            anchor.setAttribute('href', link)
-          })
-          .deleted(() => {
-            anchor.takeOff()
-          })
       }
     })
 
     const setStyle = options => {
-      let { start, end, type, listTag, editor } = options
-      const elements = style(effects, start, end, type, editor)
+      let { range, type, listTag, editor } = options
+      const elements = style(effects, range, type, editor)
       render({
         richtext,
         editors: editor,
@@ -69,14 +67,12 @@ function create(effects) {
         listTag
       })
       if (typeof type === 'string' && effects[type].parent) {
-        end -= start
-        start = 0
+        range = range.shiftToStart()
       }
-      Editor.setCursor(
-        elements.active,
-        richtextOptions.staySelected ? start : end,
-        end
-      )
+      if (!richtextOptions.staySelected) {
+        range = range.toEnd()
+      }
+      Editor.setCursor(elements.active, range)
     }
 
     const styleSelectedOrAll = (type, listTag) => {
@@ -84,12 +80,8 @@ function create(effects) {
       if (Editor.isNotEditor(richtext, editor)) {
         return
       }
-      let { start, end } = relativeRange(editor)
-      if (start === end) {
-        start = 0
-        end = el.active().textLength
-      }
-      setStyle({ start, end, type, listTag, editor })
+      const range = relativeRange(editor).selectedForSure(editor.textLength)
+      setStyle({ range, type, listTag, editor })
     }
 
     const ifReady = func => {
@@ -97,11 +89,11 @@ function create(effects) {
       if (Editor.isNotEditor(richtext, editor)) {
         return
       }
-      const { start, end } = relativeRange(editor)
-      if (start === end) {
+      const range = relativeRange(editor)
+      if (range.standing()) {
         return
       }
-      func(start, end, editor)
+      func(range, editor)
     }
 
     return {
@@ -114,19 +106,20 @@ function create(effects) {
         }
       },
       style: type => {
-        ifReady((start, end, editor) => setStyle({ start, end, type, editor }))
+        ifReady((range, editor) => setStyle({ range, type, editor }))
       },
       styleLink: () =>
-        ifReady((start, end, editor) => {
-          showDialog(richtext, {
-            defaultValue: richtextOptions.defaultLink
-          }).succeeded(link => {
-            setStyle({
-              start,
-              end,
-              type: { tag: 'a', href: link },
-              editor
-            })
+        ifReady((range, editor) => {
+          showDialog({
+            richtext,
+            defaultValue: richtextOptions.defaultLink,
+            succeeded: link => {
+              setStyle({
+                range,
+                type: { tag: 'a', href: link },
+                editor
+              })
+            }
           })
         }),
       apply: type => styleSelectedOrAll(type),

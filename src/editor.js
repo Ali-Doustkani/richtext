@@ -1,4 +1,4 @@
-import { absoluteRange, relativeRange } from './DOM'
+import { absoluteRange, relativeRange, CursorRange } from './Ranging'
 
 function canBackspace(editor) {
   const { start, end } = relRange(editor)
@@ -27,9 +27,11 @@ function focusNext(editor) {
   }
 }
 
-function setCursor(editor, start, end) {
-  end = end || start
-  const points = absoluteRange(editor, { start, end })
+function setCursor(editor, pos) {
+  if (typeof pos === 'number') {
+    pos = CursorRange.fromPosition(pos)
+  }
+  const points = absoluteRange(editor, pos)
   const range = document.createRange()
   range.setStart(points.startContainer, points.startOffset)
   range.setEnd(points.endContainer, points.endOffset)

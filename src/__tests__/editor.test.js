@@ -1,8 +1,8 @@
 import * as Editor from './../editor'
-import { relativeRange } from '../DOM/Range'
+import { relativeRange } from '../Ranging/RangeComputer'
 import { el } from '../DOM/Query'
 
-jest.mock('../DOM/Range')
+jest.mock('../Ranging/RangeComputer')
 window.getSelection = () => ({
   getRangeAt: () => null
 })
