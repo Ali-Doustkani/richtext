@@ -1,5 +1,5 @@
 import { el } from './../../DOM/Query'
-import { render as _render, renderImage } from './../../DOM/Renderer'
+import { renderText as _render } from './../../DOM/textRenderer'
 
 let richtext
 let editors
@@ -374,47 +374,5 @@ describe('lists', () => {
 
       expectHtml('<ul><li>1</li><li>2</li></ul><p>3</p>')
     })
-  })
-})
-
-describe('renderImage', () => {
-  it('put <img> at the end if editor is null', () => {
-    el('p')
-      .val('Paragraph')
-      .appendTo(richtext)
-    renderImage({
-      richtext,
-      editor: null,
-      elements: [el('img')]
-    })
-    expectHtml('<p>Paragraph</p><img>')
-  })
-
-  it('put <img> between paragraphs', () => {
-    const editor = el('p')
-      .val('FirstSecond')
-      .appendTo(richtext)
-    renderImage({
-      richtext,
-      editor,
-      elements: [el('p').val('First'), el('img'), el('p').val('Second')]
-    })
-    expectHtml('<p>First</p><img><p>Second</p>')
-  })
-
-  it('put <img> between list items', () => {
-    el('ul')
-      .append(el('li').val('FirstSecond'))
-      .append(el('li').val('Third'))
-      .appendTo(richtext)
-    const editor = richtext.firstChild().firstChild()
-    renderImage({
-      richtext,
-      editor,
-      elements: [el('li').val('First'), el('img'), el('li').val('Second')]
-    })
-    expectHtml(
-      '<ul><li>First</li></ul><img><ul><li>Second</li><li>Third</li></ul>'
-    )
   })
 })

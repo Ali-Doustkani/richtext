@@ -1,10 +1,16 @@
 import { el } from './Query'
 
-function createNewEditor(effect) {
-  return el(effect && effect.parent ? effect.tag : 'p')
+const createNewEditor = effect =>
+  el(effect && effect.parent ? effect.tag : 'p')
     .setAttributeFrom(effect)
     .isEditable()
-}
+
+const createNewImage = source =>
+  el('img')
+    .setAttribute('src', source)
+    .style({
+      'max-width': '100%'
+    })
 
 /**
  * Generates a list of QueryElement with their contents that should be put into the richtext.
@@ -75,4 +81,4 @@ function mergeable(el1, el2) {
   return theSame
 }
 
-export { generateRenderModel, createNewEditor }
+export { generateRenderModel, createNewEditor, createNewImage }

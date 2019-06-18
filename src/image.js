@@ -1,4 +1,4 @@
-import { el, renderImage } from './DOM'
+import { el, renderImage, createNewImage } from './DOM'
 import { breakAt } from './Stylist'
 
 function importImage(richtext, effects) {
@@ -14,7 +14,7 @@ function importImage(richtext, effects) {
     reader.addEventListener(
       'load',
       () => {
-        const img = createImage(reader.result)
+        const img = createNewImage(reader.result)
         if (currentEdit) {
           const renderModel = breakAt(effects, currentEdit)
           renderModel.list.splice(1, 0, img)
@@ -34,14 +34,6 @@ function importImage(richtext, effects) {
       reader.readAsDataURL(file)
     }
   }
-}
-
-function createImage(source) {
-  return el('img')
-    .setAttribute('src', source)
-    .style({
-      'max-width': '100%'
-    })
 }
 
 export { importImage }

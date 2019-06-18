@@ -4,7 +4,7 @@ import {
   addDefaultEffects,
   setOptions
 } from './args'
-import { el, render } from './DOM'
+import { el, renderText } from './DOM'
 import { relativeRange } from './Ranging'
 import { style } from './Stylist'
 import { showDialog } from './Dialogue'
@@ -65,7 +65,7 @@ function create(effects) {
     const setStyle = options => {
       let { range, type, listTag, editor } = options
       const elements = style(effects, range, type, editor)
-      render({
+      renderText({
         richtext,
         editors: editor,
         elements: elements.list,

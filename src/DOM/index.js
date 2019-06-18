@@ -1,4 +1,5 @@
 export { read } from './DomReader'
-export { generateRenderModel, createNewEditor } from './Factory'
+export { generateRenderModel, createNewEditor, createNewImage } from './Factory'
 export { el } from './Query'
-export { render, renderImage } from './Renderer'
+export { renderText } from './textRenderer'
+export { renderImage } from './imageRenderer'
