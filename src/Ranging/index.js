@@ -6,4 +6,4 @@ function relativeRange(editor) {
 
 export { relativeRange }
 export { absoluteRange } from './RangeComputer'
-export { CursorRange } from './Range'
+export { Range } from './Range'

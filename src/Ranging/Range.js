@@ -1,4 +1,4 @@
-class CursorRange {
+class Range {
   constructor(start, end) {
     this.start = start
     this.end = end
@@ -11,26 +11,26 @@ class CursorRange {
 
   selectedForSure(end) {
     if (this.standing()) {
-      return new CursorRange(0, end)
+      return new Range(0, end)
     }
     return this
   }
 
   shiftToStart() {
-    return new CursorRange(0, this.end - this.start)
+    return new Range(0, this.end - this.start)
   }
 
   toEnd() {
-    return new CursorRange(this.end, this.end)
+    return new Range(this.end, this.end)
   }
 }
 
-CursorRange.empty = function() {
-  return new CursorRange(0, 0)
+Range.empty = function() {
+  return new Range(0, 0)
 }
 
-CursorRange.fromPosition = function(position) {
-  return new CursorRange(position, position)
+Range.fromPosition = function(position) {
+  return new Range(position, position)
 }
 
-export { CursorRange }
+export { Range }

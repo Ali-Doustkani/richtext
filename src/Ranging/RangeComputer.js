@@ -1,11 +1,11 @@
 import { el } from '../DOM/Query'
-import { CursorRange } from './Range'
+import { Range } from './Range'
 
 /**
  * Calculates the selection range relative to the parent element.
  * @param {QueryElement} rootEl All the points are calculated relative to this element.
  * @param {Range} docRange The document range object.
- * @returns {CursorRange} The result object containing a 'start' and 'end' prop.
+ * @returns {Range} The result object containing a 'start' and 'end' prop.
  */
 function relativeRange(rootEl, docRange) {
   if (!rootEl) {
@@ -13,7 +13,7 @@ function relativeRange(rootEl, docRange) {
   }
 
   if (rootEl.isNot(Node.TEXT_NODE) && rootEl.hasNoChildren()) {
-    return CursorRange.empty()
+    return Range.empty()
   }
 
   let node = firstText(rootEl),
@@ -40,7 +40,7 @@ function relativeRange(rootEl, docRange) {
     }
   }
 
-  return new CursorRange(
+  return new Range(
     startOffset + docRange.startOffset,
     endOffset + docRange.endOffset
   )
