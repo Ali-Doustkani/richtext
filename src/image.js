@@ -5,6 +5,7 @@ function importImage(richtext, effects) {
   const currentEdit = el.active()
   const input = el('input')
     .setAttribute('type', 'file')
+    .setAttribute('accept', 'image/*')
     .addListener('change', loadImage)
   input.element.click()
 
