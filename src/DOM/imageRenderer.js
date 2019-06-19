@@ -9,7 +9,7 @@ const renderImage = params => {
   } else if (isLiImgLi(elements)) {
     renderLiImgLi(richtext, editor, elements)
   } else {
-    addSingleImage(richtext, elements)
+    addAll(richtext, elements)
   }
 }
 
@@ -47,6 +47,6 @@ const renderLiImgLi = (richtext, editor, elements) => {
   )
 }
 
-const addSingleImage = (richtext, elements) => richtext.append(elements[0])
+const addAll = (richtext, elements) => richtext.append(elements)
 
 export { renderImage }

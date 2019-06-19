@@ -16,7 +16,7 @@ function importImage(richtext, effects) {
       'load',
       () => {
         const img = createNewImage(reader.result)
-        if (currentEdit) {
+        if (richtext.isParentOf(currentEdit)) {
           const renderModel = breakAt(effects, currentEdit)
           renderModel.list.splice(1, 0, img)
           renderImage({
@@ -26,7 +26,7 @@ function importImage(richtext, effects) {
           })
           renderModel.active.element.focus()
         } else {
-          renderImage({ richtext, elements: [img] })
+          renderImage({ richtext, elements: [img, el('p').isEditable()] })
         }
       },
       false

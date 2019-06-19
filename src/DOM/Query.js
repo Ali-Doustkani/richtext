@@ -236,6 +236,20 @@ class QueryElement {
     return el(this.element.parentNode)
   }
 
+  isParentOf(other) {
+    if (!other) {
+      return false
+    }
+    let parent = other.parent()
+    while (parent !== null) {
+      if (parent.is(this)) {
+        return true
+      }
+      parent = parent.parent()
+    }
+    return false
+  }
+
   child(index) {
     return el(this.element.childNodes[index])
   }
