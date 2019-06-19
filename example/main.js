@@ -1,6 +1,6 @@
 import createRichtext from './../src/Richtext'
 
-const div = document.getElementById('editor')
+const richtextEl = document.getElementById('richtext')
 const richtext = createRichtext({
   bold: 'b',
   italic: 'i',
@@ -22,9 +22,8 @@ const richtext = createRichtext({
     tag: 'div',
     className: 'notebox'
   }
-})(div)
+})(richtextEl)
 richtext.setOptions({ defaultLink: 'https://' })
-div.firstChild.focus()
 
 function wire(id, func) {
   document.getElementById(id).onmousedown = e => e.preventDefault()
@@ -45,3 +44,9 @@ wire('orderedList', () => richtext.applyOrderedList())
 wire('hyperlink', () => richtext.styleLink())
 wire('image', () => richtext.selectImage())
 wire('notebox', () => richtext.apply('notebox'))
+wire(
+  'direction',
+  () =>
+    (richtextEl.style.direction =
+      richtextEl.style.direction === 'ltr' ? 'rtl' : 'ltr')
+)

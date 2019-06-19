@@ -10,14 +10,14 @@
         background-color: rgb(50, 50, 50);
         color: white;
       }
-      #editor {
+      #richtext {
         border: 1px solid black;
         margin: 0 10px;
         padding: 5px;
         height: 500px;
         overflow: scroll;
       }
-      #editor > p {
+      #richtext > p {
         cursor: text;
       }
       .text-highlight {
@@ -51,11 +51,12 @@
     <button id="hyperlink">Hyperlink</button>
     <button id="image">Image</button>
     <button id="notebox">Notebox</button>
+    <button id="direction">Direction</button>
     <label>
       Stay Selected
       <input type="checkbox" id="staySelected" />
     </label>
-    <article id="editor"></article>
+    <article id="richtext"></article>
     <script src="main.js"></script>
   </body>
 </html>
