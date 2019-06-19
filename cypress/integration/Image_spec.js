@@ -21,6 +21,9 @@ it('add and remove images', () => {
   cy.get('#editor>figure>button')
     .invoke('show')
     .click()
+  cy.get('#editor>p')
+    .eq(0)
+    .should('have.focus')
   cy.get('#editor').shouldHaveHtml(`
     <p contenteditable="true">First</p>
     <p contenteditable="true">Second</p>`)

@@ -3,6 +3,8 @@ import { el } from './../../DOM/Query'
 import 'jest-dom/extend-expect'
 import { getByText, fireEvent } from '@testing-library/dom'
 
+jest.mock('./../../editor')
+
 let figure
 beforeEach(() => {
   figure = createFigure(el('img')).element

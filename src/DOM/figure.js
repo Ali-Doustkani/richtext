@@ -1,10 +1,14 @@
 import { el } from './Query'
+import { focusPrev } from './../editor'
 
-const remove = e =>
-  el(e.target)
+const remove = e => {
+  const btn = el(e.target)
+  focusPrev(btn.parent())
+  btn
     .removeListener('click', remove)
     .parent()
     .remove()
+}
 
 const createFigure = img =>
   el('figure')
