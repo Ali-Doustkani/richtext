@@ -1,8 +1,9 @@
 import { el } from './Query'
+import { createFigure } from './figure'
 
-function renderImage(params) {
+const renderImage = params => {
   let { richtext, editor, elements } = params
-  elements = elements.map(wrap)
+  elements = elements.map(e => (e.is('img') ? createFigure(e) : e))
   if (isPImgP(elements)) {
     renderPImgP(richtext, editor, elements)
   } else if (isLiImgLi(elements)) {
@@ -12,33 +13,26 @@ function renderImage(params) {
   }
 }
 
-function isPImgP(elements) {
-  return (
-    elements.length === 3 &&
-    elements[0].is('p') &&
-    elements[1].is('figure') &&
-    elements[2].is('p')
-  )
-}
+const isPImgP = elements =>
+  elements.length === 3 &&
+  elements[0].is('p') &&
+  elements[1].is('figure') &&
+  elements[2].is('p')
 
-function renderPImgP(richtext, editor, elements) {
+const renderPImgP = (richtext, editor, elements) =>
   richtext
     .insertBefore(editor, elements[0])
     .insertBefore(editor, elements[1])
     .insertBefore(editor, elements[2])
     .remove(editor)
-}
 
-function isLiImgLi(elements) {
-  return (
-    elements.length === 3 &&
-    elements[0].is('li') &&
-    elements[1].is('figure') &&
-    elements[2].is('li')
-  )
-}
+const isLiImgLi = elements =>
+  elements.length === 3 &&
+  elements[0].is('li') &&
+  elements[1].is('figure') &&
+  elements[2].is('li')
 
-function renderLiImgLi(richtext, editor, elements) {
+const renderLiImgLi = (richtext, editor, elements) => {
   const [li1, img, li2] = elements
   const list = editor.parent()
   const rest = list.removeFrom(editor).splice(1)
@@ -53,17 +47,6 @@ function renderLiImgLi(richtext, editor, elements) {
   )
 }
 
-function addSingleImage(richtext, elements) {
-  richtext.append(elements[0])
-}
-
-function wrap(element) {
-  if (element.is('img')) {
-    return el('figure')
-      .append(element)
-      .append(el('figcaption').isEditable())
-  }
-  return element
-}
+const addSingleImage = (richtext, elements) => richtext.append(elements[0])
 
 export { renderImage }

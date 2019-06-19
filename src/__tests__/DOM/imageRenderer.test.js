@@ -5,7 +5,8 @@ let richtext
 beforeEach(() => (richtext = el('div')))
 
 function expectHtml(html) {
-  expect(richtext.element.innerHTML).toBe(html)
+  const withoutStyle = richtext.element.innerHTML.replace(/\sstyle=".+?"/g, '')
+  expect(withoutStyle).toBe(html)
 }
 
 it('put <img> at the end if editor is null', () => {
