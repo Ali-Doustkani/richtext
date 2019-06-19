@@ -1,36 +1,43 @@
-import { el, read, render, relativeRange } from './DOM'
+import { el, renderText } from './DOM'
+import { relativeRange } from './Ranging'
 import { breakAt, glue } from './Stylist'
 import * as Editor from './editor'
 
 function enterKey(event, effects, richtext) {
   event.preventDefault() // prevent creating new lines in the same p element
   const editor = el.active()
+  if (editor.is('figcaption')) {
+    return
+  }
   if (editor.is('pre') && !event.ctrlKey) {
     Editor.handlePreEnter(editor)
     return
   }
   if (editor.is('li') && event.ctrlKey) {
-    const renderModel = breakAt(read(effects, editor), relativeRange(editor))
-    renderModel.list[1].to('p').isEditable()
-    render({ richtext, editors: editor, elements: renderModel.list })
-    renderModel.active.element.focus()
+    const renderModel = breakAt(effects, editor)
+    renderModel.list[1].to('p').editable()
+    renderText({ richtext, editors: editor, elements: renderModel.list })
+    renderModel.active.focus()
     return
   }
-  const renderModel = breakAt(read(effects, editor), relativeRange(editor))
-  render({ richtext, editors: editor, elements: renderModel.list })
-  renderModel.active.element.focus()
+  const renderModel = breakAt(effects, editor)
+  renderText({ richtext, editors: editor, elements: renderModel.list })
+  renderModel.active.focus()
 }
 
 function backspaceKey(event, effects, richtext) {
   const editor = el.active()
+  if (editor.is('figcaption')) {
+    return
+  }
   if (!Editor.canBackspace(editor)) {
     return
   }
   event.preventDefault()
   const prevEditor = Editor.previousEditor(editor)
   const len = prevEditor.textLength
-  const renderModels = glue(read(effects, prevEditor), read(effects, editor))
-  render({
+  const renderModels = glue(effects, prevEditor, editor)
+  renderText({
     richtext,
     editors: [prevEditor, editor],
     elements: renderModels.list
@@ -40,6 +47,9 @@ function backspaceKey(event, effects, richtext) {
 
 function deleteKey(event, effects, richtext) {
   const editor = el.active()
+  if (editor.is('figcaption')) {
+    return
+  }
   if (!Editor.canDelete(editor)) {
     return
   }
@@ -47,8 +57,8 @@ function deleteKey(event, effects, richtext) {
 
   const len = editor.textLength
   const nextEditor = Editor.nextEditor(editor)
-  const renderModel = glue(read(effects, editor), read(effects, nextEditor))
-  render({
+  const renderModel = glue(effects, editor, nextEditor)
+  renderText({
     richtext,
     editors: [editor, nextEditor],
     elements: renderModel.list

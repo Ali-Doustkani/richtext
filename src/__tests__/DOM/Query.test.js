@@ -202,7 +202,7 @@ describe('attributes', () => {
 
   it('set contentEditable', () => {
     expect(el('p').element.contentEditable).toBe(undefined)
-    expect(el('p').isEditable().element.contentEditable).toBe(true)
+    expect(el('p').editable().element.contentEditable).toBe(true)
   })
 
   it('set attributes value', () => {
@@ -418,5 +418,22 @@ describe('parentOf', () => {
     const target = el('a')
     el('div').append(target)
     expect(el.parentOf(target, 'p')).toBe(null)
+  })
+})
+
+describe('isParentOf', () => {
+  it('return true if it is parent of another element', () => {
+    const child = el('p')
+    const parent = el('div').append(el('div').append(child))
+    expect(parent.isParentOf(child)).toBe(true)
+  })
+
+  it('return false for null', () => {
+    expect(el('div').isParentOf(null)).toBe(false)
+  })
+
+  it('return false for self', () => {
+    const parent = el('div')
+    expect(parent.isParentOf(parent)).toBe(false)
   })
 })

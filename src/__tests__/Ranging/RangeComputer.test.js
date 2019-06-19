@@ -1,5 +1,5 @@
-import { relativeRange, absoluteRange } from './../../DOM/Range'
-import { el } from './../../DOM/Query'
+import { relativeRange, absoluteRange } from './../../Ranging/RangeComputer'
+import { el } from '../../DOM/Query'
 
 describe('calculate realtive range', () => {
   it('select empty paragraph', () => {

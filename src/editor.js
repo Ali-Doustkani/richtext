@@ -1,4 +1,4 @@
-import { absoluteRange, relativeRange } from './DOM'
+import { absoluteRange, relativeRange, Range } from './Ranging'
 
 function canBackspace(editor) {
   const { start, end } = relRange(editor)
@@ -14,7 +14,7 @@ function canDelete(editor) {
 function focusPrev(editor) {
   const prev = previousEditor(editor)
   if (prev) {
-    prev.element.focus()
+    prev.focus()
     setCursor(prev, prev.val().length)
   }
 }
@@ -22,14 +22,16 @@ function focusPrev(editor) {
 function focusNext(editor) {
   const next = nextEditor(editor)
   if (next) {
-    next.element.focus()
+    next.focus()
     setCursor(next, 0)
   }
 }
 
-function setCursor(editor, start, end) {
-  end = end || start
-  const points = absoluteRange(editor, { start, end })
+function setCursor(editor, pos) {
+  if (typeof pos === 'number') {
+    pos = Range.fromPosition(pos)
+  }
+  const points = absoluteRange(editor, pos)
   const range = document.createRange()
   range.setStart(points.startContainer, points.startOffset)
   range.setEnd(points.endContainer, points.endOffset)
@@ -54,24 +56,28 @@ function handlePreEnter(editor) {
   }
 }
 
-function previousEditor(editor) {
-  if (editor.is('li') && editor.is(editor.parent().firstChild())) {
-    return editor.parent().previous()
-  }
-  const prev = editor.previous()
-  if (prev && prev.is('ul')) {
-    return prev.lastChild()
-  }
-  return prev
-}
+const previousEditor = editor =>
+  getNextEditor(editor, n => n.previous(), n => n.lastChild())
 
-function nextEditor(editor) {
-  if (editor.is('li') && editor.is(editor.parent().lastChild())) {
-    return editor.parent().next()
+const nextEditor = editor =>
+  getNextEditor(editor, n => n.next(), n => n.firstChild())
+
+function getNextEditor(editor, nextNode, childOf) {
+  let next = nextNode(editor)
+  if (editor.is('li')) {
+    if (next) {
+      return next
+    }
+    next = nextNode(editor.parent())
+  } else if (editor.is('figcaption')) {
+    next = nextNode(editor.parent())
   }
-  const next = editor.next()
+
   if (next && next.is('ul')) {
-    return next.firstChild()
+    return childOf(next)
+  }
+  if (next && next.is('figure')) {
+    return next.lastChild()
   }
   return next
 }

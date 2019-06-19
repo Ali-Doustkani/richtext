@@ -1,5 +1,5 @@
 import { el } from './../../DOM/Query'
-import { render as _render } from './../../DOM/Renderer'
+import { renderText as _render } from './../../DOM/textRenderer'
 
 let richtext
 let editors

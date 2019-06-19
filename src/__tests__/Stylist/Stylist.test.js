@@ -11,8 +11,7 @@ describe('when input is plain text', () => {
       style({
         type: effects.italic,
         input: 'hello world',
-        from: 0,
-        to: 5
+        range: { start: 0, end: 5 }
       })
     ).toEqual([
       { text: 'hello', effects: [effects.italic], active: true },
@@ -25,8 +24,7 @@ describe('when input is plain text', () => {
       style({
         type: effects.bold,
         input: 'one two three',
-        from: 0,
-        to: 3
+        range: { start: 0, end: 3 }
       })
     ).toEqual([
       { text: 'one', effects: [effects.bold], active: true },
@@ -39,8 +37,7 @@ describe('when input is plain text', () => {
       style({
         type: effects.bold,
         input: 'ali',
-        from: 1,
-        to: 3
+        range: { start: 1, end: 3 }
       })
     ).toEqual([
       { text: 'a', effects: [], active: false },
@@ -53,8 +50,7 @@ describe('when input is plain text', () => {
       style({
         type: effects.bold,
         input: 'one two three',
-        from: 4,
-        to: 7
+        range: { start: 4, end: 7 }
       })
     ).toEqual([
       { text: 'one ', effects: [], active: false },
@@ -73,8 +69,7 @@ describe('when input is plain text', () => {
           { text: ' three' },
           { text: ' four' }
         ],
-        from: 5,
-        to: 10
+        range: { start: 5, end: 10 }
       })
     ).toEqual([
       { text: 'one t', effects: [], active: false },
@@ -88,8 +83,7 @@ describe('when input is plain text', () => {
       style({
         type: effects.bold,
         input: 'ali',
-        from: 0,
-        to: 3
+        range: { start: 0, end: 3 }
       })
     ).toEqual([{ text: 'ali', effects: [effects.bold], active: true }])
   })
@@ -104,8 +98,7 @@ describe('when input is plain text', () => {
           { text: 'three' },
           { text: 'four' }
         ],
-        from: 2,
-        to: 12
+        range: { start: 2, end: 12 }
       })
     ).toEqual([
       { text: 'on', effects: [], active: false },
@@ -119,8 +112,7 @@ describe('when input is plain text', () => {
       style({
         type: { tag: 'a', href: 'link' },
         input: 'HelloWorld',
-        from: 0,
-        to: 5,
+        range: { start: 0, end: 5 },
         href: 'link'
       })
     ).toEqual([
@@ -139,8 +131,7 @@ describe('when some parts of input are styled', () => {
           { text: 'hello' },
           { text: ' world!', effects: [effects.bold] }
         ],
-        from: 3,
-        to: 8
+        range: { start: 3, end: 8 }
       })
     ).toEqual([
       { text: 'hel', effects: [], active: false },
@@ -156,8 +147,7 @@ describe('when some parts of input are styled', () => {
           { text: 'hello', effects: [effects.bold] },
           { text: ' world!' }
         ],
-        from: 0,
-        to: 7
+        range: { start: 0, end: 7 }
       })
     ).toEqual([
       { text: 'hello w', effects: [effects.bold], active: true },
@@ -174,8 +164,7 @@ describe('when some parts of input are styled', () => {
           { text: 'second', effects: [effects.bold] },
           { text: 'third' }
         ],
-        from: 6,
-        to: 13
+        range: { start: 6, end: 13 }
       })
     ).toEqual([
       { text: 'first', effects: [], active: false },
@@ -194,8 +183,7 @@ describe('when unstyling', () => {
           { text: 'first', effects: [effects.bold] },
           { text: ' second' }
         ],
-        from: 0,
-        to: 5
+        range: { start: 0, end: 5 }
       })
     ).toEqual([{ text: 'first second', effects: [], active: true }])
   })
@@ -205,8 +193,7 @@ describe('when unstyling', () => {
       style({
         type: effects.bold,
         input: { text: 'first second', effects: [effects.bold] },
-        from: 6,
-        to: 12
+        range: { start: 6, end: 12 }
       })
     ).toEqual([
       { text: 'first ', effects: [effects.bold], active: false },
@@ -223,8 +210,7 @@ describe('when unstyling', () => {
           { text: '4', effects: [effects.bold] },
           { text: '5' }
         ],
-        from: 3,
-        to: 4
+        range: { start: 3, end: 4 }
       })
     ).toEqual([{ text: '12345', effects: [], active: true }])
   })
@@ -234,8 +220,7 @@ describe('when unstyling', () => {
       style({
         type: effects.bold,
         input: { text: 'hello world', effects: [effects.bold, effects.italic] },
-        from: 2,
-        to: 5
+        range: { start: 2, end: 5 }
       })
     ).toEqual([
       { text: 'he', effects: [effects.bold, effects.italic], active: false },
@@ -251,8 +236,7 @@ describe('when applying multiple styles', () => {
       style({
         type: effects.italic,
         input: [{ text: 'hello' }, { text: 'world', effects: [effects.bold] }],
-        from: 5,
-        to: 10
+        range: { start: 5, end: 10 }
       })
     ).toEqual([
       { text: 'hello', effects: [], active: false },
@@ -269,8 +253,7 @@ describe('when applying multiple styles', () => {
           { text: 'second ', effects: [effects.bold] },
           { text: 'third' }
         ],
-        from: 0,
-        to: 6
+        range: { start: 0, end: 6 }
       })
     ).toEqual([
       { text: 'first ', effects: [effects.italic], active: true },
@@ -284,8 +267,7 @@ describe('when applying multiple styles', () => {
       style({
         type: effects.bold,
         input: { text: 'hello world', effects: [effects.italic] },
-        from: 6,
-        to: 11
+        range: { start: 6, end: 11 }
       })
     ).toEqual([
       { text: 'hello ', effects: [effects.italic], active: false },
@@ -302,8 +284,7 @@ describe('when applying multiple styles', () => {
           { text: 'second ', effects: [effects.bold] },
           { text: 'third' }
         ],
-        from: 13,
-        to: 18
+        range: { start: 13, end: 18 }
       })
     ).toEqual([
       { text: 'first ', effects: [], active: false },
@@ -322,8 +303,7 @@ describe('when applying multiple styles', () => {
           { text: 'three', effects: [effects.bold] },
           { text: 'four' }
         ],
-        from: 1,
-        to: 14
+        range: { start: 1, end: 14 }
       })
     ).toEqual([
       { text: 'o', effects: [], active: false },
@@ -342,8 +322,7 @@ describe('when applying multiple styles', () => {
           { text: 'Hello', effects: [{ tag: 'a', href: 'link1' }] },
           { text: 'World', effects: [] }
         ],
-        from: 0,
-        to: 10
+        range: { start: 0, end: 10 }
       })
     ).toEqual([
       {
@@ -361,8 +340,7 @@ describe('when input is empty', () => {
       style({
         type: effects.bold,
         input: [{ text: '' }],
-        from: 0,
-        to: 0
+        range: { start: 0, end: 0 }
       })
     ).toEqual([{ text: '', effects: [effects.bold], active: true }])
   })
@@ -372,8 +350,7 @@ describe('when input is empty', () => {
       style({
         type: effects.bold,
         input: [{ text: '', effects: [effects.bold] }],
-        from: 0,
-        to: 0
+        range: { start: 0, end: 0 }
       })
     ).toEqual([{ text: '', effects: [], active: true }])
   })

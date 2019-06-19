@@ -1,9 +1,16 @@
-import { checkEffects, checkEditor, addDefaultEffects } from './args'
-import { el, render, relativeRange } from './DOM'
+import {
+  checkEffects,
+  checkEditor,
+  addDefaultEffects,
+  setOptions
+} from './args'
+import { el, renderText } from './DOM'
+import { relativeRange } from './Ranging'
 import { style } from './Stylist'
-import { showDialog } from './Dialogue'
+import { showDialog } from './Dialog'
 import * as Handle from './keyHandler'
 import * as Editor from './editor'
+import { importImage } from './image'
 
 /**
  * It creates a configurator function based on the effects.
@@ -45,37 +52,31 @@ function create(effects) {
     richtextElement.addEventListener('click', e => {
       const anchor = el.parentOf(el(e.target), 'a')
       if (anchor) {
-        showDialog(richtext, {
+        showDialog({
+          richtext,
           defaultValue: anchor.getAttribute('href'),
-          mode: 'edit'
+          mode: 'edit',
+          succeeded: link => anchor.setAttribute('href', link),
+          deleted: () => anchor.takeOff()
         })
-          .succeeded(link => {
-            anchor.setAttribute('href', link)
-          })
-          .deleted(() => {
-            anchor.takeOff()
-          })
       }
     })
 
     const setStyle = options => {
-      let { start, end, type, listTag, editor } = options
-      const elements = style(effects, start, end, type, editor)
-      render({
+      let { range, type, listTag, editor } = options
+      const elements = style(effects, range, type, editor)
+      renderText({
         richtext,
         editors: editor,
         elements: elements.list,
         listTag
       })
-      if (typeof type === 'string' && effects[type].parent) {
-        end -= start
-        start = 0
-      }
-      Editor.setCursor(
-        elements.active,
-        richtextOptions.staySelected ? start : end,
-        end
-      )
+      range =
+        typeof type === 'string' && effects[type].parent
+          ? range.shiftToStart()
+          : range
+      range = richtextOptions.staySelected ? range : range.toEnd()
+      Editor.setCursor(elements.active, range)
     }
 
     const styleSelectedOrAll = (type, listTag) => {
@@ -83,12 +84,8 @@ function create(effects) {
       if (Editor.isNotEditor(richtext, editor)) {
         return
       }
-      let { start, end } = relativeRange(editor)
-      if (start === end) {
-        start = 0
-        end = el.active().textLength
-      }
-      setStyle({ start, end, type, listTag, editor })
+      const range = relativeRange(editor).selectedForSure(editor.textLength)
+      setStyle({ range, type, listTag, editor })
     }
 
     const ifReady = func => {
@@ -96,42 +93,36 @@ function create(effects) {
       if (Editor.isNotEditor(richtext, editor)) {
         return
       }
-      const { start, end } = relativeRange(editor)
-      if (start === end) {
+      const range = relativeRange(editor)
+      if (range.standing()) {
         return
       }
-      func(start, end, editor)
+      func(range, editor)
     }
 
     return {
-      setOptions: value => {
-        if (value.staySelected !== undefined) {
-          richtextOptions.staySelected = value.staySelected
-        }
-        if (value.defaultLink !== undefined) {
-          richtextOptions.defaultLink = value.defaultLink
-        }
-      },
-      style: type => {
-        ifReady((start, end, editor) => setStyle({ start, end, type, editor }))
-      },
+      setOptions: value => setOptions(value, richtextOptions),
+      style: type =>
+        ifReady((range, editor) => setStyle({ range, type, editor })),
       styleLink: () =>
-        ifReady((start, end, editor) => {
-          showDialog(richtext, {
-            defaultValue: richtextOptions.defaultLink
-          }).succeeded(link => {
-            setStyle({
-              start,
-              end,
-              type: { tag: 'a', href: link },
-              editor
-            })
+        ifReady((range, editor) => {
+          showDialog({
+            richtext,
+            defaultValue: richtextOptions.defaultLink,
+            succeeded: link => {
+              setStyle({
+                range,
+                type: { tag: 'a', href: link },
+                editor
+              })
+            }
           })
         }),
       apply: type => styleSelectedOrAll(type),
       applyUnorderedList: () => styleSelectedOrAll('list', 'ul'),
       applyCodebox: () => styleSelectedOrAll('codebox'),
-      applyOrderedList: () => styleSelectedOrAll('list', 'ol')
+      applyOrderedList: () => styleSelectedOrAll('list', 'ol'),
+      selectImage: () => importImage(richtext, effects)
     }
   }
 }

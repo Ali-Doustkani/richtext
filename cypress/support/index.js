@@ -34,8 +34,16 @@ Cypress.Commands.add('highlightAll', { prevSubject: 'element' }, subject => {
 Cypress.Commands.add(
   'shouldHaveHtml',
   { prevSubject: 'element' },
-  (subject, html) => {
-    cy.wrap(subject).should('have.html', html.replace(/\s{2,}/g, ''))
+  (subject, html, options) => {
+    html = html.replace(/\s{2,}/g, '')
+    if (options && options.removeStyle) {
+      cy.wrap(subject).should(p => {
+        const withoutStyle = p[0].innerHTML.replace(/\sstyle=".+?"/g, '')
+        expect(html).to.equal(withoutStyle)
+      })
+    } else {
+      cy.wrap(subject).should('have.html', html)
+    }
   }
 )
 
@@ -72,3 +80,21 @@ Cypress.Commands.add(
     return subject
   }
 )
+
+Cypress.Commands.add('mockImageDialog', () => {
+  cy.document().then(document => {
+    const original = document.createElement
+    let changeFunc
+    document.createElement = elName => {
+      if (elName === 'input') {
+        return {
+          setAttribute: () => {},
+          addEventListener: (name, fn) => (changeFunc = fn),
+          click: () => changeFunc(),
+          files: [new Blob()]
+        }
+      }
+      return original.call(document, elName)
+    }
+  })
+})

@@ -5,19 +5,19 @@ import {
   queryByTestId,
   fireEvent
 } from '@testing-library/dom'
-import { showDialog } from './../Dialogue'
+import { showDialog } from './../Dialog'
 import { el } from './../DOM'
 
-let parent
+let richtext
 beforeEach(() => {
-  parent = el('div')
+  richtext = el('div')
   while (document.body.firstChild) {
     document.body.removeChild(document.body.firstChild)
   }
-  document.body.appendChild(parent.element)
+  document.body.appendChild(richtext.element)
 })
 
-afterEach(() => document.body.removeChild(parent.element))
+afterEach(() => document.body.removeChild(richtext.element))
 
 window.getSelection = () => ({
   getRangeAt: () => ({
@@ -30,60 +30,65 @@ window.getSelection = () => ({
 })
 
 describe('Showing', () => {
-  it('show dialogue', () => {
-    showDialog(parent)
-    expect(getByTestId(document, 'dialogue')).toBeVisible()
+  it('show dialog', () => {
+    showDialog({ richtext })
+    expect(getByTestId(document, 'dialog')).toBeVisible()
   })
 
   it('show delete button in edit mode', () => {
-    showDialog(parent, { mode: 'edit' })
+    showDialog({ richtext, mode: 'edit' })
     expect(getByText(document, 'Save')).toBeVisible()
     expect(getByText(document, 'Delete')).toBeVisible()
     expect(getByText(document, 'Cancel')).toBeVisible()
   })
 
   it('show default value', () => {
-    showDialog(parent, { defaultValue: 'https://' })
-    expect(getByTestId(document, 'dialogue-input').value).toBe('https://')
+    showDialog({ richtext, defaultValue: 'https://' })
+    expect(getByTestId(document, 'dialog-input').value).toBe('https://')
   })
 })
 
 describe('Saving', () => {
   it('call callback', () => {
     const fn = jest.fn()
-    showDialog(parent).succeeded(fn)
-    getByTestId(document, 'dialogue-input').value = 'some link'
+    showDialog({ richtext, succeeded: fn })
+    getByTestId(document, 'dialog-input').value = 'some link'
     getByText(document, 'Save').click()
     expect(fn).toHaveBeenCalledWith('some link')
   })
 
-  it('close dialogue', () => {
-    showDialog(parent)
+  it('close dialog', () => {
+    showDialog({ richtext })
     getByText(document, 'Save').click()
-    expect(queryByTestId(document, 'dialogue')).not.toBeInTheDocument()
+    expect(queryByTestId(document, 'dialog')).not.toBeInTheDocument()
   })
 
   it('work with enter key', () => {
     const fn = jest.fn()
-    showDialog(parent).succeeded(fn)
-    getByTestId(document, 'dialogue-input').value = 'Hello'
-    fireEvent.keyUp(getByTestId(document, 'dialogue-input'), { key: 'Enter' })
-    expect(queryByTestId(document, 'dialogue')).not.toBeInTheDocument()
+    showDialog({ richtext, succeeded: fn })
+    getByTestId(document, 'dialog-input').value = 'Hello'
+    fireEvent.keyUp(getByTestId(document, 'dialog-input'), { key: 'Enter' })
+    expect(queryByTestId(document, 'dialog')).not.toBeInTheDocument()
     expect(fn).toHaveBeenCalledWith('Hello')
   })
 
   it('save on edit mode', () => {
     const fn = jest.fn()
-    showDialog(parent, { mode: 'edit', defaultValue: 'OldValue' }).succeeded(fn)
-    expect(getByTestId(document, 'dialogue-input').value).toBe('OldValue')
-    getByTestId(document, 'dialogue-input').value = 'NewValue'
+    showDialog({
+      richtext,
+      mode: 'edit',
+      defaultValue: 'OldValue',
+      succeeded: fn
+    })
+    expect(getByTestId(document, 'dialog-input').value).toBe('OldValue')
+    getByTestId(document, 'dialog-input').value = 'NewValue'
     getByText(document, 'Save').click()
     expect(fn).toHaveBeenCalledWith('NewValue')
   })
 
   it('delete on edit mode', () => {
     const fn = jest.fn()
-    showDialog(parent, { mode: 'edit' }).deleted(fn)
+    showDialog({ richtext, mode: 'edit', deleted: fn })
     getByText(document, 'Delete').click()
     expect(fn).toHaveBeenCalled()
   })
@@ -93,32 +98,30 @@ describe('Canceling', () => {
   it('call callback', () => {
     const succeeded = jest.fn()
     const canceled = jest.fn()
-    showDialog(parent)
-      .succeeded(succeeded)
-      .canceled(canceled)
+    showDialog({ richtext, succeeded, canceled })
     getByText(document, 'Cancel').click()
     expect(canceled).toHaveBeenCalled()
   })
 
-  it('close dialogue', () => {
-    showDialog(parent)
+  it('close dialog', () => {
+    showDialog({ richtext })
     getByText(document, 'Cancel').click()
-    expect(queryByTestId(document, 'dialogue')).not.toBeInTheDocument()
+    expect(queryByTestId(document, 'dialog')).not.toBeInTheDocument()
   })
 
   it('work with escape key', () => {
     const fn = jest.fn()
-    showDialog(parent).canceled(fn)
-    fireEvent.keyUp(getByTestId(document, 'dialogue-input'), {
+    showDialog({ richtext, canceled: fn })
+    fireEvent.keyUp(getByTestId(document, 'dialog-input'), {
       key: 'Escape'
     })
-    expect(queryByTestId(document, 'dialogue')).not.toBeInTheDocument()
+    expect(queryByTestId(document, 'dialog')).not.toBeInTheDocument()
     expect(fn).toHaveBeenCalled()
   })
 
   it('cancel on edit mode', () => {
     const fn = jest.fn()
-    showDialog(parent, { mode: 'edit' }).canceled(fn)
+    showDialog({ richtext, mode: 'edit', canceled: fn })
     getByText(document, 'Cancel').click()
     expect(fn).toHaveBeenCalled()
   })

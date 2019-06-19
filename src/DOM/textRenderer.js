@@ -1,6 +1,6 @@
 import { el } from './Query'
 
-function render(params) {
+function renderText(params) {
   let { richtext, editors, elements, listTag } = params
   editors = Array.isArray(editors) ? editors : [editors]
   if (shouldCreateList(editors, elements)) {
@@ -141,4 +141,4 @@ function modifyListItem(listItem, element) {
   listItem.remove()
 }
 
-export { render }
+export { renderText }

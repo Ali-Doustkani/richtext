@@ -12,6 +12,10 @@ const richtext = createRichtext({
     parent: true,
     tag: 'h1',
     className: 'header-style'
+  },
+  image: {
+    parent: true,
+    tag: 'img'
   }
 })(div)
 richtext.setOptions({ defaultLink: 'https://' })
@@ -34,3 +38,4 @@ wire('codebox', () => richtext.applyCodebox())
 wire('list', () => richtext.applyUnorderedList())
 wire('orderedList', () => richtext.applyOrderedList())
 wire('hyperlink', () => richtext.styleLink())
+wire('image', () => richtext.selectImage())

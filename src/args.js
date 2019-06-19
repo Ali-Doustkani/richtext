@@ -51,7 +51,7 @@ function checkEditor(richtext) {
     )
   }
   if (!richtext.children.length) {
-    el(richtext).append(el('p').isEditable())
+    el(richtext).append(el('p').editable())
   }
   if (richtext.firstChild.nodeName !== 'P') {
     throw new Error('only <p> element is valid inside richtext')
@@ -73,4 +73,13 @@ function addDefaultEffects(effects) {
   }
 }
 
-export { checkEffects, checkEditor, addDefaultEffects }
+function setOptions(from, to) {
+  if (from.staySelected !== undefined) {
+    to.staySelected = from.staySelected
+  }
+  if (from.defaultLink !== undefined) {
+    to.defaultLink = from.defaultLink
+  }
+}
+
+export { checkEffects, checkEditor, addDefaultEffects, setOptions }

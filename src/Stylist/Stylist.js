@@ -18,8 +18,8 @@ function check(options) {
 }
 
 function style(options) {
-  const { input, from, to, type } = check(options)
-  const context = createContext(from, to)
+  const { input, range, type } = check(options)
+  const context = createContext(range)
   if (emptyInput(options)) {
     return [
       {
@@ -47,9 +47,9 @@ function style(options) {
 }
 
 function emptyInput(options) {
-  const { input, from, to } = options
+  const { input, range } = options
   const noInput = input.length === 1 && !input[0].text
-  return noInput && !from && !to
+  return noInput && !range.start && !range.end
 }
 
 function dontTouch({ context, text, originalEffects }) {
