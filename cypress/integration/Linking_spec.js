@@ -6,7 +6,7 @@ it('apply link to a text', () => {
   cy.contains('Bold').click()
   cy.get('#editor>p>b').highlight(0, 5)
   cy.contains('Hyperlink').click()
-  cy.get('input[data-testid="dialogue-input"]').type('link{enter}')
+  cy.get('input[data-testid="dialog-input"]').type('link{enter}')
   cy.get('#editor').shouldHaveHtml(`
   <p contenteditable="true">
     <a href="https://link"><b>Hello</b></a>
@@ -20,14 +20,14 @@ it('edit a link', () => {
     .type('Hello World')
     .highlightAll()
   cy.contains('Hyperlink').click()
-  cy.get('input[data-testid="dialogue-input"]').type('link1{enter}')
+  cy.get('input[data-testid="dialog-input"]').type('link1{enter}')
   cy.get('#editor a').click()
-  cy.get('input[data-testid="dialogue-input"]')
+  cy.get('input[data-testid="dialog-input"]')
     .should('have.value', 'https://link1')
     .type('...TEXT{esc}')
 
   cy.get('#editor a').click()
-  cy.get('input[data-testid="dialogue-input"]').type('{backspace}2{enter}')
+  cy.get('input[data-testid="dialog-input"]').type('{backspace}2{enter}')
   cy.get('#editor').shouldHaveHtml(`
   <p contenteditable="true">
     <a href="https://link2">Hello World</a>
@@ -40,7 +40,7 @@ it('delete a link', () => {
     .type('Hello')
     .highlightAll()
   cy.contains('Hyperlink').click()
-  cy.get('input[data-testid="dialogue-input"]').type('link{enter}')
+  cy.get('input[data-testid="dialog-input"]').type('link{enter}')
   cy.get('#editor a').click()
   cy.contains('Delete').click()
   cy.get('#editor').should('have.html', '<p contenteditable="true">Hello</p>')

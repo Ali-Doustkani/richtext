@@ -7,7 +7,7 @@ import {
 import { el, renderText } from './DOM'
 import { relativeRange } from './Ranging'
 import { style } from './Stylist'
-import { showDialog } from './Dialogue'
+import { showDialog } from './Dialog'
 import * as Handle from './keyHandler'
 import * as Editor from './editor'
 import { importImage } from './image'
