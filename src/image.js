@@ -17,7 +17,10 @@ function importImage(richtext, effects) {
       () => {
         const img = createNewImage(reader.result)
         let figure
-        if (richtext.isParentOf(currentEdit)) {
+        if (
+          richtext.isParentOf(currentEdit) &&
+          currentEdit.isNot('figcaption')
+        ) {
           const renderModel = breakAt(effects, currentEdit)
           renderModel.list.splice(1, 0, img)
           figure = renderImage({
