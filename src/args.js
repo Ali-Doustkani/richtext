@@ -1,44 +1,44 @@
 import { el } from './DOM'
 
-function effectsAreOk(effects) {
-  if (!effects) {
+function effectsAreOk(decors) {
+  if (!decors) {
     throw new Error("'rules' cannot be empty")
   }
-  for (let prop in effects) {
-    if (typeof effects[prop] !== 'object') {
+  for (let prop in decors) {
+    if (typeof decors[prop] !== 'object') {
       throw new Error(
-        `${prop} must be an object containing 'tag' but it's a ${typeof effects[
+        `${prop} must be an object containing 'tag' but it's a ${typeof decors[
           prop
         ]}`
       )
     }
-    if (typeof effects[prop].tag !== 'string') {
-      throw new Error(`'tag' in ${effects[prop]} is not string`)
+    if (typeof decors[prop].tag !== 'string') {
+      throw new Error(`'tag' in ${decors[prop]} is not string`)
     }
-    if (!effects[prop]) {
+    if (!decors[prop]) {
       throw new Error(
-        `'tag' in ${effects[prop]} does not have a not empty string value`
+        `'tag' in ${decors[prop]} does not have a not empty string value`
       )
     }
   }
 }
 
-function standardizeEffects(effects) {
+function standardizeEffects(decors) {
   const initObj = {}
-  for (let prop in effects) {
-    if (typeof effects[prop] === 'string') {
-      initObj[prop] = { tag: effects[prop] }
+  for (let prop in decors) {
+    if (typeof decors[prop] === 'string') {
+      initObj[prop] = { tag: decors[prop] }
     } else {
-      initObj[prop] = effects[prop]
+      initObj[prop] = decors[prop]
     }
   }
   return initObj
 }
 
-function checkEffects(effects) {
-  effects = standardizeEffects(effects)
-  effectsAreOk(effects)
-  return effects
+function checkEffects(decors) {
+  decors = standardizeEffects(decors)
+  effectsAreOk(decors)
+  return decors
 }
 
 function checkEditor(richtext) {
@@ -68,10 +68,10 @@ function checkOptions(options) {
   options = options || {}
   init(options, 'staySelected', false)
   init(options, 'defaultLink', '')
-  init(options, 'effects', [])
-  addDefaultEffects(options.effects)
+  init(options, 'decors', [])
+  addDefaultEffects(options.decors)
   if (process.env.NODE_ENV === 'development') {
-    options.effects = checkEffects(options.effects)
+    options.decors = checkEffects(options.decors)
   }
   return options
 }
@@ -82,16 +82,16 @@ function init(options, name, value) {
   }
 }
 
-function addDefaultEffects(effects) {
-  effects.list = {
+function addDefaultEffects(decors) {
+  decors.list = {
     parent: true,
     tag: 'li'
   }
-  effects.codebox = {
+  decors.codebox = {
     parent: true,
     tag: 'pre'
   }
-  effects.anchor = {
+  decors.anchor = {
     tag: 'a',
     href: ''
   }

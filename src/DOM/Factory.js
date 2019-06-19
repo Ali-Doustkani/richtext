@@ -1,8 +1,8 @@
 import { el } from './Query'
 
-const createNewEditor = effect =>
-  el(effect && effect.parent ? effect.tag : 'p')
-    .setAttributeFrom(effect)
+const createNewEditor = decor =>
+  el(decor && decor.parent ? decor.tag : 'p')
+    .setAttributeFrom(decor)
     .editable()
 
 const createNewImage = source =>
@@ -26,8 +26,8 @@ function generateRenderModel(styleModel) {
 
   const setActive = (editor, item) => (active = item.active ? editor : active)
 
-  const parentOf = effects => {
-    const result = effects ? effects.find(x => x.parent) : undefined
+  const parentOf = decors => {
+    const result = decors ? decors.find(x => x.parent) : undefined
     return result || { tag: 'p' }
   }
 
@@ -39,7 +39,7 @@ function generateRenderModel(styleModel) {
   }
 
   const editorOf = item => {
-    const pe = parentOf(item.effects)
+    const pe = parentOf(item.decors)
     let editor = lastEditorOf(pe)
     if (!editor) {
       editor = createNewEditor(pe)
@@ -51,12 +51,12 @@ function generateRenderModel(styleModel) {
 
   styleModel.forEach(item => {
     let child = item.text
-    const setChild = effect =>
-      (child = el(effect.tag)
-        .setAttributeFrom(effect)
+    const setChild = decor =>
+      (child = el(decor.tag)
+        .setAttributeFrom(decor)
         .val(child))
-    item.effects.filter(x => !x.parent && x.tag !== 'a').forEach(setChild)
-    item.effects.filter(x => !x.parent && x.tag === 'a').forEach(setChild)
+    item.decors.filter(x => !x.parent && x.tag !== 'a').forEach(setChild)
+    item.decors.filter(x => !x.parent && x.tag === 'a').forEach(setChild)
     const editor = editorOf(item)
     if (mergeable(editor.lastChild(), child)) {
       child.moveChildrenTo(editor.lastChild())

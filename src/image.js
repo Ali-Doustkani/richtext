@@ -1,7 +1,7 @@
 import { el, renderImage, createNewImage } from './DOM'
 import { breakAt } from './Stylist'
 
-function importImage(richtext, effects) {
+function importImage(richtext, decors) {
   const currentEdit = el.active()
   const input = el('input')
     .setAttribute('type', 'file')
@@ -21,7 +21,7 @@ function importImage(richtext, effects) {
           richtext.isParentOf(currentEdit) &&
           currentEdit.isNot('figcaption')
         ) {
-          const renderModel = breakAt(effects, currentEdit)
+          const renderModel = breakAt(decors, currentEdit)
           renderModel.list.splice(1, 0, img)
           figure = renderImage({
             richtext,

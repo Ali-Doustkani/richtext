@@ -4,14 +4,14 @@ import { when } from './utils'
 function check(options) {
   if (options) {
     if (typeof options.input === 'string') {
-      options.input = [{ text: options.input, effects: [] }]
+      options.input = [{ text: options.input, decors: [] }]
     } else if (
       typeof options.input === 'object' &&
       !Array.isArray(options.input)
     ) {
       options.input = [options.input]
     }
-    options.input.forEach(item => (item.effects = item.effects || []))
+    options.input.forEach(item => (item.decors = item.decors || []))
     return options
   }
   throw new Error('Invalid options')
@@ -24,7 +24,7 @@ function style(options) {
     return [
       {
         text: '',
-        effects: context.getEffective(input[0].effects, type),
+        decors: context.getEffective(input[0].decors, type),
         active: true
       }
     ]

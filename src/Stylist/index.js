@@ -3,25 +3,25 @@ import { glue as _glue, breakAt as _breakAt } from './Break'
 import { generateRenderModel, read } from './../DOM'
 import { relativeRange } from './../Ranging'
 
-function style(effects, range, styleName, editor) {
-  const ef = typeof styleName === 'string' ? effects[styleName] : styleName
+function style(decors, range, styleName, editor) {
+  const ef = typeof styleName === 'string' ? decors[styleName] : styleName
   return generateRenderModel(
     _style({
       type: ef,
-      input: read(effects, editor),
+      input: read(decors, editor),
       range
     })
   )
 }
 
-function glue(effects, editor1, editor2) {
+function glue(decors, editor1, editor2) {
   return generateRenderModel(
-    _glue(read(effects, editor1), read(effects, editor2))
+    _glue(read(decors, editor1), read(decors, editor2))
   )
 }
 
-function breakAt(effects, editor) {
-  const [m1, m2] = _breakAt(read(effects, editor), relativeRange(editor)).map(
+function breakAt(decors, editor) {
+  const [m1, m2] = _breakAt(read(decors, editor), relativeRange(editor)).map(
     m => generateRenderModel(m)
   )
   return {

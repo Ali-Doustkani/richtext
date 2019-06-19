@@ -1,24 +1,24 @@
 import { traverse } from './PreOrderTravers'
 /**
  * It reads the editor and returns an array of style models.
- * @param {Array} effects Effect rules.
+ * @param {Array} decors Decor array.
  * @param {HTMLElement} editor Current editor.
  */
-function read(effects, editor) {
+function read(decors, editor) {
   const ret = []
   traverse(editor).forEach(leaf => ret.push(toStyle(leaf)))
   return ret
 
   function toStyle(node) {
-    return { text: node.val(), effects: toEffects(node) }
+    return { text: node.val(), decors: toEffects(node) }
   }
 
   function toEffects(node) {
     const result = []
     while (node.isNot(editor.parent())) {
-      const effect = getEffect(node)
-      if (effect) {
-        result.push(effect)
+      const decor = getEffect(node)
+      if (decor) {
+        result.push(decor)
       }
       node = node.parent()
     }
@@ -26,8 +26,8 @@ function read(effects, editor) {
   }
 
   function getEffect(el) {
-    for (let prop in effects) {
-      const e = effects[prop]
+    for (let prop in decors) {
+      const e = decors[prop]
       if (e.tag && el.is(e.tag) && el.hasClassFrom(e)) {
         const specials = dynamicAttribs(e)
         return specials.length ? makeEffect(e, specials, el) : e
@@ -36,17 +36,17 @@ function read(effects, editor) {
     return null
   }
 
-  // values of dynamic attributes are read from DOM instead of effects array
-  function dynamicAttribs(effects) {
-    return Object.keys(effects).filter(
+  // values of dynamic attributes are read from DOM instead of decors array
+  function dynamicAttribs(decors) {
+    return Object.keys(decors).filter(
       x => x !== 'tag' && x !== 'className' && x !== 'parent'
     )
   }
 
-  function makeEffect(effect, specials, element) {
-    const ret = { tag: effect.tag }
-    if (effect.className) {
-      ret.className = effect.className
+  function makeEffect(decor, specials, element) {
+    const ret = { tag: decor.tag }
+    if (decor.className) {
+      ret.className = decor.className
     }
     specials.forEach(item => (ret[item] = element.getAttribute(item)))
     return ret

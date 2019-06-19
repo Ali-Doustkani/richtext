@@ -30,9 +30,9 @@ function when(condition) {
 }
 
 /**
- * Checks the equality of two different effect arrays.
- * @param {Array} first   First effects array.
- * @param {Array} second  Second effects array.
+ * Checks the equality of two different decor arrays.
+ * @param {Array} first   First decors array.
+ * @param {Array} second  Second decors array.
  * @returns {boolean}     If they are equal returns true, otherwise false.
  */
 function areEqual(first, second) {

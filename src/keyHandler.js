@@ -3,7 +3,7 @@ import { relativeRange } from './Ranging'
 import { breakAt, glue } from './Stylist'
 import * as Editor from './editor'
 
-function enterKey(event, effects, richtext) {
+function enterKey(event, decors, richtext) {
   event.preventDefault() // prevent creating new lines in the same p element
   const editor = el.active()
   if (editor.is('figcaption')) {
@@ -14,18 +14,18 @@ function enterKey(event, effects, richtext) {
     return
   }
   if (editor.is('li') && event.ctrlKey) {
-    const renderModel = breakAt(effects, editor)
+    const renderModel = breakAt(decors, editor)
     renderModel.list[1].to('p').editable()
     renderText({ richtext, editors: editor, elements: renderModel.list })
     renderModel.active.focus()
     return
   }
-  const renderModel = breakAt(effects, editor)
+  const renderModel = breakAt(decors, editor)
   renderText({ richtext, editors: editor, elements: renderModel.list })
   renderModel.active.focus()
 }
 
-function backspaceKey(event, effects, richtext) {
+function backspaceKey(event, decors, richtext) {
   const editor = el.active()
   if (editor.is('figcaption')) {
     return
@@ -36,7 +36,7 @@ function backspaceKey(event, effects, richtext) {
   event.preventDefault()
   const prevEditor = Editor.previousEditor(editor)
   const len = prevEditor.textLength
-  const renderModels = glue(effects, prevEditor, editor)
+  const renderModels = glue(decors, prevEditor, editor)
   renderText({
     richtext,
     editors: [prevEditor, editor],
@@ -45,7 +45,7 @@ function backspaceKey(event, effects, richtext) {
   Editor.setCursor(renderModels.active, len)
 }
 
-function deleteKey(event, effects, richtext) {
+function deleteKey(event, decors, richtext) {
   const editor = el.active()
   if (editor.is('figcaption')) {
     return
@@ -57,7 +57,7 @@ function deleteKey(event, effects, richtext) {
 
   const len = editor.textLength
   const nextEditor = Editor.nextEditor(editor)
-  const renderModel = glue(effects, editor, nextEditor)
+  const renderModel = glue(decors, editor, nextEditor)
   renderText({
     richtext,
     editors: [editor, nextEditor],

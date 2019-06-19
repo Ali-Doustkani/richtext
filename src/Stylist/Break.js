@@ -9,26 +9,26 @@ import { areEqual } from './utils'
 function glue(model1, model2) {
   const result = []
   const pushAll = model =>
-    model.forEach(item => result.push(copy(item.text, item.effects)))
+    model.forEach(item => result.push(copy(item.text, item.decors)))
   pushAll(model1)
 
   const parentEffect = model1.length
-    ? model1[0].effects.find(x => x.parent)
+    ? model1[0].decors.find(x => x.parent)
     : null
 
   model2.forEach(item => {
-    item.effects = item.effects.filter(x => !x.parent)
+    item.decors = item.decors.filter(x => !x.parent)
     if (parentEffect) {
-      item.effects.push(parentEffect)
+      item.decors.push(parentEffect)
     }
   })
   if (result.length && model2.length) {
-    const lastEffect = result[result.length - 1].effects
+    const lastEffect = result[result.length - 1].decors
     const firstModel = model2.shift()
-    if (areEqual(lastEffect, firstModel.effects)) {
+    if (areEqual(lastEffect, firstModel.decors)) {
       result[result.length - 1].text += firstModel.text
     } else {
-      result.push(copy(firstModel.text, firstModel.effects))
+      result.push(copy(firstModel.text, firstModel.decors))
     }
   }
   pushAll(model2)
@@ -67,7 +67,7 @@ function breakAt(model, range) {
   if (newModel.length) {
     newModel[newModel.length - 1].active = true
   } else {
-    newModel.push(copy('', originalModel[originalModel.length - 1].effects))
+    newModel.push(copy('', originalModel[originalModel.length - 1].decors))
     newModel[0].active = true
   }
   return [originalModel, newModel]
@@ -103,10 +103,10 @@ function iterateOver(model, selection, func) {
       return result
     },
     rightSlice: item =>
-      copy(item.text.slice(selection.end - read), item.effects),
+      copy(item.text.slice(selection.end - read), item.decors),
     leftSlice: item =>
-      copy(item.text.slice(0, selection.start - read), item.effects),
-    whole: item => copy(item.text, item.effects)
+      copy(item.text.slice(0, selection.start - read), item.decors),
+    whole: item => copy(item.text, item.decors)
   }
   model.forEach(item => {
     read += item.text.length
@@ -114,15 +114,15 @@ function iterateOver(model, selection, func) {
   })
 }
 
-function copy(text, effects) {
-  return { text, effects: [...effects], active: false }
+function copy(text, decors) {
+  return { text, decors: [...decors], active: false }
 }
 
 function setLastActive(array, index) {
   if (array.length) {
     array[index].active = true
   } else {
-    array.push({ text: '', effects: [], active: true })
+    array.push({ text: '', decors: [], active: true })
   }
 }
 

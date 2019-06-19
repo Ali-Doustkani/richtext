@@ -7,20 +7,20 @@ function create(result, head) {
   })
 }
 
-function addToResult(state, text, effects, active) {
+function addToResult(state, text, decors, active) {
   if (text === '') {
     return state
   }
   const result = [...state.result]
   const lastElement = result[result.length - 1]
-  if (lastElement && areEqual(lastElement.effects, effects)) {
+  if (lastElement && areEqual(lastElement.decors, decors)) {
     lastElement.text += text
     lastElement.active = active || lastElement.active
   } else {
     if (active && lastElement) {
       lastElement.active = false
     }
-    result.push({ text, effects, active })
+    result.push({ text, decors, active })
   }
   return create(result, state.head + text.length)
 }
@@ -30,8 +30,8 @@ function createContext({ start, end }) {
   let regionHead = 0
   const ret = {}
 
-  const mustUndo = (effects, type) => {
-    const hasTheEffect = effects.includes(type)
+  const mustUndo = (decors, type) => {
+    const hasTheEffect = decors.includes(type)
     const regionFitToPoints = state.head === start && regionHead === end
     const pointsAreInRegion =
       start >= state.head &&
@@ -48,21 +48,21 @@ function createContext({ start, end }) {
     return state.result
   }
 
-  ret.addResult = (text, effects, active) => {
-    state = addToResult(state, text, effects, active)
+  ret.addResult = (text, decors, active) => {
+    state = addToResult(state, text, decors, active)
     return ret
   }
 
   ret.iterateOver = (input, type, func) => {
     for (let i = 0; i < input.length; i++) {
-      const { text, effects } = input[i]
+      const { text, decors } = input[i]
       regionHead += text.length
-      func(text, effects, ret.getEffective(effects, type))
+      func(text, decors, ret.getEffective(decors, type))
     }
   }
 
-  ret.getEffective = (effects, type) =>
-    mustUndo(effects, type) ? remove(effects, type) : merge(effects, type)
+  ret.getEffective = (decors, type) =>
+    mustUndo(decors, type) ? remove(decors, type) : merge(decors, type)
 
   ret.regionUntouched = () => {
     return regionHead <= start || state.head >= end

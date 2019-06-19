@@ -3,7 +3,7 @@ import createRichtext from './../src/Richtext'
 const richtextEl = document.getElementById('richtext')
 const richtext = createRichtext(richtextEl, {
   defaultLink: 'https://',
-  effects: {
+  decors: {
     bold: 'b',
     italic: 'i',
     highlight: {

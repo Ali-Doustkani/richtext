@@ -10,7 +10,7 @@ import { importImage } from './image'
 /**
  * It creates the richtext component.
  * @param {HTMLElement} element The given <div> or <article> that should work as a richtext.
- * @param {object} options The contifuration object which includes effects and other options.
+ * @param {object} options The contifuration object which includes decors and other options.
  */
 function create(element, options) {
   checkEditor(element)
@@ -21,11 +21,11 @@ function create(element, options) {
     'keydown',
     e => {
       if (e.key === 'Enter') {
-        Handle.enterKey(e, options.effects, richtext)
+        Handle.enterKey(e, options.decors, richtext)
       } else if (e.key === 'Backspace') {
-        Handle.backspaceKey(e, options.effects, richtext)
+        Handle.backspaceKey(e, options.decors, richtext)
       } else if (e.key === 'Delete') {
-        Handle.deleteKey(e, options.effects, richtext)
+        Handle.deleteKey(e, options.decors, richtext)
       } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
         Handle.arrowUp(e)
       } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
@@ -50,7 +50,7 @@ function create(element, options) {
 
   const setStyle = params => {
     let { range, type, listTag, editor } = params
-    const elements = style(options.effects, range, type, editor)
+    const elements = style(options.decors, range, type, editor)
     renderText({
       richtext,
       editors: editor,
@@ -58,7 +58,7 @@ function create(element, options) {
       listTag
     })
     range =
-      typeof type === 'string' && options.effects[type].parent
+      typeof type === 'string' && options.decors[type].parent
         ? range.shiftToStart()
         : range
     range = options.staySelected ? range : range.toEnd()
@@ -108,7 +108,7 @@ function create(element, options) {
     applyUnorderedList: () => styleSelectedOrAll('list', 'ul'),
     applyCodebox: () => styleSelectedOrAll('codebox'),
     applyOrderedList: () => styleSelectedOrAll('list', 'ol'),
-    selectImage: () => importImage(richtext, options.effects)
+    selectImage: () => importImage(richtext, options.decors)
   }
 }
 
