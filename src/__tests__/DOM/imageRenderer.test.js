@@ -6,7 +6,12 @@ beforeEach(() => (richtext = el('div')))
 
 function expectHtml(html) {
   const withoutStyle = richtext.element.innerHTML.replace(/\sstyle=".+?"/g, '')
-  expect(withoutStyle).toBe(html)
+  expect(withoutStyle).toBe(
+    html.replace(
+      '[figure]',
+      '<figure><img><button>Remove</button><figcaption></figcaption></figure>'
+    )
+  )
 }
 
 it('put <img> at the end if editor is null', () => {
@@ -18,7 +23,7 @@ it('put <img> at the end if editor is null', () => {
     editor: null,
     elements: [el('img')]
   })
-  expectHtml('<p>Paragraph</p><figure><img><figcaption></figcaption></figure>')
+  expectHtml('<p>Paragraph</p>[figure]')
 })
 
 it('put <img> between paragraphs', () => {
@@ -30,9 +35,7 @@ it('put <img> between paragraphs', () => {
     editor,
     elements: [el('p').val('First'), el('img'), el('p').val('Second')]
   })
-  expectHtml(
-    '<p>First</p><figure><img><figcaption></figcaption></figure><p>Second</p>'
-  )
+  expectHtml('<p>First</p>[figure]<p>Second</p>')
 })
 
 it('put <img> between list items', () => {
@@ -47,6 +50,6 @@ it('put <img> between list items', () => {
     elements: [el('li').val('First'), el('img'), el('li').val('Second')]
   })
   expectHtml(
-    '<ul><li>First</li></ul><figure><img><figcaption></figcaption></figure><ul><li>Second</li><li>Third</li></ul>'
+    '<ul><li>First</li></ul>[figure]<ul><li>Second</li><li>Third</li></ul>'
   )
 })

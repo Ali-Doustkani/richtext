@@ -1,21 +1,25 @@
 import { el } from './Query'
 
-const button = el('button')
-  .val('Remove')
-  .style({
-    position: 'absolute',
-    left: '0',
-    top: '0'
-  })
-  .addListener('click', e => {
-    el(e.target)
-      .parent()
-      .remove()
-  })
+const remove = e =>
+  el(e.target)
+    .removeListener('click', remove)
+    .parent()
+    .remove()
 
 const createFigure = img =>
   el('figure')
     .append(img)
+    .append(
+      el('button')
+        .val('Remove')
+        .style({
+          display: 'none',
+          position: 'absolute',
+          left: '0',
+          top: '0'
+        })
+        .addListener('click', remove)
+    )
     .append(
       el('figcaption')
         .isEditable()
@@ -30,15 +34,16 @@ const createFigure = img =>
     .addListener('mouseenter', showDelete)
     .addListener('mouseleave', hideDelete)
 
-const showDelete = e => {
-  const figure = el(e.target)
-  figure.style({ opacity: '0.94' })
-  figure.insertBefore(figure.child(0), button)
-}
+const showDelete = e =>
+  el(e.target)
+    .style({ opacity: '0.94' })
+    .child(1)
+    .style({ display: 'inline-block' })
 
 const hideDelete = e =>
   el(e.target)
     .style({ opacity: '1' })
-    .remove(button)
+    .child(1)
+    .style({ display: 'none' })
 
 export { createFigure }

@@ -1,7 +1,7 @@
 import { createFigure } from './../../DOM/figure'
 import { el } from './../../DOM/Query'
 import 'jest-dom/extend-expect'
-import { getByText, queryByText, fireEvent } from '@testing-library/dom'
+import { getByText, fireEvent } from '@testing-library/dom'
 
 let figure
 beforeEach(() => {
@@ -15,11 +15,11 @@ it('show remove button on hover', () => {
 })
 
 it('do not show remove button on leave', () => {
-  expect(queryByText(figure, 'Remove')).not.toBeInTheDocument()
+  expect(getByText(figure, 'Remove')).not.toBeVisible()
   fireEvent.mouseEnter(figure)
-  expect(queryByText(figure, 'Remove')).toBeVisible()
+  expect(getByText(figure, 'Remove')).toBeVisible()
   fireEvent.mouseLeave(figure)
-  expect(queryByText(figure, 'Remove')).not.toBeInTheDocument()
+  expect(getByText(figure, 'Remove')).not.toBeVisible()
 })
 
 it('remove figure when remove button clicked', () => {
