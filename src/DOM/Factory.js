@@ -3,7 +3,7 @@ import { el } from './Query'
 const createNewEditor = effect =>
   el(effect && effect.parent ? effect.tag : 'p')
     .setAttributeFrom(effect)
-    .isEditable()
+    .editable()
 
 const createNewImage = source =>
   el('img')

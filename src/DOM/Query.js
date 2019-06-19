@@ -223,7 +223,7 @@ class QueryElement {
     return !this.is(type)
   }
 
-  isEditable() {
+  editable() {
     this.element.contentEditable = true
     return this
   }

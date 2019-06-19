@@ -32,7 +32,7 @@ function importImage(richtext, effects) {
         } else {
           figure = renderImage({
             richtext,
-            elements: [img, el('p').isEditable()]
+            elements: [img, el('p').editable()]
           })
         }
         figure.child(2).focus()

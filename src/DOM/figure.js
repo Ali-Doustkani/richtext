@@ -22,7 +22,7 @@ const createFigure = img =>
     )
     .append(
       el('figcaption')
-        .isEditable()
+        .editable()
         .style({ background: '#FAF3F2' })
     )
     .style({

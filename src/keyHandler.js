@@ -15,7 +15,7 @@ function enterKey(event, effects, richtext) {
   }
   if (editor.is('li') && event.ctrlKey) {
     const renderModel = breakAt(effects, editor)
-    renderModel.list[1].to('p').isEditable()
+    renderModel.list[1].to('p').editable()
     renderText({ richtext, editors: editor, elements: renderModel.list })
     renderModel.active.focus()
     return

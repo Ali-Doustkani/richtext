@@ -51,7 +51,7 @@ function checkEditor(richtext) {
     )
   }
   if (!richtext.children.length) {
-    el(richtext).append(el('p').isEditable())
+    el(richtext).append(el('p').editable())
   }
   if (richtext.firstChild.nodeName !== 'P') {
     throw new Error('only <p> element is valid inside richtext')

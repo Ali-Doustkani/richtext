@@ -202,7 +202,7 @@ describe('attributes', () => {
 
   it('set contentEditable', () => {
     expect(el('p').element.contentEditable).toBe(undefined)
-    expect(el('p').isEditable().element.contentEditable).toBe(true)
+    expect(el('p').editable().element.contentEditable).toBe(true)
   })
 
   it('set attributes value', () => {
