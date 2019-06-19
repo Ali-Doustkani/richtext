@@ -6,6 +6,9 @@ import * as Editor from './editor'
 function enterKey(event, effects, richtext) {
   event.preventDefault() // prevent creating new lines in the same p element
   const editor = el.active()
+  if (editor.is('figcaption')) {
+    return
+  }
   if (editor.is('pre') && !event.ctrlKey) {
     Editor.handlePreEnter(editor)
     return
@@ -24,6 +27,9 @@ function enterKey(event, effects, richtext) {
 
 function backspaceKey(event, effects, richtext) {
   const editor = el.active()
+  if (editor.is('figcaption')) {
+    return
+  }
   if (!Editor.canBackspace(editor)) {
     return
   }
@@ -41,6 +47,9 @@ function backspaceKey(event, effects, richtext) {
 
 function deleteKey(event, effects, richtext) {
   const editor = el.active()
+  if (editor.is('figcaption')) {
+    return
+  }
   if (!Editor.canDelete(editor)) {
     return
   }
