@@ -1,12 +1,12 @@
 it('add and remove images', () => {
   cy.visit('/')
   cy.mockImageDialog()
-  cy.get('#editor>p')
+  cy.get('#richtext>p')
     .type('FirstSecond')
     .highlight(5, 5)
   cy.contains('Image').click()
   cy.get('figcaption').should('have.focus')
-  cy.get('#editor').shouldHaveHtml(
+  cy.get('#richtext').shouldHaveHtml(
     `
   <p contenteditable="true">First</p>
   <figure>
@@ -18,13 +18,13 @@ it('add and remove images', () => {
     { removeStyle: true }
   )
 
-  cy.get('#editor>figure>button')
+  cy.get('#richtext>figure>button')
     .invoke('show')
     .click()
-  cy.get('#editor>p')
+  cy.get('#richtext>p')
     .eq(0)
     .should('have.focus')
-  cy.get('#editor').shouldHaveHtml(`
+  cy.get('#richtext').shouldHaveHtml(`
     <p contenteditable="true">First</p>
     <p contenteditable="true">Second</p>`)
 })

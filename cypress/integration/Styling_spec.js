@@ -2,28 +2,28 @@ describe('styling', () => {
   it('type and style so simple', () => {
     cy.visit('/')
 
-    cy.get('#editor>p').type('HelloWorld')
+    cy.get('#richtext>p').type('HelloWorld')
     cy.contains('Bold').click()
 
-    cy.get('#editor').shouldHaveHtml(`
+    cy.get('#richtext').shouldHaveHtml(`
       <p contenteditable="true">
         HelloWorld
       </p>
       `)
 
-    cy.get('#editor>p').highlight(0, 5)
+    cy.get('#richtext>p').highlight(0, 5)
     cy.contains('Italic').click()
 
-    cy.get('#editor').shouldHaveHtml(`
+    cy.get('#richtext').shouldHaveHtml(`
       <p contenteditable="true">
         <i>Hello</i>
         World
       </p>`)
 
-    cy.get('#editor>p').highlightAll()
+    cy.get('#richtext>p').highlightAll()
     cy.contains('Bold').click()
 
-    cy.get('#editor').shouldHaveHtml(`
+    cy.get('#richtext').shouldHaveHtml(`
       <p contenteditable="true">
         <b>
           <i>Hello</i>
@@ -35,30 +35,30 @@ describe('styling', () => {
   it('check selection based on "Stay Selected" checkbox', () => {
     cy.visit('/')
     cy.get('[type="checkbox"]').uncheck()
-    cy.get('#editor>p').type('HelloWorld')
-    cy.get('#editor>p').highlight(0, 5)
+    cy.get('#richtext>p').type('HelloWorld')
+    cy.get('#richtext>p').highlight(0, 5)
     cy.contains('Bold').click()
 
-    cy.get('#editor>p>b').shouldHavePosition(5)
+    cy.get('#richtext>p>b').shouldHavePosition(5)
 
     cy.get('[type="checkbox"]').check()
-    cy.get('#editor>p').highlightAll()
+    cy.get('#richtext>p').highlightAll()
     cy.contains('Bold').click()
 
-    cy.get('#editor>p').shouldHaveRange({
+    cy.get('#richtext>p').shouldHaveRange({
       startContainer: el => el.firstChild.firstChild,
       startOffset: 0,
       endContainer: el => el.firstChild.firstChild,
       endOffset: 10
     })
 
-    cy.get('#editor>p').type('{enter}')
-    cy.get('#editor>p')
+    cy.get('#richtext>p').type('{enter}')
+    cy.get('#richtext>p')
       .eq(1)
       .type('HelloWorld')
       .highlight(5, 6)
     cy.contains('Header').click()
-    cy.get('#editor>h1').shouldHaveRange({
+    cy.get('#richtext>h1').shouldHaveRange({
       startContainer: el => el.firstChild,
       startOffset: 0,
       endContainer: el => el.firstChild,
@@ -69,18 +69,18 @@ describe('styling', () => {
   it('apply different styles to the same text', () => {
     cy.visit('/')
 
-    cy.get('#editor>p')
+    cy.get('#richtext>p')
       .type('HelloWorld')
       .highlight(0, 5)
     cy.contains('Italic').click()
 
-    cy.get('#editor>p>i').highlight(0, 5)
+    cy.get('#richtext>p>i').highlight(0, 5)
     cy.contains('Bold').click()
 
-    cy.get('#editor>p>b>i').highlight(0, 5)
+    cy.get('#richtext>p>b>i').highlight(0, 5)
     cy.contains('Custom Style').click()
 
-    cy.get('#editor').shouldHaveHtml(`
+    cy.get('#richtext').shouldHaveHtml(`
       <p contenteditable="true">
         <span class="text-highlight">
           <b><i>Hello</i></b>
@@ -91,45 +91,45 @@ describe('styling', () => {
 
   it('apply header editor', () => {
     cy.visit('/')
-    cy.get('#editor>p')
+    cy.get('#richtext>p')
       .type('ContentTitleContent')
       .highlight(7, 12)
     cy.contains('Header').click()
 
-    cy.get('#editor>h1')
+    cy.get('#richtext>h1')
       .eq(0)
       .should('have.focus')
       .should('have.class', 'header-style')
       .type('{uparrow}{uparrow}')
 
-    cy.get('#editor>p')
+    cy.get('#richtext>p')
       .eq(0)
       .should('have.focus')
       .type('{rightarrow}')
 
-    cy.get('#editor>h1')
+    cy.get('#richtext>h1')
       .should('have.focus')
       .type('{downarrow}{downarrow}')
 
-    cy.get('#editor>p')
+    cy.get('#richtext>p')
       .eq(1)
       .should('have.focus')
       .type('{leftarrow}')
 
-    cy.get('#editor>h1')
+    cy.get('#richtext>h1')
       .should('have.focus')
       .type('{rightarrow}')
 
-    cy.get('#editor>p')
+    cy.get('#richtext>p')
       .eq(1)
       .should('have.focus')
 
-    cy.get('#editor>h1')
+    cy.get('#richtext>h1')
       .focus()
       .highlight(0, 5)
     cy.contains('Header').click()
 
-    cy.get('#editor>p').should($p => {
+    cy.get('#richtext>p').should($p => {
       expect($p).to.have.length(3)
       expect($p.eq(0)).to.have.text('Content')
       expect($p.eq(1)).to.have.text('Title')
@@ -139,11 +139,11 @@ describe('styling', () => {
 
   it('type code content inside of a pre element', () => {
     cy.visit('/')
-    cy.get('#editor>p')
+    cy.get('#richtext>p')
       .type('const str = "Hello World!"')
       .highlightAll()
     cy.contains('Code Box').click()
-    cy.get('#editor>pre')
+    cy.get('#richtext>pre')
       .type('{enter}')
       .type('const hello = str.slice(0, 5)')
       .type('{enter}')
@@ -162,7 +162,7 @@ const hello = str.slice(0, 5)
 const world = str.slice(6)`
       )
       .type('{home}{ctrl}{enter}')
-    cy.get('#editor').should(
+    cy.get('#richtext').should(
       'have.html',
       `<pre contenteditable="true">// program beginning
 const str = "Hello World!"
@@ -176,12 +176,12 @@ const world = str.slice(6)</pre>`
 describe('key handling', () => {
   it('handle enter key after selecting some text', () => {
     cy.visit('/')
-    cy.get('#editor>p')
+    cy.get('#richtext>p')
       .type('HelloWorld')
       .highlight(4, 5)
       .type('{enter}Of')
 
-    cy.get('#editor').shouldHaveHtml(`
+    cy.get('#richtext').shouldHaveHtml(`
       <p contenteditable="true">
         Hell
       </p>
@@ -192,8 +192,8 @@ describe('key handling', () => {
 
   it('handle enter key for creating new paragraphs', () => {
     cy.visit('/')
-    cy.get('#editor>p').type('Hello{enter}World')
-    cy.get('#editor').shouldHaveHtml(`
+    cy.get('#richtext>p').type('Hello{enter}World')
+    cy.get('#richtext').shouldHaveHtml(`
       <p contenteditable="true">
         Hello
       </p>
@@ -201,16 +201,16 @@ describe('key handling', () => {
         World
       </p>`)
 
-    cy.get('#editor>p').highlight(0, 5)
+    cy.get('#richtext>p').highlight(0, 5)
     cy.contains('Bold').click()
 
-    cy.get('#editor>p>b').highlight(4, 4)
+    cy.get('#richtext>p>b').highlight(4, 4)
 
-    cy.get('#editor>p')
+    cy.get('#richtext>p')
       .eq(0)
       .type('{enter}')
 
-    cy.get('#editor').shouldHaveHtml(`
+    cy.get('#richtext').shouldHaveHtml(`
       <p contenteditable="true">
         <b>Hell</b>
       </p>
@@ -224,20 +224,20 @@ describe('key handling', () => {
 
   it('handle backspace key at the beginning of a paragraph', () => {
     cy.visit('/')
-    cy.get('#editor>p')
+    cy.get('#richtext>p')
       .eq(0)
       .type('123{enter}')
     cy.focused().type('456{enter}')
     cy.focused().type('789')
-    cy.get('#editor>p')
+    cy.get('#richtext>p')
       .eq(1)
       .highlight(0, 3)
     cy.contains('Bold').click()
-    cy.get('#editor>p')
+    cy.get('#richtext>p')
       .eq(1)
       .type('{home}{backspace}')
 
-    cy.get('#editor').shouldHaveHtml(`
+    cy.get('#richtext').shouldHaveHtml(`
         <p contenteditable="true">
           123<b>456</b>
         </p>
@@ -245,25 +245,25 @@ describe('key handling', () => {
           789
         </p>
         `)
-    cy.get('#editor>p')
+    cy.get('#richtext>p')
       .eq(0)
       .shouldHavePosition(3)
   })
 
   it('handle del key at the beginning of a paragraph', () => {
     cy.visit('/')
-    cy.get('#editor>p').type('123{enter}')
+    cy.get('#richtext>p').type('123{enter}')
     cy.focused().type('456{enter}')
     cy.focused().type('789')
-    cy.get('#editor>p')
+    cy.get('#richtext>p')
       .eq(1)
       .highlight(0, 3)
     cy.contains('Bold').click()
-    cy.get('#editor>p')
+    cy.get('#richtext>p')
       .eq(0)
       .type('{end}{del}')
 
-    cy.get('#editor').shouldHaveHtml(`
+    cy.get('#richtext').shouldHaveHtml(`
         <p contenteditable="true">
           123<b>456</b>
         </p>
@@ -271,24 +271,24 @@ describe('key handling', () => {
           789
         </p>`)
 
-    cy.get('#editor>p')
+    cy.get('#richtext>p')
       .eq(0)
       .shouldHavePosition(3)
   })
 
   it('handle arrow keys between paragraphs', () => {
     cy.visit('/')
-    cy.get('#editor>p')
+    cy.get('#richtext>p')
       .type('X'.repeat(90))
       .type('{enter}')
-    cy.get('#editor>p')
+    cy.get('#richtext>p')
       .eq(1)
       .type('Y'.repeat(90))
       .type('{uparrow}')
       .should('have.focus')
       .type('{uparrow}{uparrow}')
       .should('not.have.focus')
-    cy.get('#editor>p')
+    cy.get('#richtext>p')
       .eq(0)
       .should('have.focus')
       .shouldHavePosition(90)
@@ -300,7 +300,7 @@ describe('key handling', () => {
       .should('have.focus')
       .type('{downarrow}')
       .should('not.have.focus')
-    cy.get('#editor>p')
+    cy.get('#richtext>p')
       .eq(1)
       .should('have.focus')
       .type('{downarrow}{downarrow}')
@@ -310,14 +310,14 @@ describe('key handling', () => {
       .should('have.focus')
       .type('{leftarrow}')
       .should('not.have.focus')
-    cy.get('#editor>p')
+    cy.get('#richtext>p')
       .eq(0)
       .should('have.focus')
       .shouldHavePosition(90)
       // Arrow Right
       .type('{rightarrow}')
       .should('not.have.focus')
-    cy.get('#editor>p')
+    cy.get('#richtext>p')
       .eq(1)
       .should('have.focus')
       .shouldHavePosition(0)

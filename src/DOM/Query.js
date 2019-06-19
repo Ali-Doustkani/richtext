@@ -311,6 +311,7 @@ class QueryElement {
 
   focus() {
     this.element.focus()
+    return this
   }
 
   get textLength() {

@@ -51,7 +51,9 @@ function checkEditor(richtext) {
     )
   }
   if (!richtext.children.length) {
-    el(richtext).append(el('p').editable())
+    const p = el('p').editable()
+    el(richtext).append(p)
+    p.focus()
   }
   if (richtext.firstChild.nodeName !== 'P') {
     throw new Error('only <p> element is valid inside richtext')
@@ -59,6 +61,24 @@ function checkEditor(richtext) {
   const dir = richtext.style.direction
   if (dir !== 'rtl' || dir !== 'ltr') {
     richtext.style.direction = 'ltr'
+  }
+}
+
+function checkOptions(options) {
+  options = options || {}
+  init(options, 'staySelected', false)
+  init(options, 'defaultLink', '')
+  init(options, 'effects', [])
+  addDefaultEffects(options.effects)
+  if (process.env.NODE_ENV === 'development') {
+    options.effects = checkEffects(options.effects)
+  }
+  return options
+}
+
+function init(options, name, value) {
+  if (options[name] === undefined) {
+    options[name] = value
   }
 }
 
@@ -86,4 +106,10 @@ function setOptions(from, to) {
   }
 }
 
-export { checkEffects, checkEditor, addDefaultEffects, setOptions }
+export {
+  checkEffects,
+  checkEditor,
+  addDefaultEffects,
+  setOptions,
+  checkOptions
+}
