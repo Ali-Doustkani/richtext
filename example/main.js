@@ -16,6 +16,11 @@ const richtext = createRichtext({
   image: {
     parent: true,
     tag: 'img'
+  },
+  notebox: {
+    parent: true,
+    tag: 'div',
+    className: 'notebox'
   }
 })(div)
 richtext.setOptions({ defaultLink: 'https://' })
@@ -39,3 +44,4 @@ wire('list', () => richtext.applyUnorderedList())
 wire('orderedList', () => richtext.applyOrderedList())
 wire('hyperlink', () => richtext.styleLink())
 wire('image', () => richtext.selectImage())
+wire('notebox', () => richtext.apply('notebox'))
