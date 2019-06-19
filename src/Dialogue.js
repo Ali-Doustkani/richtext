@@ -30,7 +30,7 @@ function showDialog(options) {
   }
 
   richtext.parent().insertAfter(richtext, dialogue)
-  input.element.focus()
+  input.focus()
 
   function run(func, arg) {
     richtext.parent().remove(dialogue)

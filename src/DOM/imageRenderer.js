@@ -11,6 +11,7 @@ const renderImage = params => {
   } else {
     addAll(richtext, elements)
   }
+  return elements.find(x => x.is('figure'))
 }
 
 const isPImgP = elements =>

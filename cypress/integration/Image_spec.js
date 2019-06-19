@@ -5,6 +5,7 @@ it('add and remove images', () => {
     .type('FirstSecond')
     .highlight(5, 5)
   cy.contains('Image').click()
+  cy.get('figcaption').should('have.focus')
   cy.get('#editor').shouldHaveHtml(
     `
   <p contenteditable="true">First</p>

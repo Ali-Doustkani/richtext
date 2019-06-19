@@ -14,7 +14,7 @@ function canDelete(editor) {
 function focusPrev(editor) {
   const prev = previousEditor(editor)
   if (prev) {
-    prev.element.focus()
+    prev.focus()
     setCursor(prev, prev.val().length)
   }
 }
@@ -22,7 +22,7 @@ function focusPrev(editor) {
 function focusNext(editor) {
   const next = nextEditor(editor)
   if (next) {
-    next.element.focus()
+    next.focus()
     setCursor(next, 0)
   }
 }

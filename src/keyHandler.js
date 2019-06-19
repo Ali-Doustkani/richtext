@@ -17,12 +17,12 @@ function enterKey(event, effects, richtext) {
     const renderModel = breakAt(effects, editor)
     renderModel.list[1].to('p').isEditable()
     renderText({ richtext, editors: editor, elements: renderModel.list })
-    renderModel.active.element.focus()
+    renderModel.active.focus()
     return
   }
   const renderModel = breakAt(effects, editor)
   renderText({ richtext, editors: editor, elements: renderModel.list })
-  renderModel.active.element.focus()
+  renderModel.active.focus()
 }
 
 function backspaceKey(event, effects, richtext) {
