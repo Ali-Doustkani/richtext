@@ -12,20 +12,20 @@ function glue(model1, model2) {
     model.forEach(item => result.push(copy(item.text, item.decors)))
   pushAll(model1)
 
-  const parentEffect = model1.length
+  const parentDecor = model1.length
     ? model1[0].decors.find(x => x.parent)
     : null
 
   model2.forEach(item => {
     item.decors = item.decors.filter(x => !x.parent)
-    if (parentEffect) {
-      item.decors.push(parentEffect)
+    if (parentDecor) {
+      item.decors.push(parentDecor)
     }
   })
   if (result.length && model2.length) {
-    const lastEffect = result[result.length - 1].decors
+    const lastDecor = result[result.length - 1].decors
     const firstModel = model2.shift()
-    if (areEqual(lastEffect, firstModel.decors)) {
+    if (areEqual(lastDecor, firstModel.decors)) {
       result[result.length - 1].text += firstModel.text
     } else {
       result.push(copy(firstModel.text, firstModel.decors))

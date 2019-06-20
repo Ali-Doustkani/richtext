@@ -31,14 +31,14 @@ function createContext({ start, end }) {
   const ret = {}
 
   const mustUndo = (decors, type) => {
-    const hasTheEffect = decors.includes(type)
+    const hasTheDecor = decors.includes(type)
     const regionFitToPoints = state.head === start && regionHead === end
     const pointsAreInRegion =
       start >= state.head &&
       end > state.head &&
       start < regionHead &&
       end <= regionHead
-    return hasTheEffect && (regionFitToPoints || pointsAreInRegion)
+    return hasTheDecor && (regionFitToPoints || pointsAreInRegion)
   }
 
   ret.result = () => {
@@ -115,14 +115,14 @@ function merge(array, element) {
   if (!array) {
     return [element]
   }
-  return [...array.filter(item => !effectsEqual(item, element)), element]
+  return [...array.filter(item => !decorsEqual(item, element)), element]
 }
 
-function effectsEqual(effect1, effect2) {
-  if (effect1 === effect2) {
+function decorsEqual(decor1, decor2) {
+  if (decor1 === decor2) {
     return true
   }
-  return effect1.tag === effect2.tag && effect1.className === effect2.className
+  return decor1.tag === decor2.tag && decor1.className === decor2.className
 }
 
 export default createContext

@@ -10,13 +10,13 @@ function read(decors, editor) {
   return ret
 
   function toStyle(node) {
-    return { text: node.val(), decors: toEffects(node) }
+    return { text: node.val(), decors: toDecors(node) }
   }
 
-  function toEffects(node) {
+  function toDecors(node) {
     const result = []
     while (node.isNot(editor.parent())) {
-      const decor = getEffect(node)
+      const decor = getDecor(node)
       if (decor) {
         result.push(decor)
       }
@@ -25,12 +25,12 @@ function read(decors, editor) {
     return result
   }
 
-  function getEffect(el) {
+  function getDecor(el) {
     for (let prop in decors) {
       const e = decors[prop]
       if (e.tag && el.is(e.tag) && el.hasClassFrom(e)) {
         const specials = dynamicAttribs(e)
-        return specials.length ? makeEffect(e, specials, el) : e
+        return specials.length ? makeDecor(e, specials, el) : e
       }
     }
     return null
@@ -43,7 +43,7 @@ function read(decors, editor) {
     )
   }
 
-  function makeEffect(decor, specials, element) {
+  function makeDecor(decor, specials, element) {
     const ret = { tag: decor.tag }
     if (decor.className) {
       ret.className = decor.className

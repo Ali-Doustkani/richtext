@@ -29,7 +29,7 @@ function style(options) {
       }
     ]
   }
-  context.iterateOver(input, type, (text, originalEffects, newEffects) => {
+  context.iterateOver(input, type, (text, originalDecors, newDecors) => {
     when(context.regionUntouched)
       .then(dontTouch)
       .otherwise(context.region0Part)
@@ -40,7 +40,7 @@ function style(options) {
       .then(takeFirstPart)
       .otherwise(context.regionSecondEffectiveOf2Parts)
       .then(takeSecondPart)
-      .run({ context, text, originalEffects, newEffects })
+      .run({ context, text, originalDecors, newDecors })
   })
 
   return context.result()
@@ -52,34 +52,34 @@ function emptyInput(options) {
   return noInput && !range.start && !range.end
 }
 
-function dontTouch({ context, text, originalEffects }) {
-  context.addResult(text, originalEffects, false)
+function dontTouch({ context, text, originalDecors }) {
+  context.addResult(text, originalDecors, false)
 }
 
-function takeAll({ context, text, newEffects }) {
-  context.addResult(text, newEffects, true)
+function takeAll({ context, text, newDecors }) {
+  context.addResult(text, newDecors, true)
 }
 
-function takeMiddlePart({ context, text, originalEffects, newEffects }) {
+function takeMiddlePart({ context, text, originalDecors, newDecors }) {
   const [first, middle, last] = context.threePieces(text)
   context
-    .addResult(first, originalEffects, false)
-    .addResult(middle, newEffects, true)
-    .addResult(last, originalEffects, false)
+    .addResult(first, originalDecors, false)
+    .addResult(middle, newDecors, true)
+    .addResult(last, originalDecors, false)
 }
 
-function takeFirstPart({ context, text, originalEffects, newEffects }) {
+function takeFirstPart({ context, text, originalDecors, newDecors }) {
   const [first, second] = context.twoPieces(text)
   context
-    .addResult(first, originalEffects, false)
-    .addResult(second, newEffects, true)
+    .addResult(first, originalDecors, false)
+    .addResult(second, newDecors, true)
 }
 
-function takeSecondPart({ context, text, originalEffects, newEffects }) {
+function takeSecondPart({ context, text, originalDecors, newDecors }) {
   const [first, second] = context.twoPieces(text)
   context
-    .addResult(first, newEffects, true)
-    .addResult(second, originalEffects, false)
+    .addResult(first, newDecors, true)
+    .addResult(second, originalDecors, false)
 }
 
 export { style }

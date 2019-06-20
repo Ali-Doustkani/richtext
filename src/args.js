@@ -1,46 +1,5 @@
 import { el } from './DOM'
 
-function effectsAreOk(decors) {
-  if (!decors) {
-    throw new Error("'rules' cannot be empty")
-  }
-  for (let prop in decors) {
-    if (typeof decors[prop] !== 'object') {
-      throw new Error(
-        `${prop} must be an object containing 'tag' but it's a ${typeof decors[
-          prop
-        ]}`
-      )
-    }
-    if (typeof decors[prop].tag !== 'string') {
-      throw new Error(`'tag' in ${decors[prop]} is not string`)
-    }
-    if (!decors[prop]) {
-      throw new Error(
-        `'tag' in ${decors[prop]} does not have a not empty string value`
-      )
-    }
-  }
-}
-
-function standardizeEffects(decors) {
-  const initObj = {}
-  for (let prop in decors) {
-    if (typeof decors[prop] === 'string') {
-      initObj[prop] = { tag: decors[prop] }
-    } else {
-      initObj[prop] = decors[prop]
-    }
-  }
-  return initObj
-}
-
-function checkEffects(decors) {
-  decors = standardizeEffects(decors)
-  effectsAreOk(decors)
-  return decors
-}
-
 function checkEditor(richtext) {
   if (richtext.tagName !== 'DIV' && richtext.tagName !== 'ARTICLE') {
     throw new Error('the richtext can only be a <div> or <article> element')
@@ -69,9 +28,12 @@ function checkOptions(options) {
   init(options, 'staySelected', false)
   init(options, 'defaultLink', '')
   init(options, 'decors', [])
-  addDefaultEffects(options.decors)
-  if (process.env.NODE_ENV === 'development') {
-    options.decors = checkEffects(options.decors)
+  addDefaultDecors(options.decors)
+  if (
+    process.env.NODE_ENV === 'development' ||
+    process.env.NODE_ENV === 'test'
+  ) {
+    options.decors = checkDecors(options.decors)
   }
   return options
 }
@@ -82,7 +44,7 @@ function init(options, name, value) {
   }
 }
 
-function addDefaultEffects(decors) {
+function addDefaultDecors(decors) {
   decors.list = {
     parent: true,
     tag: 'li'
@@ -97,6 +59,46 @@ function addDefaultEffects(decors) {
   }
 }
 
+function checkDecors(decors) {
+  decors = standardizeDecors(decors)
+  decorsAreOk(decors)
+  return decors
+}
+
+function decorsAreOk(decors) {
+  if (!decors) {
+    throw new Error("'rules' cannot be empty")
+  }
+  Object.entries(decors).forEach(dec => {
+    isNotNull(dec)
+    tagIsValid(dec)
+  })
+}
+
+const tagIsValid = decor => {
+  if (typeof decor[1].tag !== 'string') {
+    throw new Error(`'tag' in ${decor[0]} is not string`)
+  }
+}
+
+const isNotNull = decor => {
+  if (decor[1] === null) {
+    throw new Error('a decor cannot be null')
+  }
+}
+
+function standardizeDecors(decors) {
+  const initObj = {}
+  for (let prop in decors) {
+    if (typeof decors[prop] === 'string') {
+      initObj[prop] = { tag: decors[prop] }
+    } else {
+      initObj[prop] = decors[prop]
+    }
+  }
+  return initObj
+}
+
 function setOptions(from, to) {
   if (from.staySelected !== undefined) {
     to.staySelected = from.staySelected
@@ -106,10 +108,4 @@ function setOptions(from, to) {
   }
 }
 
-export {
-  checkEffects,
-  checkEditor,
-  addDefaultEffects,
-  setOptions,
-  checkOptions
-}
+export { checkEditor, setOptions, checkOptions }

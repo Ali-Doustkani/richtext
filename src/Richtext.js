@@ -3,9 +3,10 @@ import { el, renderText } from './DOM'
 import { relativeRange } from './Ranging'
 import { style } from './Stylist'
 import { showDialog } from './Dialog'
-import * as Handle from './keyHandler'
 import * as Editor from './editor'
 import { importImage } from './image'
+import createKeyHandler from './keyHandler'
+import createMouseHandler from './mouseHandler'
 
 /**
  * It creates the richtext component.
@@ -17,36 +18,10 @@ function create(element, options) {
   options = checkOptions(options)
 
   const richtext = el(element)
-  element.addEventListener(
-    'keydown',
-    e => {
-      if (e.key === 'Enter') {
-        Handle.enterKey(e, options.decors, richtext)
-      } else if (e.key === 'Backspace') {
-        Handle.backspaceKey(e, options.decors, richtext)
-      } else if (e.key === 'Delete') {
-        Handle.deleteKey(e, options.decors, richtext)
-      } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-        Handle.arrowUp(e)
-      } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-        Handle.arrowDown(e)
-      }
-    },
-    true
-  )
-
-  element.addEventListener('click', e => {
-    const anchor = el.parentOf(el(e.target), 'a')
-    if (anchor) {
-      showDialog({
-        richtext,
-        defaultValue: anchor.getAttribute('href'),
-        mode: 'edit',
-        succeeded: link => anchor.setAttribute('href', link),
-        deleted: () => anchor.takeOff()
-      })
-    }
-  })
+  const handleKey = createKeyHandler(richtext, options.decors)
+  const handleMouse = createMouseHandler(richtext)
+  element.addEventListener('keydown', handleKey, true)
+  element.addEventListener('click', handleMouse)
 
   const setStyle = params => {
     let { range, type, listTag, editor } = params
@@ -104,7 +79,7 @@ function create(element, options) {
           }
         })
       }),
-    apply: type => styleSelectedOrAll(type),
+    apply: styleSelectedOrAll,
     applyUnorderedList: () => styleSelectedOrAll('list', 'ul'),
     applyCodebox: () => styleSelectedOrAll('codebox'),
     applyOrderedList: () => styleSelectedOrAll('list', 'ol'),
