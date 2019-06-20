@@ -1,3 +1,6 @@
+/**
+ * Represents a cursor position in text.
+ */
 class Range {
   constructor(start, end) {
     this.start = start

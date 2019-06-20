@@ -17,6 +17,10 @@ function check(options) {
   throw new Error('Invalid options')
 }
 
+/**
+ * Creates a flat model of a styled text.
+ * @param {object} options It contains 'input', 'range', and 'type'
+ */
 function style(options) {
   const { input, range, type } = check(options)
   const context = createContext(range)
