@@ -1,8 +1,12 @@
 {
-  "name": "richtext",
-  "private": true,
-  "version": "1.0.0",
-  "main": "Richtext.js",
+  "name": "@alidoustkani/richtext",
+  "version": "0.0.1",
+  "main": "./src/Richtext.js",
+  "description": "A richtext with configurable styles",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ali-Doustkani/richtext"
+  },
   "scripts": {
     "start": "parcel ./example/index.html",
     "test": "jest",
@@ -29,6 +33,5 @@
     "jest-dom": "^3.5.0",
     "npm-run-all": "^4.1.5",
     "parcel-bundler": "^1.12.3"
-  },
-  "dependencies": {}
+  }
 }
