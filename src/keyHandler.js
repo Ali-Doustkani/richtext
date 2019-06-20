@@ -20,26 +20,11 @@ function keyHandler(richtext, decors) {
     },
     keyUp: e => {
       if (e.key === 'Backspace' || e.key === 'Delete') {
-        removeCommands()
+        const editor = el.active()
+        removeBr(editor)
+        removeCommands(editor)
       }
     }
-  }
-
-  // this avoids Browser to create the same styles again
-  function removeCommands() {
-    if (el.active().textLength !== 0) {
-      return
-    }
-    const params = [
-      'bold',
-      'italic',
-      'backColor',
-      'foreColor',
-      'formatBlock',
-      'heading',
-      'hiliteColor'
-    ]
-    params.forEach(x => document.execCommand(x))
   }
 
   function enterKey(event) {
@@ -69,6 +54,7 @@ function keyHandler(richtext, decors) {
     if (editor.is('figcaption')) {
       return
     }
+    removeBr(editor)
     if (!Editor.canBackspace(editor)) {
       return
     }
@@ -89,6 +75,7 @@ function keyHandler(richtext, decors) {
     if (editor.is('figcaption')) {
       return
     }
+    removeBr(editor)
     if (!Editor.canDelete(editor)) {
       return
     }
@@ -122,6 +109,31 @@ function keyHandler(richtext, decors) {
       event.preventDefault()
       Editor.focusNext(editor)
     }
+  }
+}
+
+// this avoids Browser to create the same styles again
+function removeCommands(editor) {
+  if (editor.textLength !== 0) {
+    return
+  }
+  const params = [
+    'bold',
+    'italic',
+    'backColor',
+    'foreColor',
+    'formatBlock',
+    'heading',
+    'hiliteColor'
+  ]
+  params.forEach(x => document.execCommand(x))
+}
+
+// removes the <br/> from empty editor
+function removeBr(editor) {
+  const firstChild = editor.firstChild()
+  if (firstChild && firstChild.is('br')) {
+    firstChild.remove()
   }
 }
 
