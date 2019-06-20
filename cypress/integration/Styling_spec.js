@@ -322,4 +322,28 @@ describe('key handling', () => {
       .should('have.focus')
       .shouldHavePosition(0)
   })
+
+  it('handle backspace in styled areas', () => {
+    cy.visit('/')
+    cy.get('#richtext>p')
+      .type('Hello')
+      .highlight(0, 5)
+    cy.contains('Bold').click()
+    cy.get('#richtext>p')
+      .type('{backspace}'.repeat(5))
+      .type('Hello')
+    cy.get('#richtext').should(
+      'have.html',
+      '<p contenteditable="true">Hello</p>'
+    )
+
+    cy.get('#richtext>p')
+      .highlight(0)
+      .type('{del}'.repeat(5))
+      .type('Hello')
+    cy.get('#richtext').should(
+      'have.html',
+      '<p contenteditable="true">Hello</p>'
+    )
+  })
 })

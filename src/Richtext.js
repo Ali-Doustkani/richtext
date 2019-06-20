@@ -20,7 +20,8 @@ function create(element, options) {
   const richtext = el(element)
   const handleKey = createKeyHandler(richtext, options.decors)
   const handleMouse = createMouseHandler(richtext)
-  element.addEventListener('keydown', handleKey, true)
+  element.addEventListener('keydown', handleKey.keyDown, true)
+  element.addEventListener('keyup', handleKey.keyUp, true)
   element.addEventListener('click', handleMouse)
 
   const setStyle = params => {

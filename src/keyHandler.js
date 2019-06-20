@@ -4,18 +4,42 @@ import { breakAt, glue } from './Stylist'
 import * as Editor from './editor'
 
 function keyHandler(richtext, decors) {
-  return function(e) {
-    if (e.key === 'Enter') {
-      enterKey(e)
-    } else if (e.key === 'Backspace') {
-      backspaceKey(e)
-    } else if (e.key === 'Delete') {
-      deleteKey(e)
-    } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-      arrowUp(e)
-    } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-      arrowDown(e)
+  return {
+    keyDown: e => {
+      if (e.key === 'Enter') {
+        enterKey(e)
+      } else if (e.key === 'Backspace') {
+        backspaceKey(e)
+      } else if (e.key === 'Delete') {
+        deleteKey(e)
+      } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+        arrowUp(e)
+      } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+        arrowDown(e)
+      }
+    },
+    keyUp: e => {
+      if (e.key === 'Backspace' || e.key === 'Delete') {
+        removeCommands()
+      }
     }
+  }
+
+  // this avoids Browser to create the same styles again
+  function removeCommands() {
+    if (el.active().textLength !== 0) {
+      return
+    }
+    const params = [
+      'bold',
+      'italic',
+      'backColor',
+      'foreColor',
+      'formatBlock',
+      'heading',
+      'hiliteColor'
+    ]
+    params.forEach(x => document.execCommand(x))
   }
 
   function enterKey(event) {
