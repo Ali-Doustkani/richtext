@@ -3,7 +3,13 @@ import { el } from './DOM'
 
 function mouseHandler(richtext) {
   return function(e) {
-    const anchor = el.parentOf(el(e.target), 'a')
+    const target = el(e.target)
+    if (target.is(richtext)) {
+      richtext.lastChild().focus()
+      return
+    }
+
+    const anchor = el.parentOf(target, 'a')
     if (anchor) {
       showDialog({
         richtext,
