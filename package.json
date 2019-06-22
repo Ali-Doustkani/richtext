@@ -15,7 +15,7 @@
     "test:cy": "npm-run-all --parallel --race start cy:open",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
-    "build": "parcel build ./src/richtext.js --out-file richtext.min.js --no-source-maps",
+    "build": "parcel build ./src/richtext.js --out-file richtext.min.js --no-source-maps --global Richtext",
     "lint": "eslint . --ignore-path .gitignore"
   },
   "author": "Ali Doustkani",

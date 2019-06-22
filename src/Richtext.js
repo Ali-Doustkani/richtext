@@ -88,4 +88,4 @@ function create(element, options) {
   }
 }
 
-export default create
+export { create }

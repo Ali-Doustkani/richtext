@@ -1,7 +1,7 @@
-import createRichtext from './../src/Richtext'
+import { create } from './../src/Richtext'
 
 const richtextEl = document.getElementById('richtext')
-const richtext = createRichtext(richtextEl, {
+const richtext = create(richtextEl, {
   defaultLink: 'https://',
   decors: {
     bold: 'b',
