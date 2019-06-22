@@ -1,8 +1,7 @@
 import { el, renderImage, createNewImage } from './DOM'
 import { breakAt } from './Stylist'
 
-function importImage(richtext, decors) {
-  const currentEdit = el.active()
+function importImage(richtext, editor, decors) {
   const input = el('input')
     .setAttribute('type', 'file')
     .setAttribute('accept', 'image/*')
@@ -17,15 +16,12 @@ function importImage(richtext, decors) {
       () => {
         const img = createNewImage(reader.result)
         let figure
-        if (
-          richtext.isParentOf(currentEdit) &&
-          currentEdit.isNot('figcaption')
-        ) {
-          const renderModel = breakAt(decors, currentEdit)
+        if (richtext.isParentOf(editor) && editor.isNot('figcaption')) {
+          const renderModel = breakAt(decors, editor)
           renderModel.list.splice(1, 0, img)
           figure = renderImage({
             richtext,
-            editor: currentEdit,
+            editor,
             elements: renderModel.list
           })
           renderModel.active.focus()

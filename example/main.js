@@ -23,8 +23,7 @@ const richtext = create(richtextEl, {
   }
 })
 
-function wire(id, func) {
-  document.getElementById(id).onmousedown = e => e.preventDefault()
+function wireClick(id, func) {
   document.getElementById(id).onclick = () => func()
 }
 
@@ -32,17 +31,17 @@ document.getElementById('staySelected').onchange = e => {
   richtext.setOptions({ staySelected: e.target.checked })
 }
 
-wire('bold', () => richtext.style('bold'))
-wire('italic', () => richtext.style('italic'))
-wire('highlight', () => richtext.style('highlight'))
-wire('header', () => richtext.apply('header'))
-wire('codebox', () => richtext.applyCodebox())
-wire('list', () => richtext.applyUnorderedList())
-wire('orderedList', () => richtext.applyOrderedList())
-wire('hyperlink', () => richtext.styleLink())
-wire('image', () => richtext.selectImage())
-wire('notebox', () => richtext.apply('notebox'))
-wire(
+wireClick('bold', () => richtext.style('bold'))
+wireClick('italic', () => richtext.style('italic'))
+wireClick('highlight', () => richtext.style('highlight'))
+wireClick('header', () => richtext.apply('header'))
+wireClick('codebox', () => richtext.applyCodebox())
+wireClick('list', () => richtext.applyUnorderedList())
+wireClick('orderedList', () => richtext.applyOrderedList())
+wireClick('hyperlink', () => richtext.styleLink())
+wireClick('image', () => richtext.selectImage())
+wireClick('notebox', () => richtext.apply('notebox'))
+wireClick(
   'direction',
   () =>
     (richtextEl.style.direction =

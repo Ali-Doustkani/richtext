@@ -18,11 +18,13 @@ function create(element, options) {
   options = checkOptions(options)
 
   const richtext = el(element)
+  let editor = richtext.firstChild()
   const handleKey = createKeyHandler(richtext, options.decors)
   const handleMouse = createMouseHandler(richtext)
   element.addEventListener('keydown', handleKey.keyDown, true)
   element.addEventListener('keyup', handleKey.keyUp, true)
   element.addEventListener('click', handleMouse)
+  element.addEventListener('focus', e => (editor = el(e.target)), true)
 
   const setStyle = params => {
     let { range, type, listTag, editor } = params
@@ -42,7 +44,6 @@ function create(element, options) {
   }
 
   const styleSelectedOrAll = (type, listTag) => {
-    const editor = el.active()
     if (Editor.isNotEditor(richtext, editor)) {
       return
     }
@@ -51,7 +52,6 @@ function create(element, options) {
   }
 
   const ifReady = func => {
-    const editor = el.active()
     if (Editor.isNotEditor(richtext, editor)) {
       return
     }
@@ -84,7 +84,7 @@ function create(element, options) {
     applyUnorderedList: () => styleSelectedOrAll('list', 'ul'),
     applyCodebox: () => styleSelectedOrAll('codebox'),
     applyOrderedList: () => styleSelectedOrAll('list', 'ol'),
-    selectImage: () => importImage(richtext, options.decors)
+    selectImage: () => importImage(richtext, editor, options.decors)
   }
 }
 
