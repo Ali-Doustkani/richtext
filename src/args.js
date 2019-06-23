@@ -29,12 +29,7 @@ function checkOptions(options) {
   init(options, 'defaultLink', '')
   init(options, 'decors', [])
   addDefaultDecors(options.decors)
-  if (
-    process.env.NODE_ENV === 'development' ||
-    process.env.NODE_ENV === 'test'
-  ) {
-    options.decors = checkDecors(options.decors)
-  }
+  options.decors = checkDecors(options.decors)
   return options
 }
 
