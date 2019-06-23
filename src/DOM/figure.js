@@ -24,11 +24,7 @@ const createFigure = img =>
         })
         .addListener('click', remove)
     )
-    .append(
-      el('figcaption')
-        .editable()
-        .style({ background: '#FAF3F2' })
-    )
+    .append(el('figcaption').editable())
     .style({
       position: 'relative',
       margin: '5px',
