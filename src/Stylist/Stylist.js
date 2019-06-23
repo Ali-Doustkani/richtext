@@ -1,5 +1,5 @@
 import createContext from './iterationContext'
-import { when } from './utils'
+import { cond } from './../Fns'
 
 function check(options) {
   if (options) {
@@ -33,20 +33,15 @@ function style(options) {
       }
     ]
   }
-  context.iterateOver(input, type, (text, originalDecors, newDecors) => {
-    when(context.regionUntouched)
-      .then(dontTouch)
-      .otherwise(context.region0Part)
-      .then(takeAll)
-      .otherwise(context.region3Parts)
-      .then(takeMiddlePart)
-      .otherwise(context.regionFirstEffectiveOf2Parts)
-      .then(takeFirstPart)
-      .otherwise(context.regionSecondEffectiveOf2Parts)
-      .then(takeSecondPart)
-      .run({ context, text, originalDecors, newDecors })
-  })
-
+  context.iterateOver(input, type, (text, originalDecors, newDecors) =>
+    cond([
+      [context.regionUntouched, dontTouch],
+      [context.region0Part, takeAll],
+      [context.region3Parts, takeMiddlePart],
+      [context.regionFirstEffectiveOf2Parts, takeFirstPart],
+      [context.regionSecondEffectiveOf2Parts, takeSecondPart]
+    ])({ context, text, originalDecors, newDecors })
+  )
   return context.result()
 }
 
