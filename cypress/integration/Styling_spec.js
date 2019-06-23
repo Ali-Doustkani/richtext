@@ -166,9 +166,9 @@ const world = str.slice(6)`
       'have.html',
       `<pre contenteditable="true">// program beginning
 const str = "Hello World!"
-</pre><pre contenteditable="true">// slice beginning
+</pre><p contenteditable="true">// slice beginning
 const hello = str.slice(0, 5)
-const world = str.slice(6)</pre>`
+const world = str.slice(6)</p>`
     )
   })
 })

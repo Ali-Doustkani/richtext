@@ -37,14 +37,10 @@ function keyHandler(richtext, decors) {
       Editor.handlePreEnter(editor)
       return
     }
-    if (editor.is('li') && event.ctrlKey) {
-      const renderModel = breakAt(decors, editor)
-      renderModel.list[1].to('p').editable()
-      renderText({ richtext, editors: editor, elements: renderModel.list })
-      renderModel.active.focus()
-      return
-    }
     const renderModel = breakAt(decors, editor)
+    if (event.ctrlKey) {
+      renderModel.list[1].to('p').editable()
+    }
     renderText({ richtext, editors: editor, elements: renderModel.list })
     renderModel.active.focus()
   }
