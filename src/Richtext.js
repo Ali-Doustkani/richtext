@@ -63,9 +63,19 @@ function create(element, options) {
   }
 
   return {
+    /**
+     * It sets options: defaultLink, staySelected.
+     */
     setOptions: value => setOptions(value, options),
+    /**
+     * Applies style to the selected text. If no text is selected then it will do nothing.
+     * @param {string} type The style name.
+     */
     style: type =>
       ifReady((range, editor) => setStyle({ range, type, editor })),
+    /**
+     * Applies hyperlink style to the selected text. It will generate <a> element.
+     */
     styleLink: () =>
       ifReady((range, editor) => {
         showDialog({
@@ -80,10 +90,25 @@ function create(element, options) {
           }
         })
       }),
+    /**
+     * Applies style to the selected text, but if there is no selection then it will apply to the whole parent element.
+     */
     apply: styleSelectedOrAll,
+    /**
+     * Applies <ul>.
+     */
     applyUnorderedList: () => styleSelectedOrAll('unorderedList', 'ul'),
-    applyCodebox: () => styleSelectedOrAll('codebox'),
+    /**
+     * Applies <ol>.
+     */
     applyOrderedList: () => styleSelectedOrAll('orderedList', 'ol'),
+    /**
+     * Applies <pre>.
+     */
+    applyCodebox: () => styleSelectedOrAll('codebox'),
+    /**
+     * Applies <figure> with an <img> and a <figcaption> inside.
+     */
     selectImage: () => importImage(richtext, editor, options.decors)
   }
 }
