@@ -27,7 +27,7 @@ function generateRenderModel(styleModel) {
   const setActive = (editor, item) => (active = item.active ? editor : active)
 
   const parentOf = decors => {
-    const result = decors ? decors.find(x => x.parent) : undefined
+    const result = decors ? decors.reverse().find(x => x.parent) : undefined
     return result || { tag: 'p' }
   }
 

@@ -1,5 +1,5 @@
 describe('styling', () => {
-  it('create unordered lists', () => {
+  it('create <ul>', () => {
     cy.visit('/')
     cy.get('#richtext>p').type('HelloWorld')
     cy.contains('List').click()
@@ -28,7 +28,7 @@ describe('styling', () => {
     </ul>`)
   })
 
-  it('create ordered lists', () => {
+  it('create <ol>', () => {
     cy.visit('/')
     cy.get('#richtext>p').type('One')
     cy.contains('Ordered List').click()
@@ -87,6 +87,54 @@ describe('styling', () => {
       <li contenteditable="true">Hello</li>
       <li contenteditable="true">SecondWorld</li>
       <li contenteditable="true">World</li>
+    </ul>`)
+  })
+
+  it('convert <ol> to <ul>', () => {
+    cy.visit('/')
+    cy.get('#richtext>p').type('1')
+    cy.contains('List').click()
+    cy.get('#richtext').shouldHaveHtml(`
+    <ul>
+      <li contenteditable="true">1</li>
+    </ul>`)
+
+    cy.contains('Ordered List').click()
+    cy.get('#richtext').shouldHaveHtml(`
+    <ol>
+      <li contenteditable="true">1</li>
+    </ol>`)
+
+    cy.contains('List').click()
+    cy.get('#richtext li').type('{enter}')
+    cy.get('#richtext li')
+      .eq(1)
+      .type('2{enter}')
+    cy.get('#richtext li')
+      .eq(2)
+      .type('3')
+    cy.get('#richtext li')
+      .eq(1)
+      .focus()
+    cy.contains('Ordered List').click()
+    cy.get('#richtext').shouldHaveHtml(`
+    <ul>
+      <li contenteditable="true">1</li>
+    </ul>
+    <ol>
+      <li contenteditable="true">2</li>
+    </ol>
+    <ul>
+      <li contenteditable="true">3</li>
+    </ul>`)
+
+    cy.get('#richtext>ol>li').focus()
+    cy.contains('List').click()
+    cy.get('#richtext').shouldHaveHtml(`
+    <ul>
+      <li contenteditable="true">1</li>
+      <li contenteditable="true">2</li>
+      <li contenteditable="true">3</li>
     </ul>`)
   })
 })

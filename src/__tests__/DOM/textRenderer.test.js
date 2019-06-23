@@ -375,4 +375,135 @@ describe('lists', () => {
       expectHtml('<ul><li>1</li><li>2</li></ul><p>3</p>')
     })
   })
+
+  describe('when changing list type', () => {
+    it('single item', () => {
+      el('ul')
+        .append(el('li').val('Hello'))
+        .appendTo(richtext)
+      editors = richtext.firstChild().firstChild()
+
+      _render({
+        richtext,
+        editors,
+        elements: [el('li').val('Hello')],
+        listTag: 'ol'
+      })
+
+      expectHtml('<ol><li>Hello</li></ol>')
+    })
+
+    it('item with previous list', () => {
+      el('ol')
+        .append(el('li').val('1'))
+        .appendTo(richtext)
+      el('ul')
+        .append(el('li').val('2'))
+        .append(el('li').val('3'))
+        .appendTo(richtext)
+      editors = richtext.child(1).child(1)
+
+      _render({
+        richtext,
+        editors,
+        elements: [el('li').val('3')],
+        listTag: 'ol'
+      })
+
+      expectHtml('<ol><li>1</li></ol><ul><li>2</li></ul><ol><li>3</li></ol>')
+    })
+
+    it('item with next list', () => {
+      el('ol')
+        .append(el('li').val('Hello'))
+        .appendTo(richtext)
+      el('ul')
+        .append(el('li').val('World'))
+        .appendTo(richtext)
+      editors = richtext.child(0).firstChild()
+
+      _render({
+        richtext,
+        editors,
+        elements: [el('li').val('Hello')],
+        listTag: 'ul'
+      })
+
+      expectHtml('<ul><li>Hello</li><li>World</li></ul>')
+    })
+
+    it('item with previous and next list', () => {
+      el('ol')
+        .append(el('li').val('1'))
+        .appendTo(richtext)
+      el('ul')
+        .append(el('li').val('2'))
+        .appendTo(richtext)
+      el('ol')
+        .append(el('li').val('3'))
+        .appendTo(richtext)
+      editors = richtext.child(1).firstChild()
+
+      _render({
+        richtext,
+        editors,
+        elements: [el('li').val('2')],
+        listTag: 'ol'
+      })
+
+      expectHtml('<ol><li>1</li><li>2</li><li>3</li></ol>')
+    })
+
+    it('first of multiple items', () => {
+      el('ul')
+        .append(el('li').val('Hello'))
+        .append(el('li').val('World'))
+        .appendTo(richtext)
+      editors = richtext.firstChild().firstChild()
+
+      _render({
+        richtext,
+        editors,
+        elements: [el('li').val('Hello')],
+        listTag: 'ol'
+      })
+
+      expectHtml('<ol><li>Hello</li></ol><ul><li>World</li></ul>')
+    })
+
+    it('last of multiple items', () => {
+      el('ul')
+        .append(el('li').val('Hello'))
+        .append(el('li').val('World'))
+        .appendTo(richtext)
+      editors = richtext.firstChild().lastChild()
+
+      _render({
+        richtext,
+        editors,
+        elements: [el('li').val('World')],
+        listTag: 'ol'
+      })
+
+      expectHtml('<ul><li>Hello</li></ul><ol><li>World</li></ol>')
+    })
+
+    it('middle of multiple items', () => {
+      el('ul')
+        .append(el('li').val('1'))
+        .append(el('li').val('2'))
+        .append(el('li').val('3'))
+        .appendTo(richtext)
+      editors = richtext.firstChild().child(1)
+
+      _render({
+        richtext,
+        editors,
+        elements: [el('li').val('2')],
+        listTag: 'ol'
+      })
+
+      expectHtml('<ul><li>1</li></ul><ol><li>2</li></ol><ul><li>3</li></ul>')
+    })
+  })
 })

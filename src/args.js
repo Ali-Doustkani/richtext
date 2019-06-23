@@ -45,9 +45,15 @@ function init(options, name, value) {
 }
 
 function addDefaultDecors(decors) {
-  decors.list = {
+  decors.orderedList = {
     parent: true,
-    tag: 'li'
+    tag: 'li',
+    parentType: 'ol'
+  }
+  decors.unorderedList = {
+    parent: true,
+    tag: 'li',
+    parentType: 'ul'
   }
   decors.codebox = {
     parent: true,

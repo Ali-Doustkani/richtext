@@ -16,7 +16,8 @@ const D = {
     tag: 'a',
     href: '' // dynamic attribute
   },
-  list: { tag: 'i' }
+  orderedList: { tag: 'li', parent: true, parentType: 'ol' },
+  unorderedList: { tag: 'li', parent: true, parentType: 'ul' }
 }
 
 it('read from paragraph editors', () => {
@@ -95,8 +96,18 @@ it('read bolded anchor', () => {
 })
 
 it('read editor tag as decor', () => {
-  richtext.append(el('i').val('HelloWorld'))
+  richtext.append(el('ol').append(el('li').val('HelloWorld')))
   expect(read(D, richtext.firstChild())).toEqual([
-    { text: 'HelloWorld', decors: [D.list] }
+    { text: 'HelloWorld', decors: [D.orderedList] }
+  ])
+})
+
+it('read parent type', () => {
+  richtext.append(el('ul').append(el('li').val('Hello')))
+  expect(read(D, richtext.firstChild().firstChild())).toEqual([
+    {
+      text: 'Hello',
+      decors: [D.unorderedList]
+    }
   ])
 })

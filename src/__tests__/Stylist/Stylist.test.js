@@ -2,7 +2,9 @@ import { style } from './../../Stylist/Stylist'
 
 const D = {
   bold: { tag: 'strong' },
-  italic: { tag: 'i' }
+  italic: { tag: 'i' },
+  ol: { parent: true, tag: 'li', parentType: 'ol' },
+  ul: { parent: true, tag: 'li', parentType: 'ul' }
 }
 
 describe('when input is plain text', () => {

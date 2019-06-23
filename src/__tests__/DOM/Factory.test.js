@@ -164,3 +164,15 @@ it('put the anchor the last wrapper', () => {
     '<a href="link"><i><b>Hello</b></i><span class="text-highlight">World</span></a>'
   )
 })
+
+it('model a parent to another parent', () => {
+  const model = generateRenderModel([
+    {
+      text: 'Hello',
+      decors: [D.bigHeader, D.smallHeader]
+    }
+  ])
+  expect(model.list[0].element.outerHTML).toBe(
+    '<h2 class="header-style">Hello</h2>'
+  )
+})

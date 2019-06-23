@@ -81,9 +81,9 @@ function create(element, options) {
         })
       }),
     apply: styleSelectedOrAll,
-    applyUnorderedList: () => styleSelectedOrAll('list', 'ul'),
+    applyUnorderedList: () => styleSelectedOrAll('unorderedList', 'ul'),
     applyCodebox: () => styleSelectedOrAll('codebox'),
-    applyOrderedList: () => styleSelectedOrAll('list', 'ol'),
+    applyOrderedList: () => styleSelectedOrAll('orderedList', 'ol'),
     selectImage: () => importImage(richtext, editor, options.decors)
   }
 }

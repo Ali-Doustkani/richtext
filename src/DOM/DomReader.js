@@ -28,7 +28,7 @@ function read(decors, editor) {
   function getDecor(el) {
     for (let prop in decors) {
       const e = decors[prop]
-      if (e.tag && el.is(e.tag) && el.hasClassFrom(e)) {
+      if (e.tag && el.is(e.tag) && el.hasClassFrom(e) && parentType(e, el)) {
         const specials = dynamicAttribs(e)
         return specials.length ? makeDecor(e, specials, el) : e
       }
@@ -36,10 +36,18 @@ function read(decors, editor) {
     return null
   }
 
+  function parentType(decor, el) {
+    if (decor.parentType) {
+      return el.parent().is(decor.parentType)
+    }
+    return true
+  }
+
   // values of dynamic attributes are read from DOM instead of decors array
   function dynamicAttribs(decors) {
     return Object.keys(decors).filter(
-      x => x !== 'tag' && x !== 'className' && x !== 'parent'
+      x =>
+        x !== 'tag' && x !== 'className' && x !== 'parent' && x !== 'parentType'
     )
   }
 

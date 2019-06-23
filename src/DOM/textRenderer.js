@@ -1,33 +1,30 @@
 import { el } from './Query'
+import { cond, unless, toArray } from './../Fns'
 
-function renderText(params) {
-  let { richtext, editors, elements, listTag } = params
-  editors = Array.isArray(editors) ? editors : [editors]
-  if (shouldCreateList(editors, elements)) {
-    createList(richtext, editors[0], elements, listTag)
-  } else if (shouldAppendOrDeleteListItem(editors, elements)) {
-    appendOrDeleteListItem(editors, elements[0])
-  } else if (shouldChangeToSingle(editors, elements)) {
-    changeToSingle(richtext, editors, elements[0], listTag)
-  } else if (shouldChangeToMultiple(editors, elements)) {
-    changeToMultiple(richtext, editors[0], elements)
-  } else if (shouldModifyListItem(editors, elements)) {
-    modifyListItem(editors[0], elements[0])
-  } else {
-    richtext.insertAfter(editors[0], elements).remove(editors)
-  }
+const renderText = params => {
+  params.editors = toArray(params.editors)
+  unless(
+    cond([
+      [shouldCreateList, createList],
+      [shouldAppendOrDeleteListItem, appendOrDeleteListItem],
+      [shouldChangeToSingle, changeToSingle],
+      [shouldChangeToMultiple, changeToMultiple],
+      [shouldChangeListType, changeListType],
+      [shouldModifyListItem, modifyListItem]
+    ]),
+    addElements
+  )(params)
 }
 
-function shouldCreateList(editors, elements) {
-  return (
-    editors.length === 1 &&
-    editors[0].isNot('li') &&
-    elements.length <= 3 &&
-    elements.some(x => x.is('li'))
-  )
-}
+const shouldCreateList = ({ editors, elements }) =>
+  editors.length === 1 &&
+  editors[0].isNot('li') &&
+  elements.length <= 3 &&
+  elements.some(x => x.is('li'))
 
-function createList(richtext, editor, elements, listTag) {
+const createList = params => {
+  let { richtext, elements, listTag } = params
+  const editor = params.editors[0]
   const element = elements.find(x => x.is('li'))
   if (elements[0].is('li') && editor.previousIs(listTag)) {
     const prevList = editor.previous()
@@ -55,16 +52,15 @@ function createList(richtext, editor, elements, listTag) {
   }
 }
 
-function shouldAppendOrDeleteListItem(editors, elements) {
-  return (
-    editors.length === 2 &&
-    editors.some(x => x.is('li')) &&
-    elements.length === 1 &&
-    elements[0].is('li')
-  )
-}
+const shouldAppendOrDeleteListItem = ({ editors, elements }) =>
+  editors.length === 2 &&
+  editors.some(x => x.is('li')) &&
+  elements.length === 1 &&
+  elements[0].is('li')
 
-function appendOrDeleteListItem([editor1, editor2], element) {
+const appendOrDeleteListItem = params => {
+  const [editor1, editor2] = params.editors
+  const element = params.elements[0]
   if (editor1.is('li')) {
     const list = editor1.parent()
     list.insertAfter(editor1, element)
@@ -73,15 +69,14 @@ function appendOrDeleteListItem([editor1, editor2], element) {
   }
 }
 
-function shouldChangeToSingle(editors, elements) {
-  return (
-    editors.some(x => x.is('li')) &&
-    elements.length === 1 &&
-    elements[0].isNot('li')
-  )
-}
+const shouldChangeToSingle = ({ editors, elements }) =>
+  editors.some(x => x.is('li')) &&
+  elements.length === 1 &&
+  elements[0].isNot('li')
 
-function changeToSingle(richtext, editors, element, listTag) {
+const changeToSingle = params => {
+  const { richtext, editors, listTag } = params
+  const element = params.elements[0]
   const listItem = editors.find(x => x.is('li'))
   const list = listItem.parent()
   if (listItem.is(list.firstChild())) {
@@ -100,16 +95,15 @@ function changeToSingle(richtext, editors, element, listTag) {
   }
 }
 
-function shouldChangeToMultiple(editors, elements) {
-  return (
-    editors.length === 1 &&
-    editors[0].is('li') &&
-    elements.length === 2 &&
-    elements.some(x => x.is('li'))
-  )
-}
+const shouldChangeToMultiple = ({ editors, elements }) =>
+  editors.length === 1 &&
+  editors[0].is('li') &&
+  elements.length === 2 &&
+  elements.some(x => x.is('li'))
 
-function changeToMultiple(richtext, listItem, elements) {
+const changeToMultiple = params => {
+  const { richtext, elements } = params
+  const listItem = params.editors[0]
   const list = listItem.parent()
   if (listItem.is(list.lastChild())) {
     listItem.remove()
@@ -127,18 +121,64 @@ function changeToMultiple(richtext, listItem, elements) {
   }
 }
 
-function shouldModifyListItem(editors, elements) {
-  return (
-    editors.length === 1 &&
-    editors[0].is('li') &&
-    elements.length === 1 &&
-    elements[0].is('li')
-  )
+const shouldChangeListType = ({ editors, elements, listTag }) =>
+  editors.length === 1 &&
+  editors[0].is('li') &&
+  elements.length === 1 &&
+  elements[0].is('li') &&
+  listTag &&
+  editors[0].parent().isNot(listTag)
+
+const changeListType = params => {
+  const { richtext, listTag } = params
+  const list = params.editors[0].parent()
+  const item = params.editors[0]
+  const newItem = params.elements[0]
+
+  let newList = el(listTag).append(newItem)
+  if (list.firstChild().is(item)) {
+    richtext.insertBefore(list, newList)
+  } else if (list.lastChild().is(item)) {
+    richtext.insertAfter(list, newList)
+  } else {
+    const rest = list.removeFrom(item).splice(1)
+    richtext.insertAfter(list, el.withTag(list).append(rest))
+    richtext.insertAfter(list, newList)
+  }
+
+  item.remove()
+  if (list.count() === 0) {
+    list.remove()
+  }
+
+  const prev = newList.previous()
+  if (prev && prev.is(listTag)) {
+    newList.moveChildrenTo(prev).remove()
+    newList = prev
+  }
+
+  const next = newList.next()
+  if (next && next.is(listTag)) {
+    next.moveChildrenTo(newList).remove()
+  }
 }
 
-function modifyListItem(listItem, element) {
+const shouldModifyListItem = ({ editors, elements }) =>
+  editors.length === 1 &&
+  editors[0].is('li') &&
+  elements.length === 1 &&
+  elements[0].is('li')
+
+const modifyListItem = params => {
+  const listItem = params.editors[0]
+  const element = params.elements[0]
   listItem.parent().insertAfter(listItem, element)
   listItem.remove()
 }
+
+const addElements = params =>
+  params.richtext
+    .insertAfter(params.editors[0], params.elements)
+    .remove(params.editors)
 
 export { renderText }
