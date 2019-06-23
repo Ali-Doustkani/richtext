@@ -17,7 +17,7 @@ function create(element, options) {
   checkEditor(element)
   options = checkOptions(options)
 
-  const richtext = el(element)
+  const richtext = el(element).style({ overflow: 'auto' })
   let editor = richtext.firstChild()
   const handleKey = createKeyHandler(richtext, options.decors)
   const handleMouse = createMouseHandler(richtext)
