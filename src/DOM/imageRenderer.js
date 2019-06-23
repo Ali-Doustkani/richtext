@@ -4,7 +4,7 @@ import { createFigure } from './figure'
 const renderImage = params => {
   let { richtext, editor, elements } = params
   elements = elements.map(e => (e.is('img') ? createFigure(e) : e))
-  if (isPImgP(elements)) {
+  if (isPImageP(elements)) {
     renderPImgP(richtext, editor, elements)
   } else if (isLiImgLi(elements)) {
     renderLiImgLi(richtext, editor, elements)
@@ -14,11 +14,13 @@ const renderImage = params => {
   return elements.find(x => x.is('figure'))
 }
 
-const isPImgP = elements =>
+const isPImageP = elements =>
   elements.length === 3 &&
-  elements[0].is('p') &&
+  elements[0].isNot('figure') &&
+  elements[0].isNot('li') &&
   elements[1].is('figure') &&
-  elements[2].is('p')
+  elements[2].isNot('figure') &&
+  elements[2].isNot('li')
 
 const renderPImgP = (richtext, editor, elements) =>
   richtext
