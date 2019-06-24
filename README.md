@@ -118,3 +118,5 @@ imageBtn.addEventListener('click', () => {
   rt.selectImage() // <figure><img src="SRC"><figcaption>CAPTION</figcaption></figure>
 })
 ```
+# License
+[MIT License](https://github.com/Ali-Doustkani/richtext/blob/master/LICENSE)
