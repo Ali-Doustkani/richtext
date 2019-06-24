@@ -1,5 +1,6 @@
-# Story
+# Story 🎉💻
 Well, I know there are lot's of powerful **richtext** editors out in the wild! But I couldn't skip the fun parts, so I created one beacuase I needed something for my blog. This editor works based on contenteditable but I have avoided to use execCommand. You can check out the demo here.
+![Demo](https://richtext.alidoustkani.com/richtext.gif)
 
 # Installation
 First of all you need an empty element on the page to handle the editor. It could be a `<div>` or an `<article>`:
