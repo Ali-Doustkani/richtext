@@ -17,7 +17,7 @@ Download the last version from [here](https://github.com/Ali-Doustkani/richtext/
 ```html
 <script src="richtext.js"></script>
 <script>
-  var richtext = Richtext.create(document.getElementById('richtext'), options); // See below for configuring options.
+  var rt = Richtext.create(document.getElementById('richtext'), options); // See below for configuring options.
   // apply the styles on UI events. See below.
 </script>
 ```
@@ -30,7 +30,7 @@ npm i @alidoustkani/richtext
 ```javascript
 import {create} from '@alidoustkani/richtext'
 
-const richtext = create(document.getElementById('richtext'), options) // see below for options
+const rt = create(document.getElementById('richtext'), options) // see below for options
 ```
 
 # API & Options
