@@ -54,9 +54,20 @@ There are two kinds of methods in richtext: `style()` and `apply()`.
   }
 }
 ```
+### Options
 * **defaultLink**: default text in the link popup.
 * **staySelected**: for `true` value, the selection will remain the same after applying styles.
 * **decors**: styling configuration. Use this option to define your styling elements and css classes.
+
+### API
+* **apply(type)**
+* **applyUnorderedList()**
+* **applyOrderedList()**
+* **applyCodebox()**
+* **selectImage()**
+* **setOptions(options)**
+* **style(type)**
+* **styleLink()**
 
 # Example
 ```javascript
