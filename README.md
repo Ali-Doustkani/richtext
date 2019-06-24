@@ -2,7 +2,7 @@
 [![jest](https://jestjs.io/img/jest-badge.svg)](https://github.com/facebook/jest)
 
 # Story 🎉💻
-Well, I know there are lot's of powerful **richtext** editors out in the wild! But I couldn't skip the fun parts, so I created one beacuase I needed something for my blog. This editor works based on contenteditable but I have avoided to use execCommand. You can check out the demo here.
+Well, I know there are lot's of powerful **richtext** editors out in the wild! But I couldn't skip the fun parts, so I created one beacuase I needed something for my blog. This editor works based on contenteditable but I have avoided to use execCommand. You can check out the demo [here](https://richtext.alidoustkani.com).
 ![Demo](https://richtext.alidoustkani.com/richtext.gif)
 
 # Installation
