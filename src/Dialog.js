@@ -64,7 +64,7 @@ function create(options) {
     .style({
       width: '100%',
       height: '100%',
-      background: 'rgba(0, 0, 0, 0.5)',
+      background: 'transparent',
       position: 'absolute',
       top: '0',
       left: '0',
@@ -72,6 +72,7 @@ function create(options) {
     })
     .append(
       el('div')
+        .style({ position: 'absolute' })
         .className('dialog')
         .append(input)
         .append(saveButton)
