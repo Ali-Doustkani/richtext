@@ -5,12 +5,12 @@
 Well, I know there are lot's of powerful **richtext** editors out in the wild! But I couldn't skip the fun parts, so I created one beacuase I needed something for my blog. This editor works based on contenteditable but I have avoided to use execCommand. You can check out the demo [here](https://richtext.alidoustkani.com).
 ![Demo](https://richtext.alidoustkani.com/richtext.gif)
 
-# Installation
+# Getting Started
 First of all you need an empty element on the page to handle the editor. It could be a `<div>` or an `<article>`:
 ```html
 <article id="richtext"></article>
 ```
-To use the richtext you can both download it or use the npm.
+To use the richtext you can both download it or install it from the npm.
 
 ### JS File
 Download the last version from [here](https://github.com/Ali-Doustkani/richtext/releases). And: 
