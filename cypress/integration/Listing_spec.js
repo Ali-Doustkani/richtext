@@ -190,6 +190,7 @@ describe('handling keys', () => {
     beforeEach(() => cy.visit('/'))
 
     it('handle two <li>', () => {
+      cy.get('#richtext').click()
       cy.contains('List').click()
       cy.get('#richtext li').type('Hello{enter}')
       cy.get('#richtext li')

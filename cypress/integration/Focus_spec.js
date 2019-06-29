@@ -1,5 +1,6 @@
 it('handle focus with click', () => {
   cy.visit('/')
+  cy.get('#richtext').click()
   cy.get('#richtext>p')
     .should('have.focus')
     .type('Hello{enter}')
