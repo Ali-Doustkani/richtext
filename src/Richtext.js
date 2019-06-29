@@ -64,9 +64,19 @@ function create(element, options) {
 
   return {
     /**
-     * It sets options: defaultLink, staySelected.
+     * Sets options: defaultLink, staySelected.
      */
     setOptions: value => setOptions(value, options),
+    /**
+     * Sets focus of Richtext.
+     */
+    focus: () => {
+      if (editor) {
+        editor.focus()
+      } else {
+        richtext.firstChild().focus()
+      }
+    },
     /**
      * Applies style to the selected text. If no text is selected then it will do nothing.
      * @param {string} type The style name.

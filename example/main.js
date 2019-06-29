@@ -47,3 +47,4 @@ wireClick(
     (richtextEl.style.direction =
       richtextEl.style.direction === 'ltr' ? 'rtl' : 'ltr')
 )
+wireClick('focus', () => richtext.focus())

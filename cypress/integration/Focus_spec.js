@@ -1,4 +1,4 @@
-it('handle focus', () => {
+it('handle focus with click', () => {
   cy.visit('/')
   cy.get('#richtext>p')
     .should('have.focus')
@@ -10,5 +10,28 @@ it('handle focus', () => {
   cy.get('#richtext').click()
   cy.get('#richtext>p')
     .eq(1)
+    .should('have.focus')
+})
+
+it('handle focus with code behind', () => {
+  cy.visit('/')
+  cy.get('#richtext>p').type('Hello{enter}')
+  cy.get('#richtext>p')
+    .eq(1)
+    .type('World')
+
+  cy.contains('Type Here').click()
+  cy.contains('Set Focus').click()
+  cy.get('#richtext>p')
+    .eq(1)
+    .should('have.focus')
+
+  cy.get('#richtext>p')
+    .eq(0)
+    .focus()
+  cy.contains('Type Here').click()
+  cy.contains('Set Focus').click()
+  cy.get('#richtext>p')
+    .eq(0)
     .should('have.focus')
 })
