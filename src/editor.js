@@ -92,6 +92,22 @@ function isNotEditor(richtext, editor) {
   return editor.parent().isNot(richtext)
 }
 
+function makeEditable(richtext) {
+  richtext.forChildren(child => {
+    if (child.is('ol') || child.is('ul')) {
+      child.forChildren(x => x.editable())
+    } else if (child.is('figure')) {
+      child.forChildren(x => {
+        if (x.is('figcaption')) {
+          x.editable()
+        }
+      })
+    } else {
+      child.editable()
+    }
+  })
+}
+
 export {
   canBackspace,
   canDelete,
@@ -101,5 +117,6 @@ export {
   handlePreEnter,
   previousEditor,
   nextEditor,
-  isNotEditor
+  isNotEditor,
+  makeEditable
 }
