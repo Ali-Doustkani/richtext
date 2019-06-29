@@ -16,10 +16,6 @@ function checkEditor(richtext) {
   if (richtext.firstChild.nodeName !== 'P') {
     throw new Error('only <p> element is valid inside richtext')
   }
-  const dir = richtext.style.direction
-  if (dir !== 'rtl' || dir !== 'ltr') {
-    richtext.style.direction = 'ltr'
-  }
 }
 
 function checkOptions(options) {
