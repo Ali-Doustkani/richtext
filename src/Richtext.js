@@ -77,6 +77,12 @@ function create(element, options) {
         richtext.firstChild().focus()
       }
     },
+    setInnerHTML: html => {
+      if (html) {
+        element.innerHTML = html
+        Editor.makeEditable(richtext)
+      }
+    },
     /**
      * Applies style to the selected text. If no text is selected then it will do nothing.
      * @param {string} type The style name.

@@ -230,3 +230,66 @@ describe('navigating from <figure> to <p>', () => {
     expect(Editor.nextEditor(cap).is(richtext.lastChild())).toBe(true)
   })
 })
+
+describe('making children editable', () => {
+  delete HTMLElement.prototype.contentEditable
+  Object.defineProperty(HTMLElement.prototype, 'contentEditable', {
+    configurable: true,
+    get: () => {},
+    set: function(val) {
+      this.setAttribute('contenteditable', val)
+    }
+  })
+
+  let richtext
+  beforeEach(() => (richtext = el('div')))
+
+  it('do not touch inner elements', () => {
+    richtext.element.innerHTML = '<p><strong>1</strong></p>'
+    Editor.makeEditable(richtext)
+    expect(richtext.element.innerHTML).toBe(
+      '<p contenteditable="true"><strong>1</strong></p>'
+    )
+  })
+
+  it('do not touch other attributes', () => {
+    richtext.element.innerHTML = '<pre class="text-cls">CODE</pre>'
+    Editor.makeEditable(richtext)
+    expect(richtext.element.innerHTML).toBe(
+      '<pre class="text-cls" contenteditable="true">CODE</pre>'
+    )
+  })
+
+  it('make all <li>s of <ul> editable', () => {
+    richtext.element.innerHTML = '<ul><li>1</li></ul>'
+    Editor.makeEditable(richtext)
+    expect(richtext.element.innerHTML).toBe(
+      '<ul><li contenteditable="true">1</li></ul>'
+    )
+  })
+
+  it('make all <li>s of <ol> editable', () => {
+    richtext.element.innerHTML = '<ol><li>1</li></ol>'
+    Editor.makeEditable(richtext)
+    expect(richtext.element.innerHTML).toBe(
+      '<ol><li contenteditable="true">1</li></ol>'
+    )
+  })
+
+  it('make <figcaption> editable', () => {
+    richtext.element.innerHTML =
+      '<figure><img><figcaption>1</figcaption></figure>'
+    Editor.makeEditable(richtext)
+    expect(richtext.element.innerHTML).toBe(
+      '<figure><img><figcaption contenteditable="true">1</figcaption></figure>'
+    )
+  })
+
+  it('make all other tags editable', () => {
+    richtext.element.innerHTML = '<pre>CODE</pre>'
+    Editor.makeEditable(richtext)
+    expect(richtext.element.innerHTML).toBe(
+      '<pre contenteditable="true">CODE</pre>'
+    )
+  })
+})
