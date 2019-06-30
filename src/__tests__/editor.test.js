@@ -235,7 +235,6 @@ describe('making children editable', () => {
   delete HTMLElement.prototype.contentEditable
   Object.defineProperty(HTMLElement.prototype, 'contentEditable', {
     configurable: true,
-    get: () => {},
     set: function(val) {
       this.setAttribute('contenteditable', val)
     }
