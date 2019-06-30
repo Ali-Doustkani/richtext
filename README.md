@@ -1,3 +1,4 @@
+[![Build Status](https://alidoustkani.visualstudio.com/Richtext/_apis/build/status/Ali-Doustkani.richtext?branchName=master)](https://alidoustkani.visualstudio.com/Richtext/_build/latest?definitionId=5&branchName=master)
 [![Cypress.io tests](https://img.shields.io/badge/cypress.io-tests-green.svg?style=flat-square)](https://cypress.io)
 [![jest](https://jestjs.io/img/jest-badge.svg)](https://github.com/facebook/jest)
 
