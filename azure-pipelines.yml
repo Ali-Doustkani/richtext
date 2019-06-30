@@ -16,7 +16,7 @@ steps:
 - script: npm run lint
   displayName: 'Linting'
 
-- script: npm tests
+- script: npm test
   displayName: 'Unit Tests'
 
 - script: npm run test:integration
