@@ -13,14 +13,21 @@ steps:
 - script: npm install
   displayName: 'installing dependencies'
 
-- script: npm run lint
-  displayName: 'Linting'
+#- script: npm run lint
+#  displayName: 'Linting'
 
-- script: npm test
-  displayName: 'Unit Tests'
+#- script: npm test
+#  displayName: 'Unit Tests'
 
-- script: npm run test:integration
-  displayName: 'E2E Tests'
+#- script: npm run test:integration
+#  displayName: 'E2E Tests'
 
 - script: npm run build
   displayName: 'Building richtext.min.js'
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: './dist'
+    Contents: 'richtext.min.js'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    CleanTargetFolder: true
