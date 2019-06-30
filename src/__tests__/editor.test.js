@@ -232,12 +232,21 @@ describe('navigating from <figure> to <p>', () => {
 })
 
 describe('making children editable', () => {
+  const desc = Object.getOwnPropertyDescriptor(
+    HTMLElement.prototype,
+    'contentEditable'
+  )
   delete HTMLElement.prototype.contentEditable
   Object.defineProperty(HTMLElement.prototype, 'contentEditable', {
     configurable: true,
     set: function(val) {
       this.setAttribute('contenteditable', val)
     }
+  })
+
+  afterAll(() => {
+    delete HTMLElement.prototype.contentEditable
+    Object.defineProperty(HTMLElement.prototype, 'contentEditable', desc)
   })
 
   let richtext
