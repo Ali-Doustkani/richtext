@@ -13,7 +13,7 @@ steps:
 - script: npm install
   displayName: 'installing dependencies'
 
-- script: npm lint
+- script: npm run lint
   displayName: 'Linting'
 
 - script: npm tests
