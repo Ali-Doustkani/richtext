@@ -22,7 +22,7 @@ steps:
     git config --global credential.helper store
     git config user.email "ali.doostkany@gmail.com"
     git config user.name "Ali"
-    Add-Content "$HOME\.git-credentials" "https://a3a5e0f4070f4a8ad839d982d6bbdac992e7de90:x-oauth-basic@github.com/Ali-Doustkani/richtext.git"
+    Add-Content "$HOME\.git-credentials" "https://Ali-Doustkani:rylaH@scorpions@1368@github.com/Ali-Doustkani/richtext.git"
     git checkout master
     git push 
 #git commit -a -m "clean commit"
