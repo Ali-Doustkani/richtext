@@ -37,7 +37,7 @@ steps:
 
 - bash: |
     git branch -a
-    git push https://Ali-Doustkani:rylaH@scorpions@1368@github.com/Ali-Doustkani/richtext.git
+    git push https://a3a5e0f4070f4a8ad839d982d6bbdac992e7de90@github.com/Ali-Doustkani/richtext.git
   displayName: 'git push'
 
 - task: CopyFiles@2
