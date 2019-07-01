@@ -22,19 +22,19 @@ steps:
     git config user.email "ali.doostkany@gmail.com"
     git config user.name "Ali Doustkani"
     git commit -a -m "clean commit"
-    npm version patch
+    npm version $(Version)
   displayName: 'versioning'
 
-- script: npm test
-  displayName: 'unit testing'
+# - script: npm test
+#   displayName: 'unit testing'
 
-- script: npm run test:integration
-  displayName: 'e2e testing'
+# - script: npm run test:integration
+#   displayName: 'e2e testing'
 
 - script: npm run build
   displayName: 'bundling richtext.min.js'
 
-- script: git push
+- script: git push origin master
   displayName: 'git push'
 
 - task: CopyFiles@2
