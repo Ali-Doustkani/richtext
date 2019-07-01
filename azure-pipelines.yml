@@ -36,9 +36,8 @@ steps:
 #   displayName: 'bundling richtext.min.js'
 
 - bash: |
-    git remote -v
     git branch -a
-    git push
+    git push https://ali-doustkani:a3a5e0f4070f4a8ad839d982d6bbdac992e7de90@github.com/Ali-Doustkani/richtext.git
   displayName: 'git push'
 
 - task: CopyFiles@2
