@@ -15,8 +15,8 @@ steps:
     versionSpec: '10.x'
   displayName: 'Install Node.js'
   
-- script: npm install
-  displayName: 'installing dependencies'
+# - script: npm install
+#   displayName: 'installing dependencies'
 
 - script: |
     git config user.email "ali.doostkany@gmail.com"
@@ -31,10 +31,12 @@ steps:
 # - script: npm run test:integration
 #   displayName: 'e2e testing'
 
-- script: npm run build
-  displayName: 'bundling richtext.min.js'
+# - script: npm run build
+#   displayName: 'bundling richtext.min.js'
 
-- script: git push origin master
+- script: |
+    git status -s
+    git push origin master
   displayName: 'git push'
 
 - task: CopyFiles@2
