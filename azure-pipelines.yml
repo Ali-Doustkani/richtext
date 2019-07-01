@@ -35,9 +35,10 @@ steps:
 # - script: npm run build
 #   displayName: 'bundling richtext.min.js'
 
-- script: |
+- bash: |
+    curl -H 'Authorization: token a3a5e0f4070f4a8ad839d982d6bbdac992e7de90'
     git branch -a
-    git push https://a3a5e0f4070f4a8ad839d982d6bbdac992e7de90@github.com/Ali-Doustkani/richtext.git
+    git push
   displayName: 'git push'
 
 - task: CopyFiles@2
