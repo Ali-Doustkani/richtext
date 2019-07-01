@@ -36,7 +36,7 @@ steps:
 #   displayName: 'bundling richtext.min.js'
 
 - bash: |
-    git remote
+    git remote -v
     git branch -a
     git push
   displayName: 'git push'
