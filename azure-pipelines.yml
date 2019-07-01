@@ -10,6 +10,9 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
+- checkout: self
+  persistCredentials: true
+
 - task: NodeTool@0
   inputs:
     versionSpec: '10.x'
@@ -17,18 +20,6 @@ steps:
   
 - script: npm install
   displayName: 'installing dependencies'
-
-- checkout: self
-  persistCredentials: true
-
-- script: |
-    git checkout master
-    git config user.name "Ali"
-    git config user.email "ali.doostkany@gmail.com"
-    git commit -a -m "clean commit"
-    npm version $(Version)
-    git push 
-  displayName: 'versioning'
 
 - script: npm test
   displayName: 'unit testing'
@@ -38,6 +29,15 @@ steps:
 
 - script: npm run build
   displayName: 'bundling richtext.min.js'
+
+- script: |
+    git checkout master
+    git config user.name "Ali"
+    git config user.email "ali.doostkany@gmail.com"
+    git commit -a -m "clean commit"
+    npm version $(Version)
+    git push 
+  displayName: 'versioning'
 
 - task: CopyFiles@2
   inputs:
