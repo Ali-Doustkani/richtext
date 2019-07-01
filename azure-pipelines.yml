@@ -35,8 +35,8 @@ steps:
 #   displayName: 'bundling richtext.min.js'
 
 - script: |
-    git status -s
-    git push origin master
+    git branch -a
+    git push origin HEAD:master
   displayName: 'git push'
 
 - task: CopyFiles@2
