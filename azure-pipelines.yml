@@ -34,8 +34,9 @@ steps:
     git checkout master
     git config user.name "Ali"
     git config user.email "ali.doostkany@gmail.com"
+    git config push.followTags true
     git commit -a -m "clean commit"
-    npm version $(Version)
+    npm version $(Version) -m "%s [skip ci]"
     git push 
   displayName: 'versioning'
 
