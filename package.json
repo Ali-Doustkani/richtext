@@ -1,6 +1,6 @@
 {
   "name": "@alidoustkani/richtext",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "main": "./src/Richtext.js",
   "description": "A richtext with configurable styles",
   "keywords": [
