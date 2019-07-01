@@ -22,6 +22,8 @@ steps:
   persistCredentials: true
 
 - script: |
+    git config user.name "Ali"
+    git config user.email "ali.doostkany@gmail.com"
     git commit -a -m "clean commit"
     npm version patch
     git push 
