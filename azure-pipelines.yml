@@ -18,7 +18,9 @@ steps:
 - script: npm install
   displayName: 'installing dependencies'
 
-- script: npm version patch
+- bash: |
+    git commit -m "clean commit"
+    npm version patch
   displayName: 'versioning'
 
 - script: npm tests
