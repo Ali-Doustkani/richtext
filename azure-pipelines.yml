@@ -21,6 +21,7 @@ steps:
 - script: |
     git config user.email "ali.doostkany@gmail.com"
     git config user.name "Ali Doustkani"
+    git checkout master
     git commit -a -m "clean commit"
     npm version $(Version)
   displayName: 'versioning'
