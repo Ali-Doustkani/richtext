@@ -10,19 +10,23 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '10.x'
-  displayName: 'Install Node.js'
+# - task: NodeTool@0
+#   inputs:
+#     versionSpec: '10.x'
+#   displayName: 'Install Node.js'
   
-- script: npm install
-  displayName: 'installing dependencies'
+# - script: npm install
+#   displayName: 'installing dependencies'
 
+- checkout: self
+  persistCredentials: true
+  
 - script: |
     git checkout master
     git config user.name "Ali"
     git config user.email "ali.doostkany@gmail.com"
     git commit -a -m "clean commit"
+    npm version patch
     git push 
     
 #Add-Content "$HOME\.git-credentials" "https://Ali-Doustkani:rylaH@scorpions@1368@github.com/Ali-Doustkani/richtext.git"
@@ -41,15 +45,15 @@ steps:
 
  
 
-- task: CopyFiles@2
-  inputs:
-    SourceFolder: './dist'
-    Contents: 'richtext.min.js'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
-    CleanTargetFolder: true
+# - task: CopyFiles@2
+#   inputs:
+#     SourceFolder: './dist'
+#     Contents: 'richtext.min.js'
+#     TargetFolder: '$(Build.ArtifactStagingDirectory)'
+#     CleanTargetFolder: true
 
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'drop'
-    publishLocation: 'Container'
+# - task: PublishBuildArtifacts@1
+#   inputs:
+#     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+#     ArtifactName: 'drop'
+#     publishLocation: 'Container'
