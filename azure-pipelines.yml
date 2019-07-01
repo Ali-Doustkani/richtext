@@ -23,7 +23,7 @@ steps:
     git config user.name "Ali"
     git config user.email "ali.doostkany@gmail.com"
     git commit -a -m "clean commit"
-    git push https://b9cd5737a0d44f779a251728252b18c4dadc335b@github.com/Ali-Doustkani/richtext.git
+    git push 
     
 #Add-Content "$HOME\.git-credentials" "https://Ali-Doustkani:rylaH@scorpions@1368@github.com/Ali-Doustkani/richtext.git"
 #
