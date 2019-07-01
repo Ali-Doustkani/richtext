@@ -21,7 +21,7 @@ steps:
 - script: |
     git config user.email "ali.doostkany@gmail.com"
     git config user.name "Ali Doustkani"
-    git commit -m "clean commit"
+    git commit -a -m "clean commit"
     npm version patch
   displayName: 'versioning'
 
