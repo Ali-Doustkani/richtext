@@ -10,23 +10,23 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-# - task: NodeTool@0
-#   inputs:
-#     versionSpec: '10.x'
-#   displayName: 'Install Node.js'
+- task: NodeTool@0
+  inputs:
+    versionSpec: '10.x'
+  displayName: 'Install Node.js'
   
-# - script: npm install
-#   displayName: 'installing dependencies'
+- script: npm install
+  displayName: 'installing dependencies'
 
-- pwsh: |
+- script: |
     git checkout master
-
+    git commit -a -m "clean commit"
+    git push 
+    
 #git config user.name "Ali"
 #git config user.email "ali.doostkany@gmail.com"
 #Add-Content "$HOME\.git-credentials" "https://Ali-Doustkani:rylaH@scorpions@1368@github.com/Ali-Doustkani/richtext.git"
 #
-#git push 
-#git commit -a -m "clean commit"
 # npm version $(Version)
   displayName: 'versioning'
 
