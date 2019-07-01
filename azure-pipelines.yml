@@ -19,12 +19,12 @@ steps:
 #   displayName: 'installing dependencies'
 
 - pwsh: |
-    git pull 
+    git checkout master
 
 #git config user.name "Ali"
 #git config user.email "ali.doostkany@gmail.com"
 #Add-Content "$HOME\.git-credentials" "https://Ali-Doustkani:rylaH@scorpions@1368@github.com/Ali-Doustkani/richtext.git"
-#git checkout master
+#
 #git push 
 #git commit -a -m "clean commit"
 # npm version $(Version)
