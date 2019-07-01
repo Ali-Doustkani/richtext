@@ -20,10 +20,10 @@ steps:
 
 - script: |
     git checkout master
-    git commit -a -m "clean commit"
     git config user.name "Ali"
     git config user.email "ali.doostkany@gmail.com"
-    git push 
+    git commit -a -m "clean commit"
+    git push https://ca253b27d790d03153328fd7508639a14845f94e@github.com/Ali-Doustkani/richtext.git
     
 #Add-Content "$HOME\.git-credentials" "https://Ali-Doustkani:rylaH@scorpions@1368@github.com/Ali-Doustkani/richtext.git"
 #
