@@ -25,7 +25,7 @@ steps:
     npm version patch
   displayName: 'versioning'
 
-- script: npm tests
+- script: npm test
   displayName: 'unit testing'
 
 - script: npm run test:integration
