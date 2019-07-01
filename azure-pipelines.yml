@@ -30,8 +30,20 @@ steps:
 - script: npm run build
   displayName: 'Building richtext.min.js'
 
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: './dist'
+    Contents: 'richtext.min.js'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    CleanTargetFolder: true
+
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'
     publishLocation: 'Container'
+
+- task: PublishPipelineArtifact@1
+  inputs:
+    targetPath: '$(Pipeline.Workspace)'
+    artifact: 'theBuildArtifact'
