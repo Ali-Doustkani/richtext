@@ -19,8 +19,8 @@ steps:
 #   displayName: 'installing dependencies'
 
 - checkout: self
-  persistCredentials: true
-  
+#  persistCredentials: true
+
 - script: |
     git checkout master
     git config user.name "Ali"
