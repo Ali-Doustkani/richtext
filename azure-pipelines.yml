@@ -21,10 +21,10 @@ steps:
 - script: |
     git checkout master
     git commit -a -m "clean commit"
+    git config user.name "Ali"
+    git config user.email "ali.doostkany@gmail.com"
     git push 
     
-#git config user.name "Ali"
-#git config user.email "ali.doostkany@gmail.com"
 #Add-Content "$HOME\.git-credentials" "https://Ali-Doustkani:rylaH@scorpions@1368@github.com/Ali-Doustkani/richtext.git"
 #
 # npm version $(Version)
