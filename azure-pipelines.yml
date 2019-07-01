@@ -18,12 +18,15 @@ steps:
 # - script: npm install
 #   displayName: 'installing dependencies'
 
-- script: |
+- pwsh: |
+    git checkout master
+    git config --global credential.helper store
     git config user.email "ali.doostkany@gmail.com"
     git config user.name "Ali Doustkani"
-    git checkout master
+    Add-Content "$HOME\.git-credentials" "https://a3a5e0f4070f4a8ad839d982d6bbdac992e7de90:x-oauth-basic@github.com/Ali-Doustkani/richtext.git"
     git commit -a -m "clean commit"
-    npm version $(Version)
+    git push
+# npm version $(Version)
   displayName: 'versioning'
 
 # - script: npm test
@@ -35,10 +38,7 @@ steps:
 # - script: npm run build
 #   displayName: 'bundling richtext.min.js'
 
-- bash: |
-    git branch -a
-    git push https://a3a5e0f4070f4a8ad839d982d6bbdac992e7de90@github.com/Ali-Doustkani/richtext.git
-  displayName: 'git push'
+ 
 
 - task: CopyFiles@2
   inputs:
