@@ -10,10 +10,10 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '10.x'
-  displayName: 'Install Node.js'
+# - task: NodeTool@0
+#   inputs:
+#     versionSpec: '10.x'
+#   displayName: 'Install Node.js'
   
 # - script: npm install
 #   displayName: 'installing dependencies'
@@ -36,7 +36,7 @@ steps:
 #   displayName: 'bundling richtext.min.js'
 
 - bash: |
-    curl -H 'Authorization: token a3a5e0f4070f4a8ad839d982d6bbdac992e7de90'
+    git remote
     git branch -a
     git push
   displayName: 'git push'
