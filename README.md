@@ -1,6 +1,7 @@
 [![Build Status](https://alidoustkani.visualstudio.com/Richtext/_apis/build/status/CI%20Build?branchName=master)](https://alidoustkani.visualstudio.com/Richtext/_build/latest?definitionId=7&branchName=master)
 [![Cypress.io tests](https://img.shields.io/badge/cypress.io-tests-green.svg?style=flat-square)](https://cypress.io)
 [![jest](https://jestjs.io/img/jest-badge.svg)](https://github.com/facebook/jest)
+[![npm version](https://badge.fury.io/js/%40alidoustkani%2Frichtext.svg)](https://badge.fury.io/js/%40alidoustkani%2Frichtext)
 
 # Story 🎉💻
 Well, I know there are lot's of powerful **richtext** editors out in the wild! But I couldn't skip the fun parts, so I created one beacuase I needed something for my blog. This editor works based on contenteditable but I have avoided to use execCommand. You can check out the demo [here](https://richtext.alidoustkani.com).
