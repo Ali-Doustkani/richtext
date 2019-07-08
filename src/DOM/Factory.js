@@ -5,9 +5,10 @@ const createNewEditor = decor =>
     .setAttributeFrom(decor)
     .editable()
 
-const createNewImage = source =>
+const createNewImage = (source, filename) =>
   el('img')
     .setAttribute('src', source)
+    .setAttribute('data-filename', filename)
     .style({
       'max-width': '100%'
     })

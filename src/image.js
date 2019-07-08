@@ -14,7 +14,7 @@ function importImage(richtext, editor, decors) {
     reader.addEventListener(
       'load',
       () => {
-        const img = createNewImage(reader.result)
+        const img = createNewImage(reader.result, file.name)
         let figure
         if (richtext.isParentOf(editor) && editor.isNot('figcaption')) {
           const renderModel = breakAt(decors, editor)
