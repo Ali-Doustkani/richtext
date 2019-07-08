@@ -1,6 +1,8 @@
+import 'jest-dom/extend-expect'
 import * as Editor from './../editor'
 import { relativeRange } from '../Ranging/RangeComputer'
 import { el } from '../DOM/Query'
+import { getByText, fireEvent } from '@testing-library/dom'
 
 jest.mock('../Ranging/RangeComputer')
 window.getSelection = () => ({
@@ -299,5 +301,19 @@ describe('making children editable', () => {
     expect(richtext.element.innerHTML).toBe(
       '<pre contenteditable="true">CODE</pre>'
     )
+  })
+
+  it('hide/show remove button on <figure> mouse/out', () => {
+    richtext.element.innerHTML =
+      '<figure><img><button style="display: none">Remove</button></figure>'
+    Editor.makeEditable(richtext)
+    const button = getByText(richtext.element, 'Remove')
+    expect(button).not.toBeVisible()
+
+    fireEvent.mouseEnter(richtext.firstChild().element)
+    expect(button).toBeVisible()
+
+    fireEvent.mouseLeave(richtext.firstChild().element)
+    expect(button).not.toBeVisible()
   })
 })

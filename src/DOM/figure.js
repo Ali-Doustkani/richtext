@@ -46,4 +46,9 @@ const hideDelete = e =>
     .child(1)
     .style({ display: 'none' })
 
-export { createFigure }
+const setEventHandlers = figure =>
+  figure
+    .addListener('mouseenter', showDelete)
+    .addListener('mouseleave', hideDelete)
+
+export { createFigure, setEventHandlers }

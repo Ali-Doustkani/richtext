@@ -1,4 +1,5 @@
 import { absoluteRange, relativeRange, Range } from './Ranging'
+import { setEventHandlers } from './DOM/figure'
 
 function canBackspace(editor) {
   const { start, end } = relRange(editor)
@@ -97,6 +98,7 @@ function makeEditable(richtext) {
     if (child.is('ol') || child.is('ul')) {
       child.forChildren(x => x.editable())
     } else if (child.is('figure')) {
+      setEventHandlers(child)
       child.forChildren(x => {
         if (x.is('figcaption')) {
           x.editable()
