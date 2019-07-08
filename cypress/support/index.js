@@ -87,11 +87,13 @@ Cypress.Commands.add('mockImageDialog', () => {
     let changeFunc
     document.createElement = elName => {
       if (elName === 'input') {
+        const file = new Blob()
+        file.name = 'image.jpeg'
         return {
           setAttribute: () => {},
           addEventListener: (name, fn) => (changeFunc = fn),
           click: () => changeFunc(),
-          files: [new Blob()]
+          files: [file]
         }
       }
       return original.call(document, elName)

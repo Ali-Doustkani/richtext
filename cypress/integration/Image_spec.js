@@ -10,7 +10,7 @@ it('add and remove images', () => {
     `
   <p contenteditable="true">First</p>
   <figure>
-    <img src="data:">
+    <img src="data:" data-filename="image.jpeg">
     <button>Remove</button>
     <figcaption contenteditable="true"></figcaption>
   </figure>
