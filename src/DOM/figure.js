@@ -2,6 +2,7 @@ import { el } from './Query'
 import { focusPrev } from './../editor'
 
 const remove = e => {
+  e.preventDefault()
   const btn = el(e.target)
   focusPrev(btn.parent())
   btn
