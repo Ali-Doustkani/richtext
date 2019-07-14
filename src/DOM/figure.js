@@ -2,7 +2,6 @@ import { el } from './Query'
 import { focusPrev } from './../editor'
 
 const remove = e => {
-  e.preventDefault()
   const btn = el(e.target)
   focusPrev(btn.parent())
   btn
@@ -51,5 +50,7 @@ const setEventHandlers = figure =>
   figure
     .addListener('mouseenter', showDelete)
     .addListener('mouseleave', hideDelete)
+    .child(1)
+    .addListener('click', remove)
 
 export { createFigure, setEventHandlers }
