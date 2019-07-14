@@ -4,6 +4,10 @@ import { el } from './DOM'
 function mouseHandler(richtext) {
   return function(e) {
     const target = el(e.target)
+    if(target.is('button')){
+      e.preventDefault()
+    }
+    
     if (target.is(richtext)) {
       richtext.lastChild().focus()
       return
