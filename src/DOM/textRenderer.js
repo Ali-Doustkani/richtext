@@ -10,7 +10,8 @@ const renderText = params => {
       [shouldChangeToSingle, changeToSingle],
       [shouldChangeToMultiple, changeToMultiple],
       [shouldChangeListType, changeListType],
-      [shouldModifyListItem, modifyListItem]
+      [shouldModifyListItem, modifyListItem],
+      [shouldChangeFigcaption, changeFigcaption]
     ]),
     addElements
   )(params)
@@ -174,6 +175,17 @@ const modifyListItem = params => {
   const element = params.elements[0]
   listItem.parent().insertAfter(listItem, element)
   listItem.remove()
+}
+
+const shouldChangeFigcaption = ({ editors, elements }) =>
+  editors.length === 1 &&
+  editors[0].is('figcaption') &&
+  elements.length === 1 &&
+  elements[0].is('figcaption')
+
+const changeFigcaption = ({ editors, elements }) => {
+  elements[0].appendTo(editors[0].parent())
+  editors[0].remove()
 }
 
 const addElements = params =>

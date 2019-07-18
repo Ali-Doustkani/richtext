@@ -437,3 +437,43 @@ describe('isParentOf', () => {
     expect(parent.isParentOf(parent)).toBe(false)
   })
 })
+
+describe('writing text', () => {
+  let wrapper
+  beforeEach(() => (wrapper = el('p').append('Hello')))
+
+  it('at beginning', () => {
+    wrapper.writeText('World', { start: 0, end: 0 })
+    expect(wrapper.element.innerHTML).toBe('WorldHello')
+  })
+
+  it('at end', () => {
+    wrapper.writeText('World', { start: 5, end: 5 })
+    expect(wrapper.element.innerHTML).toBe('HelloWorld')
+  })
+
+  it('at middle', () => {
+    wrapper.writeText('World', { start: 4, end: 5 })
+    expect(wrapper.element.innerHTML).toBe('HellWorld')
+  })
+
+  it('without range', () => {
+    wrapper.writeText('World')
+    expect(wrapper.element.innerHTML).toBe('Hello')
+  })
+
+  it('start > end', () => {
+    wrapper.writeText('World', { start: 10, end: 0 })
+    expect(wrapper.element.innerHTML).toBe('Hello')
+  })
+
+  it('start out of range', () => {
+    wrapper.writeText('World', { start: 10, end: 11 })
+    expect(wrapper.element.innerHTML).toBe('Hello')
+  })
+
+  it('end out of range', () => {
+    wrapper.writeText('World', { start: 0, end: 10 })
+    expect(wrapper.element.innerHTML).toBe('Hello')
+  })
+})

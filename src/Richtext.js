@@ -52,7 +52,7 @@ function create(element, options) {
   }
 
   const ifReady = func => {
-    if (Editor.isNotEditor(richtext, editor)) {
+    if (Editor.isNotEditor(richtext, editor) && editor.isNot('figcaption')) {
       return
     }
     const range = relativeRange(editor)

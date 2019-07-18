@@ -11,14 +11,23 @@ function el(element) {
   throw new Error('Unsupported type to wrap')
 }
 
+/**
+ * get the active element of document
+ */
 el.active = function() {
   return el(document.activeElement)
 }
 
+/**
+ * create a new Query object with the same tag as the 'queryElement'
+ */
 el.withTag = function(queryElement) {
   return el(queryElement.element.tagName)
 }
 
+/**
+ * return true if 'queryElement1' and 'queryElement2' have the same tag
+ */
 el.hasTheSameTag = function(queryElement1, queryElement2) {
   if (
     queryElement1 &&
@@ -31,6 +40,9 @@ el.hasTheSameTag = function(queryElement1, queryElement2) {
   return false
 }
 
+/**
+ * return the most close parent that has the tag of 'tagName'
+ */
 el.parentOf = function(queryElement, tagName) {
   while (queryElement && queryElement.isNot(tagName)) {
     queryElement = queryElement.parent()
@@ -38,10 +50,18 @@ el.parentOf = function(queryElement, tagName) {
   return queryElement
 }
 
+/**
+ * API for accessing DOM
+ */
 class QueryElement {
   constructor(element) {
     this.element = element
   }
+
+  /**
+   * append 'string', 'array', or other 'Query' element as the last child(ren).
+   * @param {any} child the child to append
+   */
   append(child) {
     if (!child) {
       return this
@@ -60,6 +80,36 @@ class QueryElement {
       this.element.appendChild(child.element)
     }
 
+    return this
+  }
+
+  /**
+   * Write the text at a specific position.
+   * @param {String} text the text to write.
+   * @param {Range} range the position to write to.
+   */
+  writeText(text, range) {
+    if (!range || range.start > range.end) {
+      return this
+    }
+
+    const textChild = this.element.firstChild
+
+    if (!textChild || textChild.nodeType !== Node.TEXT_NODE) {
+      return this
+    }
+
+    if (
+      range.start > textChild.data.length ||
+      range.end > textChild.data.length
+    ) {
+      return this
+    }
+
+    textChild.data =
+      textChild.data.substring(0, range.start) +
+      text +
+      textChild.data.substring(range.end, textChild.data.length)
     return this
   }
 

@@ -507,3 +507,11 @@ describe('lists', () => {
     })
   })
 })
+
+describe('figure captions', () => {
+  it('simple caption style', () => {
+    editors = el('figcaption').appendTo(richtext)
+    render([el('figcaption').append(el('strong').val('hey'))])
+    expectHtml('<figcaption><strong>hey</strong></figcaption>')
+  })
+})
