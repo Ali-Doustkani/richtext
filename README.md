@@ -56,6 +56,10 @@ There are two kinds of methods in richtext: `style()` and `apply()`.
   }
 }
 ```
+### Funcionalities
+* **{Ctrl}ENTER**: creates the next `<p>` editor and goes to it.
+* **{Ctrl}SPACE**: appends a RLM to the current position.
+
 ### Options
 * **defaultLink**: default text in the link popup.
 * **staySelected**: for `true` value, the selection will remain the same after applying styles.
