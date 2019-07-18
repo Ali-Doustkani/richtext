@@ -53,6 +53,10 @@ function addDefaultDecors(decors) {
     tag: 'a',
     href: ''
   }
+  decors.caption = {
+    parent: true,
+    tag: 'figcaption'
+  }
 }
 
 function checkDecors(decors) {
