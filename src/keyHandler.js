@@ -3,6 +3,9 @@ import { relativeRange } from './Ranging'
 import { breakAt, glue } from './Stylist'
 import * as Editor from './editor'
 
+const RLM = String.fromCharCode(8207)
+const SPACE = String.fromCharCode(160)
+
 function keyHandler(richtext, decors) {
   return {
     keyDown: e => {
@@ -23,6 +26,11 @@ function keyHandler(richtext, decors) {
         const editor = el.active()
         removeBr(editor)
         removeCommands(editor)
+      } else if (e.key === ' ' && e.ctrlKey) {
+        const editor = el.active()
+        const range = relativeRange(editor)
+        editor.writeText(RLM + SPACE, range)
+        Editor.setCursor(editor, range.append(2))
       }
     }
   }

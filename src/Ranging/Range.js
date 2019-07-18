@@ -26,6 +26,10 @@ class Range {
   toEnd() {
     return new Range(this.end, this.end)
   }
+
+  append(num) {
+    return new Range(this.start + num, this.end + num)
+  }
 }
 
 Range.empty = function() {
