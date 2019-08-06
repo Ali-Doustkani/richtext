@@ -93,19 +93,19 @@ function isNotEditor(richtext, editor) {
   return editor.parent().isNot(richtext)
 }
 
-function makeEditable(richtext) {
+function makeEditable(richtext, isEditable) {
   richtext.forChildren(child => {
     if (child.is('ol') || child.is('ul')) {
-      child.forChildren(x => x.editable())
+      child.forChildren(x => x.editable(isEditable))
     } else if (child.is('figure')) {
       setEventHandlers(child)
       child.forChildren(x => {
         if (x.is('figcaption')) {
-          x.editable()
+          x.editable(isEditable)
         }
       })
     } else {
-      child.editable()
+      child.editable(isEditable)
     }
   })
 }

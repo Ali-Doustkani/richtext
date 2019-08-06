@@ -273,8 +273,12 @@ class QueryElement {
     return !this.is(type)
   }
 
-  editable() {
-    this.element.contentEditable = true
+  editable(value) {
+    if (value === undefined) {
+      this.element.contentEditable = true
+    } else {
+      this.element.contentEditable = value
+    }
     return this
   }
 
@@ -357,6 +361,23 @@ class QueryElement {
       this.element.style[prop] = styles[prop]
     }
     return this
+  }
+
+  /**
+   * Add a class to class list
+   * @param {string} className the value added to the class attribute
+   */
+  addClassName(className) {
+    this.element.classList.add(className)
+    return this
+  }
+
+  /**
+   * Remove a class from the list
+   * @param {string} className the value removed from the class attribute
+   */
+  removeClassName(className) {
+    this.element.classList.remove(className)
   }
 
   focus() {

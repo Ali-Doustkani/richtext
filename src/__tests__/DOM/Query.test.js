@@ -203,6 +203,10 @@ describe('attributes', () => {
   it('set contentEditable', () => {
     expect(el('p').element.contentEditable).toBe(undefined)
     expect(el('p').editable().element.contentEditable).toBe(true)
+    expect(el('p').editable(true).element.contentEditable).toBe(true)
+
+    const paragraph = el('p').editable()
+    expect(paragraph.editable(false).element.contentEditable).toBe(false)
   })
 
   it('set attributes value', () => {
@@ -219,6 +223,33 @@ describe('attributes', () => {
         .setAttribute('data-id', '123')
         .getAttribute('data-id')
     ).toBe('123')
+  })
+
+  it('add class', () => {
+    const p = el('p')
+    p.addClassName('foo')
+    expect(p.element.classList.length).toBe(1)
+    expect(p.element.classList[0]).toEqual('foo')
+
+    p.addClassName('bar')
+    expect(p.element.classList.length).toBe(2)
+    expect(p.element.classList[0]).toBe('foo')
+    expect(p.element.classList[1]).toBe('bar')
+
+    p.addClassName('bar')
+    expect(p.element.classList.length).toBe(2)
+  })
+
+  it('remove class', () => {
+    const p = el('p')
+    p.addClassName('foo').addClassName('bar')
+
+    p.removeClassName('foo')
+    expect(p.element.classList.length).toBe(1)
+    expect(p.element.classList[0]).toBe('bar')
+
+    p.removeClassName('bar')
+    expect(p.element.classList.length).toBe(0)
   })
 })
 

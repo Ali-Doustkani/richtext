@@ -106,6 +106,9 @@ function setOptions(from, to) {
   if (from.defaultLink !== undefined) {
     to.defaultLink = from.defaultLink
   }
+  if (from.disabled !== undefined) {
+    to.disabled = from.disabled
+  }
 }
 
 export { checkEditor, setOptions, checkOptions }

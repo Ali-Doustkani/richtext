@@ -41,6 +41,9 @@
       :focus {
         outline: none;
       }
+      .disabled {
+        background: lightgrey;
+      }
     </style>
   </head>
   <body>
@@ -60,6 +63,10 @@
     <label>
       Stay Selected
       <input type="checkbox" id="staySelected" />
+    </label>
+    <label>
+      Disabled
+      <input type="checkbox" id="disabled" />
     </label>
     <article id="richtext" style="overflow: auto; direction: ltr;"></article>
     <script src="main.js"></script>

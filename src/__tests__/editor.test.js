@@ -243,6 +243,13 @@ describe('making children editable', () => {
     configurable: true,
     set: function(val) {
       this.setAttribute('contenteditable', val)
+    },
+    get: function() {
+      const value = this.getAttribute('contenteditable')
+      if (value === null || value === 'false') {
+        return false
+      }
+      return true
     }
   })
 
@@ -315,5 +322,27 @@ describe('making children editable', () => {
 
     fireEvent.mouseLeave(richtext.firstChild().element)
     expect(button).not.toBeVisible()
+  })
+
+  it('making children not editable', () => {
+    richtext.element.innerHTML =
+      '<p contenteditable><strong>T1</strong></p>' +
+      '<ul><li contenteditable>T2</li><li contenteditable>T3</li></ul>' +
+      '<ol><li contenteditable>T3</li></ol>' +
+      '<figure><img/><figcaption contenteditable>T4</figcaption></figure>'
+
+    expect(richtext.firstChild().element.contentEditable).toBe(true)
+    expect(richtext.child(1).firstChild().element.contentEditable).toBe(true)
+    expect(richtext.child(1).child(1).element.contentEditable).toBe(true)
+    expect(richtext.child(2).firstChild().element.contentEditable).toBe(true)
+    expect(richtext.child(3).child(1).element.contentEditable).toBe(true)
+
+    Editor.makeEditable(richtext, false)
+
+    expect(richtext.firstChild().element.contentEditable).toBe(false)
+    expect(richtext.child(1).firstChild().element.contentEditable).toBe(false)
+    expect(richtext.child(1).child(1).element.contentEditable).toBe(false)
+    expect(richtext.child(2).firstChild().element.contentEditable).toBe(false)
+    expect(richtext.child(3).child(1).element.contentEditable).toBe(false)
   })
 })

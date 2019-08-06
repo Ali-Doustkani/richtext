@@ -27,9 +27,11 @@ function wireClick(id, func) {
   document.getElementById(id).onclick = () => func()
 }
 
-document.getElementById('staySelected').onchange = e => {
+document.getElementById('staySelected').onchange = e =>
   richtext.setOptions({ staySelected: e.target.checked })
-}
+
+document.getElementById('disabled').onchange = e =>
+  richtext.setOptions({ disabled: e.target.checked })
 
 wireClick('bold', () => richtext.style('bold'))
 wireClick('italic', () => richtext.style('italic'))

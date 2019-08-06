@@ -64,9 +64,19 @@ function create(element, options) {
 
   return {
     /**
-     * Sets options: defaultLink, staySelected.
+     * Sets options: defaultLink, staySelected, disabled.
      */
-    setOptions: value => setOptions(value, options),
+    setOptions: value => {
+      setOptions(value, options)
+      if (typeof value.disabled === 'boolean') {
+        Editor.makeEditable(richtext, !value.disabled)
+        if (value.disabled) {
+          richtext.addClassName('disabled')
+        } else {
+          richtext.removeClassName('disabled')
+        }
+      }
+    },
     /**
      * Sets focus of Richtext.
      */
@@ -80,7 +90,7 @@ function create(element, options) {
     setInnerHTML: html => {
       if (html) {
         element.innerHTML = html
-        Editor.makeEditable(richtext)
+        Editor.makeEditable(richtext, true)
       }
     },
     /**
