@@ -13,9 +13,6 @@ function checkEditor(richtext) {
     const p = el('p').editable()
     el(richtext).append(p)
   }
-  if (richtext.firstChild.nodeName !== 'P') {
-    throw new Error('only <p> element is valid inside richtext')
-  }
 }
 
 function checkOptions(options) {
