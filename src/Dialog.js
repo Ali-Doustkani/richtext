@@ -79,7 +79,7 @@ function create(options) {
         .append(deleteButton)
         .append(cancelButton)
         .style({
-          top: rect.top + rect.height + 3 + 'px',
+          top: rect.top + window.pageYOffset + rect.height + 3 + 'px',
           left: rect.left + 'px'
         })
     )
